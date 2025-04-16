@@ -1,0 +1,27 @@
+<!-- index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="sections-grid">
+    <!-- Rankings Section -->
+    <div class="section-card">
+        <h2>Rankings</h2>
+        <p>Esplora le graduatorie nazionali con tutti i risultati dal 2005 in poi</p>
+        <a href="{{ url_for('rankings') }}" class="button">Vai alla pagina</a>
+    </div>
+
+    <!-- Statistics Section (placeholder) -->
+    <div class="section-card">
+        <h2>Statistiche</h2>
+        <p>Prossimamente...</p>
+        <button class="button" disabled>Prossimamente</button>
+    </div>
+
+    <!-- Additional Section (placeholder) -->
+    <div class="section-card">
+        <h2>???</h2>
+        <p>...</p>
+        <button class="button" disabled>Prossimamente</button>
+    </div>
+</div>
+{% endblock %}

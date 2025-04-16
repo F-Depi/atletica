@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="disciplineInfo" 
+     data-discipline="{{ discipline }}"
+     data-classifica-type="{{ discipline_info.classifica }}"
+     style="display: none;">
+</div>
+
+<div id="filtersContainer" class="filters">
+    <form id="filterForm">
+        <!-- Discipline filter -->
+        <select name="discipline" class="filter-select">
+            {% for disc, info in disciplines.items() %}
+            <option value="{{ disc }}" {% if discipline == disc %}selected{% endif %}>
+                {{ disc }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <!-- Indoor/Outdoor filter -->
+        <select name="ambiente" class="filter-select">
+            <option value="ALL" {% if ambiente == 'ALL' %}selected{% endif %}>Tutti (I/O)</option>
+            <option value="I" {% if ambiente == 'I' %}selected{% endif %}>Indoor</option>
+            <option value="P" {% if ambiente == 'P' %}selected{% endif %}>Outdoor</option>
+        </select>
+
+        <!-- Year filter -->
+        <select name="year" class="filter-select">
+            <option value="">Tutti gli anni</option>
+            {% for y in range(2025, 2004, -1) %}
+            <option value="{{ y }}" {% if year == y|string %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Gender filter -->
+        <select name="gender" class="filter-select">
+            <option value="">Misto</option>
+            <option value="M" {% if gender == 'M' %}selected{% endif %}>Uomini</option>
+            <option value="F" {% if gender == 'F' %}selected{% endif %}>Donne</option>
+        </select>
+
+        <!-- Category filter -->
+        <select name="category" class="filter-select">
+            <option value="">Tutte le categorie</option>
+            {% for cat in categories %}
+            <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>
+            {% if cat.startswith('U') %}
+            U{{ cat[1:] }}
+            {% elif cat == 'SEN' %}
+            Senior
+            {% elif cat.startswith('M') %}
+            M{{ cat[1:] }}
+            {% else %}
+            {{ cat }}
+            {% endif %}
+            </option>
+            {% endfor %}
+        </select>
+
+        <!-- Limit filter -->
+        <select name="limit" class="filter-select">
+            <option value="50" {% if limit == 50 %}selected{% endif %}>50 risultati</option>
+            <option value="100" {% if limit == 100 %}selected{% endif %}>100 risultati</option>
+            <option value="200" {% if limit == 200 %}selected{% endif %}>200 risultati</option>
+            <option value="500" {% if limit == 500 %}selected{% endif %}>500 risultati</option>
+        </select>
+
+        <label class="toggle-switch">
+            <input type="checkbox" name="allResults" value="true" {% if show_all %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Tutti i risultati</span>
+        </label>
+
+        {% if show_wind %}
+        <label class="wind-checkbox">
+            <input type="checkbox" name="legal_wind" 
+            {% if legal_wind_only or request.args.get('legal_wind') is none %}checked{% endif %}>
+            Esclusi ventosi
+        </label>
+        {% endif %}
+
+        <button type="submit" class="apply-filters-btn">Applica filtri</button>
+    </form>
+</div>
+
+<div class="stats-container" id="statsContainer">
+    <!-- Stats will be loaded here -->
+</div>
+
+<div class="rankings-table-container">
+<table class="rankings-table">
+    <thead>
+        <tr>
+            <th>Posizione</th>
+            <th>Risultato</th>
+            {% if show_wind %}
+            <th>Vento</th>
+            {% endif %}
+            {% if ambiente == "ALL" and not show_wind%}
+            <th>Ambiente</th>
+            {% endif %}
+            <th>Atleta</th>
+            <th>Anno</th>
+            <th>Categoria</th>
+            <th>Società</th>
+            <th>Luogo</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.position }}</td>
+            <td>{{ format_time(result.prestazione, discipline_info) }}</td>
+            {% if show_wind %}
+            <td>{{ result.vento if result.ambiente == 'P' else '(Indoor)' }}</td>
+            {% endif %}
+            {% if ambiente == "ALL" and not show_wind %}
+            <td>{{ 'Indoor' if result.ambiente == 'I' else 'Outdoor' }}</td>
+            {% endif %}
+            <td>{{ result.atleta }}</td>
+            <td>{{ result.anno }}</td>
+            <td>{{ result.categoria }}</td>
+            <td>{{ result.società }}</td>
+            <td>{{ result.luogo }}</td>
+            <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+
+<!-- Pagination section in rankings.html -->
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if current_page > 1 %}
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">First</a>
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=current_page-1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Precedente</a>
+    {% endif %}
+
+    {% set start = [1, current_page - 2] | max %}
+    {% set end = [total_pages, current_page + 2] | min %}
+
+    {% if start > 1 %}
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">1</a>
+    {% if start > 2 %}
+    <span class="page-ellipsis">...</span>
+    {% endif %}
+    {% endif %}
+
+    {% for p in range(start, end + 1) %}
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=p, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+
+    {% if end < total_pages %}
+    {% if end < total_pages - 1 %}
+    <span class="page-ellipsis">...</span>
+    {% endif %}
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">{{ total_pages }}</a>
+    {% endif %}
+
+    {% if current_page < total_pages %}
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=current_page+1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Successiva</a>
+    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Ultima</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Results count -->
+<div class="results-info">
+    Da {{ (current_page - 1) * limit + 1 }} a {{ min(current_page * limit, total_count) }} 
+    di {{ total_count }} risultati totali
+</div>
+
+<!-- Include the external JavaScript file -->
+<script src="{{ url_for('static', filename='js/rankings.js') }}"></script>
+
+{% endblock %}
