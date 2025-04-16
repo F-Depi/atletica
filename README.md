@@ -1,22 +1,22 @@
 # Initialization
-The database was generated with
-```
-python scripts/db_init.py
-```
-The first time the website is run with:
+Il database dei dati è create e aggiornato da 
+[database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana)
+
+
+La prima volta che si runna il sito:
 
 ```
-export FLASK_APP=app.py                                                                                                                                                                                 <<<
+export FLASK_APP=app.py                                                                                                                                                     <<<
 export FLASK_ENV=development
 flask run
 ```
 
-Then:
+Poi:
 ```
 flask run
 ```
 
-## Database structure
+## Struttura del database postgreSQL
  - id SERIAL PRIMARY KEY,
  - prestazione FLOAT,
  - vento VARCHAR(10),
@@ -25,7 +25,7 @@ flask run
  - atleta VARCHAR(100),
  - anno VARCHAR(4),
  - categoria VARCHAR(20),
- - societa VARCHAR(100),
+ - società VARCHAR(100),
  - posizione VARCHAR(10),
  - luogo VARCHAR(100),
  - data DATE,
@@ -34,6 +34,9 @@ flask run
  - disciplina VARCHAR(50),
  - ambiente CHAR(1)
 
+
+_Un grazie all'IA, che dopo 2 anni che volevo fare un sito, ma non avevo il
+tempo di imparare mi ha permesso di imbastire questo progetto_
 
 ## Pompt (Sonnet 3.5):
 I'm use fedora linux and I want to selfhost a website.
