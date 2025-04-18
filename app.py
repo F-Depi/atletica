@@ -113,7 +113,9 @@ def rankings():
                     luogo, 
                     data, 
                     vento,
-                    ambiente
+                    ambiente,
+                    link_atleta,
+                    link_società
                 FROM results 
                 WHERE {where_clause}
             )
@@ -136,7 +138,9 @@ def rankings():
                     luogo, 
                     data, 
                     vento,
-                    ambiente
+                    ambiente,
+                    link_atleta,
+                    link_società
                 FROM results 
                 WHERE {where_clause}
                 ORDER BY atleta, prestazione {sort_direction}, data DESC
