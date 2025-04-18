@@ -32,7 +32,7 @@ function loadStats(discipline, queryParams) {
             const isBestTime = classificaType === 'tempo';
             const statsHtml = `
                 <div class="stat-box">
-                    <h3>${isBestTime ? 'Migliore' : 'Best'}</h3>
+                    <h3>Migliore</h3>
                     <p>${formatTime(data.best, classificaType)}</p>
                 </div>
                 <div class="stat-box">
@@ -131,4 +131,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load stats when page first loads
     loadCurrentStats();
+});
+
+
+// To jump to a specific page of the rankings
+function goToPage() {
+    const input = document.getElementById('pageInput');
+    const pagination = document.querySelector('.pagination');
+    const totalPages = parseInt(pagination.dataset.totalPages);
+    
+    const page = parseInt(input.value);
+    if (page && page >= 1 && page <= totalPages) {
+        // Get current URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        // Update the page parameter
+        urlParams.set('page', page);
+        // Construct new URL
+        window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+    }
+}
+
+// Add event listener when the document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const pageInput = document.getElementById('pageInput');
+    if (pageInput) {
+        pageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                goToPage();
+            }
+        });
+    }
 });

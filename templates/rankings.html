@@ -91,7 +91,7 @@
 <table class="rankings-table">
     <thead>
         <tr>
-            <th>Posizione</th>
+            <th></th>
             <th>Risultato</th>
             {% if show_wind %}
             <th>Vento</th>
@@ -110,7 +110,7 @@
     <tbody>
         {% for result in results %}
         <tr>
-            <td>{{ result.position }}</td>
+            <td><b>{{ result.position }}</b></td>
             <td>{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}</td>
             {% if show_wind %}
             <td>{{ result.vento if result.ambiente == 'P' else '(Indoor)' }}</td>
@@ -133,12 +133,7 @@
 
 <!-- Pagination section in rankings.html -->
 {% if total_pages > 1 %}
-<div class="pagination">
-    {% if current_page > 1 %}
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">First</a>
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=current_page-1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Precedente</a>
-    {% endif %}
-
+<div class="pagination" data-total-pages="{{ total_pages }}">
     {% set start = [1, current_page - 2] | max %}
     {% set end = [total_pages, current_page + 2] | min %}
 
@@ -160,18 +155,19 @@
     <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">{{ total_pages }}</a>
     {% endif %}
 
-    {% if current_page < total_pages %}
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=current_page+1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Successiva</a>
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">Ultima</a>
-    {% endif %}
+    <div class="page-input-container">
+        <input type="number" 
+               id="pageInput" 
+               min="1" 
+               max="{{ total_pages }}" 
+               class="page-input" 
+               placeholder="Pagina">
+        <button onclick="goToPage()" class="page-go-btn">Vai</button>
+    </div>
+
 </div>
 {% endif %}
 
-<!-- Results count -->
-<div class="results-info">
-    Da {{ (current_page - 1) * limit + 1 }} a {{ min(current_page * limit, total_count) }} 
-    di {{ total_count }} risultati totali
-</div>
 
 <!-- Include the external JavaScript file -->
 <script src="{{ url_for('static', filename='js/rankings.js') }}"></script>

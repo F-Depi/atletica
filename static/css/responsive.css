@@ -1,0 +1,76 @@
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .rankings-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .stats-container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filters form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .apply-filters-btn {
+        margin: 12px 0 0 0;
+        width: 100%;
+    }
+    
+    .nav-links {
+        gap: 10px;
+    }
+
+    .theme-toggle {
+        margin-left: 5px;
+    }
+    
+    .toggle-switch {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters {
+        position: static;
+        margin: 10px 0;
+        padding: 10px;
+    }
+
+    .filters form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+}
+
+@media print {
+    header, footer, .filters, .pagination, .theme-toggle {
+        display: none;
+    }
+    
+    body {
+        background-color: white;
+        color: black;
+    }
+    
+    .rankings-table {
+        width: 100%;
+        box-shadow: none;
+    }
+    
+    .rankings-table th, .rankings-table td {
+        border: 1px solid #ddd;
+    }
+}

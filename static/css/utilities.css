@@ -1,0 +1,54 @@
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-color);
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Error and Success Messages */
+.error-message {
+    background-color: #fce8e6;
+    color: var(--error-color);
+    padding: 16px;
+    border-radius: 8px;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.success-message {
+    background-color: #e6f4ea;
+    color: var(--success-color);
+    padding: 16px;
+    border-radius: 8px;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+[data-theme="dark"] .error-message {
+    background-color: rgba(242, 139, 130, 0.2);
+}
+
+[data-theme="dark"] .success-message {
+    background-color: rgba(129, 201, 149, 0.2);
+}

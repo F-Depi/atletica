@@ -1,0 +1,44 @@
+.rankings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 24px;
+}
+
+.rankings-table th,
+.rankings-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rankings-table th {
+    background-color: var(--table-header-background);
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.rankings-table td {
+    color: var(--text-color);
+}
+
+.rankings-table tr:hover {
+    background-color: var(--background-color-over);
+}
+
+.rankings-table td a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.rankings-table td a:visited {
+    color: var(--text-color);
+}
+
+.rankings-table td a:hover {
+    text-decoration: underline;
+    color: var(--text-color);
+}

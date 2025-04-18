@@ -1,0 +1,33 @@
+/* Theme variables - Light theme (default) */
+:root {
+    --primary-color: #1a73e8;
+    --secondary-color: #4285f4;
+    --text-color: #202124;
+    --background-color: #f8f9fa;
+    --border-color: #dadce0;
+    --error-color: #d93025;
+    --success-color: #188038;
+    --card-background: white;
+    --table-header-background: #f8f9fa;
+    --table-row-background: white;
+    --pagination-active-bg: #1a73e8;
+    --pagination-active-text: white;
+    --background-color-over: rgba(26, 115, 232, 0.05);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --primary-color: #8ab4f8;
+    --secondary-color: #669df6;
+    --text-color: #e8eaed;
+    --background-color: #202124;
+    --border-color: #5f6368;
+    --error-color: #f28b82;
+    --success-color: #81c995;
+    --card-background: #303134;
+    --table-header-background: #3c4043;
+    --table-row-background: #303134;
+    --pagination-active-bg: #8ab4f8;
+    --pagination-active-text: #202124;
+    --background-color-over: rgba(138, 180, 248, 0.1);
+}
