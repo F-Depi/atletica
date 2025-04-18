@@ -111,7 +111,7 @@
         {% for result in results %}
         <tr>
             <td>{{ result.position }}</td>
-            <td>{{ format_time(result.prestazione, discipline_info) }}</td>
+            <td>{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}</td>
             {% if show_wind %}
             <td>{{ result.vento if result.ambiente == 'P' else '(Indoor)' }}</td>
             {% endif %}

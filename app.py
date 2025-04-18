@@ -59,9 +59,7 @@ def rankings():
     if legal_wind_only and show_wind:
         conditions.append("""(
             ambiente = 'I' OR
-            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0 OR
-            vento IS NULL OR
-            vento = ''
+            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
         )""")
 
     if gender:
@@ -107,6 +105,7 @@ def rankings():
             WITH base_results AS (
                 SELECT 
                     prestazione, 
+                    cronometraggio,
                     atleta, 
                     anno, 
                     categoria, 
@@ -129,6 +128,7 @@ def rankings():
             WITH ranked_athletes AS (
                 SELECT DISTINCT ON (atleta)
                     prestazione, 
+                    cronometraggio,
                     atleta, 
                     anno, 
                     categoria, 
@@ -229,9 +229,7 @@ def discipline_stats(discipline):
         query += """ 
         AND (
             ambiente = 'I' OR
-            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0 OR
-            vento IS NULL OR
-            vento = ''
+            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
         )
         """
 
@@ -266,15 +264,24 @@ def should_show_wind(discipline, ambiente):
     return True
 
 
-def format_time(seconds, discipline_info):
-    """Format time based on discipline type and duration"""
+def format_time(seconds, discipline_info, cronometraggio):
+    """Format time based on discipline type, duration and cronometraggio"""
+    tot_digits = 5
+    decimal_digits = 2
+
+    ## To manual timings 0.24s is added in prestazione for the rankings, but we
+    ## now want to display the original time with 1 decimal digit
+    if cronometraggio == 'm':
+        seconds -= 0.24
+        decimal_digits = 1
+        tot_digits = 4
     if discipline_info['classifica'] == 'tempo' and seconds < 10:
-        return f"{seconds:04.2f}"
+            return f"{seconds:0{tot_digits - 1}.{decimal_digits}f}"
     if discipline_info['classifica'] == 'tempo' and seconds >= 60:
         minutes = int(seconds // 60)
         remaining_seconds = seconds % 60
-        return f"{minutes}:{remaining_seconds:05.2f}"
-    return f"{seconds:05.2f}"
+        return f"{minutes}:{remaining_seconds:0{tot_digits}.{decimal_digits}f}"
+    return f"{seconds:0{tot_digits}.{decimal_digits}f}"
 
 
 # Category mapping dictionary
