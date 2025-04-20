@@ -1,0 +1,4 @@
+Manca il giavellotto 300gr per RF. cod G3
+Mancano i 60Hs 5H H60 per RX indoor. cod HN
+nel .json non ho messo i 200Hs ai ragazzi
+marcia 2000m ancora non c'è qui
