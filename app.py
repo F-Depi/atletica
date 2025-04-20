@@ -20,7 +20,12 @@ with open('data/dizionario_gare.json') as f:
 def index():
     return render_template('index.html', disciplines=DISCIPLINES)
 
-# Carichiamo le discipline in funzione della categoria
+## Invia tutte le discipline alla tab con tutti i filtri
+@app.route('/api/disciplines/all')
+def get_all_disciplines():
+    return jsonify(DISCIPLINES)
+
+## Carichiamo le discipline in funzione della categoria
 @app.route('/api/disciplines/<category>/<gender>')
 def get_disciplines(category, gender):
     try:
