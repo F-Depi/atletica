@@ -1,12 +1,111 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="disciplineInfo" 
-     data-discipline="{{ discipline }}"
-     data-classifica-type="{{ discipline_info.classifica }}"
-     style="display: none;">
+    data-discipline="{{ discipline }}"
+    data-classifica-type="{{ discipline_info.classifica }}"
+    style="display: none;">
 </div>
 
 <div id="filtersContainer" class="filters">
+    <!-- Tab selector -->
+    <div class="tabs">
+        <button class="tab-btn" data-tab="men">Uomini</button>
+        <button class="tab-btn" data-tab="women">Donne</button>
+        <button class="tab-btn" data-tab="advanced">Tutti i filtri e le gare</button>
+    </div>
+
+    <!-- Men tab content -->
+    <div id="menTab" class="tab-content">
+        <form id="menForm" class="filter-form">
+            <select name="category" class="filter-select" id="menCategorySelect">
+                {% for category in ['Senior', 'U23', 'U20', 'U18', 'U16', 'U14'] %}
+                <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="discipline" class="filter-select" id="menDisciplineSelect" disabled>
+                <option value="">Disciplina</option>
+            </select>
+
+            <select name="year" class="filter-select" id="menYearSelect">
+                <option value="">Tutti gli anni</option>
+                {% for y in range(2025, 2004, -1) %}
+                <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="limit" class="filter-select" id="menLimitSelect">
+                <option value="50">50 risultati</option>
+                <option value="100">100 risultati</option>
+                <option value="200">200 risultati</option>
+                <option value="500">500 risultati</option>
+            </select>
+
+            <div id="menWindCheckbox" class="wind-checkbox" style="display: none;">
+                <label>
+                    <input type="checkbox" name="legal_wind" checked>
+                    Escludi ventosi
+                </label>
+            </div>
+
+            <label class="toggle-switch">
+                <input type="checkbox" name="allResults" id="menAllResults">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Tutti i risultati</span>
+            </label>
+
+            <button type="submit" class="apply-filters-btn">Applica filtri</button>
+        </form>
+    </div>
+
+
+    <!-- Women tab content (stessa struttura ma con ID diversi) -->
+    <div id="womenTab" class="tab-content">
+        <form id="womenForm" class="filter-form">
+            <select name="category" class="filter-select" id="womenCategorySelect">
+                {% for category in ['Senior', 'U23', 'U20', 'U18', 'U16', 'U14'] %}
+                <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="discipline" class="filter-select" id="womenDisciplineSelect" disabled>
+                <option value="">Disciplina</option>
+            </select>
+
+            <select name="year" class="filter-select" id="womenYearSelect">
+                <option value="">Tutti gli anni</option>
+                {% for y in range(2025, 2004, -1) %}
+                <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="limit" class="filter-select" id="womenLimitSelect">
+                <option value="50">50 risultati</option>
+                <option value="100">100 risultati</option>
+                <option value="200">200 risultati</option>
+                <option value="500">500 risultati</option>
+            </select>
+
+            <div id="womenWindCheckbox" class="wind-checkbox" style="display: none;">
+                <label>
+                    <input type="checkbox" name="legal_wind" checked>
+                    Escludi ventosi
+                </label>
+            </div>
+
+            <label class="toggle-switch">
+                <input type="checkbox" name="allResults" id="womenAllResults">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Tutti i risultati</span>
+            </label>
+
+            <button type="submit" class="apply-filters-btn">Applica filtri</button>
+        </form>
+    </div>
+
+
+     <!-- Advanced tab content -->
+    <div id="advancedTab" class="tab-content">
     <form id="filterForm">
         <!-- Discipline filter -->
         <select name="discipline" class="filter-select">
@@ -81,7 +180,9 @@
 
         <button type="submit" class="apply-filters-btn">Applica filtri</button>
     </form>
+    </div>
 </div>
+
 
 <div class="stats-container" id="statsContainer">
     <!-- Stats will be loaded here -->

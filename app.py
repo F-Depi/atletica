@@ -5,6 +5,7 @@ import pandas as pd
 from config import DB_CONFIG
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 
+
 app = Flask(__name__)
 
 # Create SQLAlchemy engine
@@ -19,9 +20,189 @@ with open('data/dizionario_gare.json') as f:
 def index():
     return render_template('index.html', disciplines=DISCIPLINES)
 
+# Carichiamo le discipline in funzione della categoria
+@app.route('/api/disciplines/<category>/<gender>')
+def get_disciplines(category, gender):
+    try:
+        # Carica il dizionario delle discipline standard
+        with open('data/discipline_standard.json') as f:
+            standard_disciplines = json.load(f)
+        
+        # Filtra le discipline per categoria e genere
+        if category not in standard_disciplines:
+            return jsonify({'error': 'Categoria non valida'}), 400
+            
+        disciplines = [
+            d for d in standard_disciplines[category] 
+            if gender in d['sesso']
+        ]
+        
+        return jsonify(disciplines)
+    except Exception as e:
+        app.logger.error(f"Error loading disciplines: {str(e)}")
+        return jsonify({'error': 'Errore interno del server'}), 500
+
 
 @app.route('/rankings')
 def rankings():
+    tab = request.args.get('tab', 'men')
+    
+    if tab in ['men', 'women']:
+        # Gestione modalità standard
+        return handle_standard_rankings(tab)
+    else:
+        # Gestione modalità avanzata (il tuo codice esistente)
+        return handle_advanced_rankings()
+
+
+def handle_standard_rankings(tab):
+    # Ottieni i parametri
+    category = request.args.get('category', 'Senior')
+    discipline = request.args.get('discipline', '100m')
+    year = request.args.get('year')
+    limit = request.args.get('limit', 50, type=int)
+    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
+    show_all = request.args.get('allResults', '').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
+    
+    # Se non sono specificati categoria e disciplina, mostra una pagina vuota
+    if not (category and discipline):
+        return render_template(
+            'rankings.html',
+            results=[],
+            total_pages=0,
+            current_page=1
+        )
+
+    # Determina il genere dal tab
+    gender = 'M' if tab == 'men' else 'F'
+    
+    # Ottieni le categorie italiane corrispondenti
+    italian_categories = [k for k, v in CATEGORY_MAPPING.items() if v == category]
+    
+    # Base conditions
+    conditions = [
+        "disciplina = :discipline",
+        "sesso = :gender"
+    ]
+    params = {
+        'discipline': discipline,
+        'gender': gender
+    }
+
+    # Aggiungi filtro categoria
+    if italian_categories:
+        categories_list = "', '".join(italian_categories)
+        conditions.append(f"categoria IN ('{categories_list}')")
+
+    # Aggiungi filtro anno
+    if year:
+        conditions.append("EXTRACT(YEAR FROM data) = :year")
+        params['year'] = int(year)
+
+    # Aggiungi filtro vento se necessario
+    if legal_wind_only and should_show_wind(discipline, 'P'):
+        conditions.append("""(
+            ambiente = 'I' OR
+            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
+        )""")
+
+    # Costruisci la query
+    where_clause = " AND ".join(conditions)
+
+    # Esegui query per il conteggio
+    engine = get_db_engine()
+    if show_all:
+        count_query = f"SELECT COUNT(*) FROM results WHERE {where_clause}"
+    else:
+        count_query = f"SELECT COUNT(DISTINCT atleta) FROM results WHERE {where_clause}"
+
+    with engine.connect() as conn:
+        total_count = pd.read_sql(text(count_query), conn, params=params).iloc[0, 0]
+
+    # Calcola paginazione
+    total_pages = (total_count + limit - 1) // limit
+    offset = (page - 1) * limit
+    params['limit'] = limit
+    params['offset'] = offset
+
+    # Costruisci la query principale
+    sort_direction = 'ASC' if DISCIPLINES[discipline]['classifica'] == 'tempo' else 'DESC'
+    
+    if show_all:
+        main_query = f"""
+            WITH base_results AS (
+                SELECT 
+                    prestazione, 
+                    cronometraggio,
+                    atleta, 
+                    anno, 
+                    categoria, 
+                    società, 
+                    luogo, 
+                    data, 
+                    vento,
+                    ambiente,
+                    link_atleta,
+                    link_società
+                FROM results 
+                WHERE {where_clause}
+            )
+            SELECT *,
+                RANK() OVER (ORDER BY prestazione {sort_direction}) as position
+            FROM base_results
+            ORDER BY prestazione {sort_direction}, atleta ASC, data DESC
+            LIMIT :limit OFFSET :offset
+        """
+    else:
+        main_query = f"""
+            WITH ranked_athletes AS (
+                SELECT DISTINCT ON (atleta)
+                    prestazione, 
+                    cronometraggio,
+                    atleta, 
+                    anno, 
+                    categoria, 
+                    società, 
+                    luogo, 
+                    data, 
+                    vento,
+                    ambiente,
+                    link_atleta,
+                    link_società
+                FROM results 
+                WHERE {where_clause}
+                ORDER BY atleta, prestazione {sort_direction}, data DESC
+            )
+            SELECT *,
+                RANK() OVER (ORDER BY prestazione {sort_direction}) as position
+            FROM ranked_athletes
+            ORDER BY prestazione {sort_direction}, atleta ASC
+            LIMIT :limit OFFSET :offset
+        """
+
+    # Esegui query principale
+    with engine.connect() as conn:
+        result = pd.read_sql(text(main_query), conn, params=params)
+
+    return render_template(
+        'rankings.html',
+        results=result.to_dict('records'),
+        discipline=discipline,
+        discipline_info=DISCIPLINES[discipline],
+        show_wind=should_show_wind(discipline, 'P'),
+        current_page=page,
+        total_pages=total_pages,
+        limit=limit,
+        total_count=total_count,
+        format_time=format_time,
+        show_all=show_all,
+        legal_wind_only=legal_wind_only
+    )
+
+
+## "Tutti i filtri e le gare" tab
+def handle_advanced_rankings():
     # Get all query parameters with defaults
     discipline = request.args.get('discipline')
     if not discipline:
