@@ -151,18 +151,65 @@ class StandardFilterManager {
 
 class AdvancedFilterManager {
     constructor() {
-        // Gestisci il form dei filtri avanzati esistente
-        const form = document.querySelector('#advancedTab form');
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.submitAdvancedFilters(form);
+        this.form = document.querySelector('#advancedForm');
+        this.disciplineSelect = document.getElementById('advancedDisciplineSelect');
+        
+        this.initializeEventListeners();
+        this.loadDisciplines();
+        this.initializeFromUrl();
+    }
+
+    async loadDisciplines() {
+        try {
+            const response = await fetch('/api/disciplines/all');
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const disciplines = await response.json();
+
+            // Popola il select delle discipline
+            Object.entries(disciplines).forEach(([disc, info]) => {
+                const option = document.createElement('option');
+                option.value = disc;
+                option.textContent = disc;
+                this.disciplineSelect.appendChild(option);
             });
+
+            // Se c'è una disciplina nell'URL, selezionala
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('discipline')) {
+                this.disciplineSelect.value = urlParams.get('discipline');
+            }
+        } catch (error) {
+            console.error('Error loading disciplines:', error);
+            this.disciplineSelect.innerHTML = '<option value="">Errore caricamento discipline</option>';
         }
     }
 
-    submitAdvancedFilters(form) {
-        const formData = new FormData(form);
+    initializeEventListeners() {
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.submitFilters();
+        });
+    }
+
+    initializeFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Imposta i valori dei filtri dall'URL
+        for (const [key, value] of urlParams.entries()) {
+            const element = this.form.elements[key];
+            if (element) {
+                if (element.type === 'checkbox') {
+                    element.checked = value.toLowerCase() === 'true';
+                } else {
+                    element.value = value;
+                }
+            }
+        }
+    }
+
+    submitFilters() {
+        const formData = new FormData(this.form);
         const urlParams = new URLSearchParams();
         
         for (const [key, value] of formData.entries()) {
