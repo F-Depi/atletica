@@ -63,7 +63,7 @@ def rankings():
         )""")
 
     if gender:
-        conditions.append("categoria ~ ('^.*' || :gender || '[0-9]*$')")
+        conditions.append("sesso = :gender")
         params['gender'] = gender
 
     if category:
