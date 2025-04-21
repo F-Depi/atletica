@@ -18,9 +18,14 @@
     <div id="menTab" class="tab-content">
         <form id="menForm" class="filter-form">
             <select name="category" class="filter-select" id="menCategorySelect">
-                {% for category in ['Senior', 'U23', 'U20', 'U18', 'U16', 'U14'] %}
-                <option value="{{ category }}">{{ category }}</option>
-                {% endfor %}
+                <option value="ASS">Assoluti</option>
+                <option value="SEN">Senior</option>
+                <option value="U23">Promesse</option>
+                <option value="U20">Juniores</option>
+                <option value="U18">Allievi</option>
+                <option value="U16">Cadetti</option>
+                <option value="U14">Ragazzi</option>
+                <option value="U12">Esordienti</option>
             </select>
 
             <select name="discipline" class="filter-select" id="menDisciplineSelect" disabled>
@@ -41,18 +46,18 @@
                 <option value="500">500 risultati</option>
             </select>
 
+            <label class="toggle-switch">
+                <input type="checkbox" name="allResults" value="true" {% if show_all %}checked{% endif %} id="menAllResults" {% if show_all %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Tutti i risultati</span>
+            </label>
+
             <div id="menWindCheckbox" class="wind-checkbox" style="display: none;">
                 <label>
                     <input type="checkbox" name="legal_wind" checked>
                     Escludi ventosi
                 </label>
             </div>
-
-            <label class="toggle-switch">
-                <input type="checkbox" name="allResults" id="menAllResults">
-                <span class="toggle-slider"></span>
-                <span class="toggle-label">Tutti i risultati</span>
-            </label>
 
             <button type="submit" class="apply-filters-btn">Applica filtri</button>
         </form>
@@ -63,9 +68,14 @@
     <div id="womenTab" class="tab-content">
         <form id="womenForm" class="filter-form">
             <select name="category" class="filter-select" id="womenCategorySelect">
-                {% for category in ['Senior', 'U23', 'U20', 'U18', 'U16', 'U14'] %}
-                <option value="{{ category }}">{{ category }}</option>
-                {% endfor %}
+                <option value="ASS">Assolute</option>
+                <option value="SEN">Senior</option>
+                <option value="U23">Promesse</option>
+                <option value="U20">Juniores</option>
+                <option value="U18">Allieve</option>
+                <option value="U16">Cadette</option>
+                <option value="U14">Ragazze</option>
+                <option value="U12">Esordienti</option>
             </select>
 
             <select name="discipline" class="filter-select" id="womenDisciplineSelect" disabled>
@@ -86,18 +96,18 @@
                 <option value="500">500 risultati</option>
             </select>
 
+            <label class="toggle-switch">
+                <input type="checkbox" name="allResults" value="true" {% if show_all %}checked{% endif %} id="womenAllResults">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Tutti i risultati</span>
+            </label>
+
             <div id="womenWindCheckbox" class="wind-checkbox" style="display: none;">
                 <label>
                     <input type="checkbox" name="legal_wind" checked>
                     Escludi ventosi
                 </label>
             </div>
-
-            <label class="toggle-switch">
-                <input type="checkbox" name="allResults" id="womenAllResults">
-                <span class="toggle-slider"></span>
-                <span class="toggle-label">Tutti i risultati</span>
-            </label>
 
             <button type="submit" class="apply-filters-btn">Applica filtri</button>
         </form>
@@ -137,18 +147,16 @@
             <!-- Category filter -->
             <select name="category" class="filter-select">
                 <option value="">Tutte le categorie</option>
-                {% for cat in categories %}
-                <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>
-                {% if cat.startswith('U') %}
-                U{{ cat[1:] }}
-                {% elif cat == 'SEN' %}
-                Senior
-                {% elif cat.startswith('M') %}
-                M{{ cat[1:] }}
-                {% else %}
-                {{ cat }}
-                {% endif %}
-                </option>
+                <option value="U14">Ragazzi</option>
+                <option value="U16">Cadetti</option>
+                <option value="U18">Allievi</option>
+                <option value="U20">Juniores</option>
+                <option value="U23">Promesse</option>
+                <option value="SEN">Senior</option>
+                <option value="ASS">Assoluti</option>
+                <!-- Master from 35 to 85 -->
+                {% for i in range(35, 100, 5) %}
+                <option value="M{{ i }}" {% if category == 'M' + i|string %}selected{% endif %}>Master {{ i }}</option>
                 {% endfor %}
             </select>
 
@@ -185,46 +193,46 @@
 </div>
 
 <div class="rankings-table-container">
-<table class="rankings-table">
-    <thead>
-        <tr>
-            <th></th>
-            <th>Risultato</th>
-            {% if show_wind %}
-            <th>Vento</th>
-            {% endif %}
-            {% if ambiente == "ALL" and not show_wind%}
-            <th>Ambiente</th>
-            {% endif %}
-            <th>Atleta</th>
-            <th>Anno</th>
-            <th>Categoria</th>
-            <th>Società</th>
-            <th>Luogo</th>
-            <th>Data</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for result in results %}
-        <tr>
-            <td><b>{{ result.position }}</b></td>
-            <td>{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}</td>
-            {% if show_wind %}
-            <td>{{ result.vento if result.ambiente == 'P' else '(Indoor)' }}</td>
-            {% endif %}
-            {% if ambiente == "ALL" and not show_wind %}
-            <td>{{ 'Indoor' if result.ambiente == 'I' else 'Outdoor' }}</td>
-            {% endif %}
-            <td><a href="{{ result.link_atleta }}">{{ result.atleta }}</a></td>
-            <td>{{ result.anno }}</td>
-            <td>{{ result.categoria }}</td>
-            <td><a href="{{ result.link_società }}">{{ result.società }}</a></td>
-            <td>{{ result.luogo }}</td>
-            <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <table class="rankings-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Risultato</th>
+                {% if show_wind %}
+                <th>Vento</th>
+                {% endif %}
+                {% if ambiente == "ALL" and not show_wind%}
+                <th>Ambiente</th>
+                {% endif %}
+                <th>Atleta</th>
+                <th>Anno</th>
+                <th>Categoria</th>
+                <th>Società</th>
+                <th>Luogo</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td><b>{{ result.position }}</b></td>
+                <td>{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}</td>
+                {% if show_wind %}
+                <td>{{ result.vento if result.ambiente == 'P' else '(Indoor)' }}</td>
+                {% endif %}
+                {% if ambiente == "ALL" and not show_wind %}
+                <td>{{ 'Indoor' if result.ambiente == 'I' else 'Outdoor' }}</td>
+                {% endif %}
+                <td><a href="{{ result.link_atleta }}">{{ result.atleta }}</a></td>
+                <td>{{ result.anno }}</td>
+                <td>{{ result.categoria }}</td>
+                <td><a href="{{ result.link_società }}">{{ result.società }}</a></td>
+                <td>{{ result.luogo }}</td>
+                <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 
@@ -254,11 +262,11 @@
 
     <div class="page-input-container">
         <input type="number" 
-               id="pageInput" 
-               min="1" 
-               max="{{ total_pages }}" 
-               class="page-input" 
-               placeholder="Pagina">
+        id="pageInput" 
+        min="1" 
+        max="{{ total_pages }}" 
+        class="page-input" 
+        placeholder="Pagina">
         <button onclick="goToPage()" class="page-go-btn">Vai</button>
     </div>
 

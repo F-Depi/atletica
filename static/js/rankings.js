@@ -10,7 +10,7 @@ class TabFilterManager {
         this.advancedFilters = new AdvancedFilterManager();
 
         this.initializeEventListeners();
-        
+
         // Attiva il tab iniziale basato sull'URL o default a 'men'
         const urlParams = new URLSearchParams(window.location.search);
         const initialTab = urlParams.get('tab') || 'men';
@@ -45,7 +45,7 @@ class StandardFilterManager {
     constructor(gender, genderCode) {
         this.gender = gender;
         this.genderCode = genderCode;
-        
+
         // Elementi del form
         this.form = document.getElementById(`${gender}Form`);
         this.categorySelect = document.getElementById(`${gender}CategorySelect`);
@@ -56,6 +56,13 @@ class StandardFilterManager {
         this.allResultsToggle = document.getElementById(`${gender}AllResults`);
 
         this.initializeEventListeners();
+        
+        // Se non ci sono parametri nell'URL, carica le discipline per la categoria di default
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.get('category') && !urlParams.get('discipline')) {
+            this.updateDisciplineSelect();
+        }
+
         this.initializeFromUrl();
     }
 
@@ -75,72 +82,175 @@ class StandardFilterManager {
     }
 
     initializeFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Imposta i valori dei filtri dall'URL se presenti
-        if (urlParams.get('category')) {
-            this.categorySelect.value = urlParams.get('category');
-            this.updateDisciplineSelect().then(() => {
-                if (urlParams.get('discipline')) {
-                    this.disciplineSelect.value = urlParams.get('discipline');
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Imposta categoria e carica le discipline
+    if (urlParams.get('category')) {
+        this.categorySelect.value = urlParams.get('category');
+        this.updateDisciplineSelect().then(() => {
+            // Dopo che le discipline sono state caricate, imposta la disciplina selezionata
+            const discipline = urlParams.get('discipline');
+            const ambiente = urlParams.get('ambiente');
+
+            if (discipline && ambiente) {
+                // Cerca l'opzione corrispondente
+                const options = Array.from(this.disciplineSelect.options);
+                const targetOption = options.find(option => {
+                    if (!option.value) return false;
+                    const data = JSON.parse(option.value);
+                    return data.disciplina === discipline && data.ambiente === ambiente;
+                });
+                
+                if (targetOption) {
+                    this.disciplineSelect.value = targetOption.value;
                     this.updateWindCheckboxVisibility();
                 }
-            });
+            }
+        });
+    }
+    
+    // Imposta gli altri valori
+    if (urlParams.get('year')) this.yearSelect.value = urlParams.get('year');
+    if (urlParams.get('limit')) this.limitSelect.value = urlParams.get('limit');
+    if (urlParams.get('allResults')) this.allResultsToggle.checked = true;
+    
+    // Imposta il checkbox del vento se presente
+    const legalWind = urlParams.get('legal_wind');
+    if (legalWind !== null && this.windCheckbox) {
+        const windInput = this.windCheckbox.querySelector('input');
+        if (windInput) {
+            windInput.checked = legalWind.toLowerCase() === 'true';
         }
-        
-        if (urlParams.get('year')) this.yearSelect.value = urlParams.get('year');
-        if (urlParams.get('limit')) this.limitSelect.value = urlParams.get('limit');
-        if (urlParams.get('allResults')) this.allResultsToggle.checked = true;
+    }
     }
 
     async updateDisciplineSelect() {
         const category = this.categorySelect.value;
-        
+
         if (!category) {
             this.disciplineSelect.disabled = true;
-            this.disciplineSelect.innerHTML = '<option value="">Seleziona disciplina</option>';
             return;
         }
 
         try {
             const response = await fetch(`/api/disciplines/${category}/${this.genderCode}`);
             if (!response.ok) throw new Error('Network response was not ok');
-            
+
             const disciplines = await response.json();
 
-            this.disciplineSelect.innerHTML = '<option value="">Seleziona disciplina</option>';
+            // Rimuovi tutte le opzioni esistenti
+            this.disciplineSelect.innerHTML = '';
+
             disciplines.forEach(d => {
-                const option = document.createElement('option');
-                option.value = d.disciplina;
-                option.textContent = d.disciplina;
-                option.dataset.hasWind = d.vento === 'sì' ? 'true' : 'false';
-                this.disciplineSelect.appendChild(option);
+                if (d.ambiente === 'I-P') {
+                    // Crea due opzioni per Indoor e Outdoor
+                    const optionOutdoor = document.createElement('option');
+                    optionOutdoor.value = JSON.stringify({
+                        disciplina: d.disciplina,
+                        ambiente: 'P'
+                    });
+                    optionOutdoor.textContent = d.disciplina;
+                    this.disciplineSelect.appendChild(optionOutdoor);
+
+                    const optionIndoor = document.createElement('option');
+                    optionIndoor.value = JSON.stringify({
+                        disciplina: d.disciplina,
+                        ambiente: 'I'
+                    });
+                    optionIndoor.textContent = d.disciplina + ' (indoor)';
+                    this.disciplineSelect.appendChild(optionIndoor);
+                } else {
+                    // Ambiente singolo (I, P o IP)
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({
+                        disciplina: d.disciplina,
+                        ambiente: d.ambiente
+                    });
+                    option.textContent = d.disciplina + (d.ambiente === 'I' ? ' (indoor)' : '');
+                    this.disciplineSelect.appendChild(option);
+                }
             });
 
             this.disciplineSelect.disabled = false;
+
+            // Se non c'è una disciplina selezionata, seleziona i 100m
+            if (!this.disciplineSelect.value) {
+                // Cerca l'opzione dei 100m outdoor
+                const options = Array.from(this.disciplineSelect.options);
+                const hundred = options.find(option => {
+                    if (!option.value) return false;
+                    const data = JSON.parse(option.value);
+                    return data.disciplina === '100m' && data.ambiente === 'P';
+                });
+
+                if (hundred) {
+                    this.disciplineSelect.value = hundred.value;
+                    this.updateWindCheckboxVisibility();
+                    // Aggiungi questa riga per forzare il submit dei filtri
+                    this.submitFilters();
+                }
+            }
         } catch (error) {
             console.error('Error loading disciplines:', error);
-            this.disciplineSelect.innerHTML = '<option value="">Errore caricamento discipline</option>';
             this.disciplineSelect.disabled = true;
         }
     }
 
-    updateWindCheckboxVisibility() {
-        const selectedOption = this.disciplineSelect.options[this.disciplineSelect.selectedIndex];
-        const hasWind = selectedOption && selectedOption.dataset.hasWind === 'true';
-        this.windCheckbox.style.display = hasWind ? 'block' : 'none';
+    async updateWindCheckboxVisibility() {
+        const selectedValue = this.disciplineSelect.value;
+        if (!selectedValue) {
+            this.windCheckbox.style.display = 'none';
+            return;
+        }
+
+        try {
+            const { disciplina, ambiente } = JSON.parse(selectedValue);
+
+            // Non mostrare il checkbox per gare indoor
+            if (ambiente === 'I') {
+                this.windCheckbox.style.display = 'none';
+                return;
+            }
+
+            // Controlla se la disciplina ha il vento
+            const response = await fetch(`/api/discipline_info/${disciplina}`);
+            const info = await response.json();
+
+            this.windCheckbox.style.display = info.vento === 'sì' ? 'block' : 'none';
+        } catch (error) {
+            console.error('Error checking wind:', error);
+            this.windCheckbox.style.display = 'none';
+        }
     }
 
     submitFilters() {
         const formData = new FormData(this.form);
         const urlParams = new URLSearchParams();
-        
+
         // Aggiungi il tab corrente
         urlParams.set('tab', this.gender);
 
-        // Aggiungi tutti i parametri del form che hanno un valore
+        // Gestisci la disciplina selezionata
+        const disciplineValue = formData.get('discipline');
+        if (disciplineValue) {
+            const { disciplina, ambiente } = JSON.parse(disciplineValue);
+            urlParams.set('discipline', disciplina);
+            urlParams.set('ambiente', ambiente);
+        }
+
+        // Gestisci il checkbox del vento
+        if (this.windCheckbox.style.display !== 'none') {
+            const windInput = this.windCheckbox.querySelector('input');
+            if (windInput) {
+                urlParams.set('legal_wind', windInput.checked);
+            }
+        }
+
+        // Aggiungi gli altri parametri
         for (const [key, value] of formData.entries()) {
-            if (value) urlParams.set(key, value);
+            if (key !== 'discipline' && key !== 'legal_wind' && value) {
+                urlParams.set(key, value);
+            }
         }
 
         // Reindirizza alla nuova URL
@@ -153,7 +263,7 @@ class AdvancedFilterManager {
     constructor() {
         this.form = document.querySelector('#advancedForm');
         this.disciplineSelect = document.getElementById('advancedDisciplineSelect');
-        
+
         this.initializeEventListeners();
         this.loadDisciplines();
         this.initializeFromUrl();
@@ -163,7 +273,7 @@ class AdvancedFilterManager {
         try {
             const response = await fetch('/api/disciplines/all');
             if (!response.ok) throw new Error('Network response was not ok');
-            
+
             const disciplines = await response.json();
 
             // Popola il select delle discipline
@@ -194,7 +304,7 @@ class AdvancedFilterManager {
 
     initializeFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        
+
         // Imposta i valori dei filtri dall'URL
         for (const [key, value] of urlParams.entries()) {
             const element = this.form.elements[key];
@@ -211,7 +321,7 @@ class AdvancedFilterManager {
     submitFilters() {
         const formData = new FormData(this.form);
         const urlParams = new URLSearchParams();
-        
+
         for (const [key, value] of formData.entries()) {
             if (value) urlParams.set(key, value);
         }
@@ -231,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadStats(discipline, queryParams) {
     // Create a copy of queryParams to avoid modifying the original
     const params = new URLSearchParams(queryParams);
-    
+
     // Ensure the category parameter is properly encoded
     const category = params.get('category');
     if (category) {
@@ -262,22 +372,22 @@ function loadStats(discipline, queryParams) {
             const isBestTime = classificaType === 'tempo';
             const statsHtml = `
                 <div class="stat-box">
-                    <h3>Migliore</h3>
-                    <p>${formatTime(data.best, classificaType)}</p>
+                <h3>Migliore</h3>
+                <p>${formatTime(data.best, classificaType)}</p>
                 </div>
                 <div class="stat-box">
-                    <h3>Media</h3>
-                    <p>${formatTime(data.average, classificaType)}</p>
+                <h3>Media</h3>
+                <p>${formatTime(data.average, classificaType)}</p>
                 </div>
                 <div class="stat-box">
-                    <h3>Atleti totali</h3>
-                    <p>${data.athletes}</p>
+                <h3>Atleti totali</h3>
+                <p>${data.athletes}</p>
                 </div>
                 <div class="stat-box">
-                    <h3>Risultati totali</h3>
-                    <p>${data.performances}</p>
+                <h3>Risultati totali</h3>
+                <p>${data.performances}</p>
                 </div>
-            `;
+                `;
             document.getElementById('statsContainer').innerHTML = statsHtml;
         })
         .catch(error => {
@@ -304,7 +414,7 @@ function goToPage() {
     const input = document.getElementById('pageInput');
     const pagination = document.querySelector('.pagination');
     const totalPages = parseInt(pagination.dataset.totalPages);
-    
+
     const page = parseInt(input.value);
     if (page && page >= 1 && page <= totalPages) {
         // Get current URL parameters
