@@ -15,39 +15,49 @@ def get_db_engine():
 # Load disciplines data
 with open('data/dizionario_gare.json') as f:
     DISCIPLINES = json.load(f)
+with open('data/discipline_standard.json') as f:
+    DISCIPLINE_STANDARD = json.load(f)
 
 @app.route('/')
 def index():
     return render_template('index.html', disciplines=DISCIPLINES)
 
+
 ## Invia tutte le discipline alla tab con tutti i filtri
+## Per la tab "Tutti i filtri e le gare"
 @app.route('/api/disciplines/all')
 def get_all_disciplines():
     return jsonify(DISCIPLINES)
 
+
 ## Carichiamo le discipline in funzione della categoria
+## Per le tab "Uomni" e "Donne"
 @app.route('/api/disciplines/<category>/<gender>')
 def get_disciplines(category, gender):
     try:
-        # Carica il dizionario delle discipline standard
-        with open('data/discipline_standard.json') as f:
-            standard_disciplines = json.load(f)
-        
-        # Filtra le discipline per categoria e genere
-        if category not in standard_disciplines:
-            return jsonify({'error': 'Categoria non valida'}), 400
-            
         disciplines = [
-            d for d in standard_disciplines[category] 
+            d for d in DISCIPLINE_STANDARD[category] 
             if gender in d['sesso']
         ]
-        
         return jsonify(disciplines)
+
     except Exception as e:
         app.logger.error(f"Error loading disciplines: {str(e)}")
         return jsonify({'error': 'Errore interno del server'}), 500
 
 
+## Permette a rankings.js di sapere se una disciplina ha il vento e 
+## visualizzare il checkbox di conseguenza
+@app.route('/api/discipline_info/<discipline>')
+def get_discipline_info(discipline):
+    if discipline in DISCIPLINES:
+        return jsonify({
+            'vento': DISCIPLINES[discipline].get('vento', 'no')
+        })
+    return jsonify({'error': 'Disciplina non trovata'}), 404
+
+
+## Questa è quella che gestisce le query quando si preme invio
 @app.route('/rankings')
 def rankings():
     tab = request.args.get('tab', 'men')
@@ -56,34 +66,28 @@ def rankings():
         # Gestione modalità standard
         return handle_standard_rankings(tab)
     else:
-        # Gestione modalità avanzata (il tuo codice esistente)
+        # Gestione modalità avanzata
         return handle_advanced_rankings()
 
 
+## Tab "Uomini" e "Donne". Sesso è già determinato, si sceglie subito una categoria
+## e le discipline possibili sono caricate a partire da DISCIPLINE_STANDARD
 def handle_standard_rankings(tab):
     # Ottieni i parametri
-    category = request.args.get('category', 'Senior')
+    category = request.args.get('category', 'Assoluti')
     discipline = request.args.get('discipline', '100m')
-    year = request.args.get('year')
+    year = request.args.get('year', None)
     limit = request.args.get('limit', 50, type=int)
-    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
     show_all = request.args.get('allResults', '').lower() == 'true'
+    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
     page = request.args.get('page', 1, type=int)
     
-    # Se non sono specificati categoria e disciplina, mostra una pagina vuota
-    if not (category and discipline):
-        return render_template(
-            'rankings.html',
-            results=[],
-            total_pages=0,
-            current_page=1
-        )
-
-    # Determina il genere dal tab
+    # Determina il genere da tab
     gender = 'M' if tab == 'men' else 'F'
     
     # Ottieni le categorie italiane corrispondenti
     italian_categories = [k for k, v in CATEGORY_MAPPING.items() if v == category]
+    print(f"italian_categories: {italian_categories}")
     
     # Base conditions
     conditions = [
@@ -94,6 +98,15 @@ def handle_standard_rankings(tab):
         'discipline': discipline,
         'gender': gender
     }
+
+    # Gestione ambiente
+    ambiente = request.args.get('ambiente')
+    if ambiente:
+        if ambiente in ['I', 'P']:
+            conditions.append("ambiente = :ambiente")
+            params['ambiente'] = ambiente
+        elif ambiente == 'IP':
+            conditions.append("ambiente IN ('I', 'P')")
 
     # Aggiungi filtro categoria
     if italian_categories:
@@ -209,21 +222,17 @@ def handle_standard_rankings(tab):
 ## "Tutti i filtri e le gare" tab
 def handle_advanced_rankings():
     # Get all query parameters with defaults
-    discipline = request.args.get('discipline')
-    if not discipline:
-        discipline = '100m'  
-    
+    discipline = request.args.get('discipline', '100m')
     ambiente = request.args.get('ambiente', 'P')
-    page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 50, type=int)
     year = request.args.get('year', None)
-    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
     gender = request.args.get('gender', None)
     category = request.args.get('category')
+    limit = request.args.get('limit', 50, type=int)
     show_all = request.args.get('allResults', '').lower() == 'true'
+    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
     
-    # Get categories and setup basic parameters
-    categories = get_categories(discipline, ambiente)
+    # Get properties of the discipline
     classification_type = DISCIPLINES[discipline]['classifica']
     sort_direction = 'ASC' if classification_type == 'tempo' else 'DESC'
     show_wind = should_show_wind(discipline, ambiente)
@@ -247,13 +256,15 @@ def handle_advanced_rankings():
             ambiente = 'I' OR
             CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
         )""")
+        params['legal_wind'] = legal_wind_only
 
     if gender:
         conditions.append("sesso = :gender")
         params['gender'] = gender
 
     if category:
-        italian_categories = [k for k, v in CATEGORY_MAPPING.items() if v == category]
+        italian_categories = CATEGORY_MAPPING[category]
+        print(f"italian_categories: {italian_categories}")
         if italian_categories:
             categories_list = "', '".join(italian_categories)
             conditions.append(f"categoria IN ('{categories_list}')")
@@ -361,7 +372,6 @@ def handle_advanced_rankings():
         legal_wind_only=legal_wind_only,
         gender=gender,
         category=category,
-        categories=categories,
         format_time=format_time,
         show_all=show_all
 )
@@ -405,7 +415,7 @@ def discipline_stats(discipline):
 
     if gender:
         query += """ 
-        AND categoria ~ ('^.*' || :gender || '[0-9]*$')
+        AND sesso = :gender
         """
         params['gender'] = gender
 
@@ -445,12 +455,6 @@ def should_show_wind(discipline, ambiente):
     if discipline_info.get('vento') != 'sì':
         return False
     
-    # Don't show wind for throws and track events over 200m
-    if (discipline_info.get('tipo') == 'Lanci' or 
-        (discipline_info.get('tipo') == 'Corse Piane' and 
-         any(str(n) in discipline for n in range(300, 10001)))):
-        return False
-    
     return True
 
 
@@ -476,78 +480,74 @@ def format_time(seconds, discipline_info, cronometraggio):
 
 # Category mapping dictionary
 CATEGORY_MAPPING = {
-    # Under 14
-    'RM': 'U14', 'RF': 'U14',
-    # Under 16
-    'CM': 'U16', 'CF': 'U16',
-    # Under 18
-    'AM': 'U18', 'AF': 'U18',
-    # Under 20
-    'JM': 'U20', 'JF': 'U20',
-    # Under 23
-    'PM': 'U23', 'PF': 'U23',
-    # Senior
-    'SM': 'SEN', 'SF': 'SEN',
-    # Masters (automatically handled below)
+    'U14': ['RM', 'RF'],
+    'U16': ['CM', 'CF'],
+    'U18': ['AM', 'AF'],
+    'U20': ['JM', 'JF'],
+    'U23': ['PM', 'PF'],
+    'SEN': ['SM', 'SF'],
+    'ASS': ['AM', 'AF', 'JM', 'JF', 'PM', 'PF', 'SM', 'SF']
+    + [f'SM{age}' for age in range(35, 100, 5)]
+    + [f'SF{age}' for age in range(35, 100, 5)]
 }
-
-
-# Add master categories to mapping
+# Add Masters categories (from M35 to M95)
 for age in range(35, 100, 5):
-    CATEGORY_MAPPING[f'SM{age}'] = f'M{age}'
-    CATEGORY_MAPPING[f'SF{age}'] = f'M{age}'
-
-ORDERED_CATEGORIES = [
-    # Youth categories
-    'U14', 'U16', 'U18', 'U20',
-    # Under 23
-    'U23',
-    # Senior
-    'SEN',
-    # Masters (from M35 to M95)
-] + [f'M{age}' for age in range(35, 100, 5)]
-
-
-def get_categories(discipline, ambiente):
-    engine = get_db_engine()
-    
-    # Modify query based on ambiente
-    if ambiente == 'ALL':
-        query = """
-            SELECT DISTINCT categoria 
-            FROM results 
-            WHERE disciplina = :discipline 
-            ORDER BY categoria
-        """
-        params = {'discipline': discipline}
-    else:
-        query = """
-            SELECT DISTINCT categoria 
-            FROM results 
-            WHERE disciplina = :discipline 
-            AND ambiente = :ambiente 
-            ORDER BY categoria
-        """
-        params = {'discipline': discipline, 'ambiente': ambiente}
-    
-    with engine.connect() as conn:
-        result = pd.read_sql(
-            text(query), 
-            conn,
-            params=params
-        )
-    
-    # Convert Italian categories to standardized ones
-    standardized_categories = set()
-    for cat in result['categoria']:
-        if cat in CATEGORY_MAPPING:
-            standardized_categories.add(CATEGORY_MAPPING[cat])
-    
-    # Return only categories that exist in the database, maintaining our preferred order
-    return [cat for cat in ORDERED_CATEGORIES if cat in standardized_categories]
+    CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
 
 
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+#ORDERED_CATEGORIES = [
+#    # Youth categories
+#    'U14', 'U16', 'U18', 'U20',
+#    # Under 23
+#    'U23',
+#    # Senior
+#    'SEN',
+#    # Masters (from M35 to M95)
+#] + [f'M{age}' for age in range(35, 100, 5)]
+
+
+
+#def get_categories(discipline, ambiente):
+#    engine = get_db_engine()
+#    
+#    # Modify query based on ambiente
+#    if ambiente == 'ALL':
+#        query = """
+#            SELECT DISTINCT categoria 
+#            FROM results 
+#            WHERE disciplina = :discipline 
+#            ORDER BY categoria
+#        """
+#        params = {'discipline': discipline}
+#    else:
+#        query = """
+#            SELECT DISTINCT categoria 
+#            FROM results 
+#            WHERE disciplina = :discipline 
+#            AND ambiente = :ambiente 
+#            ORDER BY categoria
+#        """
+#        params = {'discipline': discipline, 'ambiente': ambiente}
+#    
+#    with engine.connect() as conn:
+#        result = pd.read_sql(
+#            text(query), 
+#            conn,
+#            params=params
+#        )
+#    
+#    # Convert Italian categories to standardized ones
+#    standardized_categories = set()
+#    for cat in result['categoria']:
+#        if cat in CATEGORY_MAPPING:
+#            standardized_categories.add(CATEGORY_MAPPING[cat])
+#    
+#    # Return only categories that exist in the database, maintaining our preferred order
+#    return [cat for cat in ORDERED_CATEGORIES if cat in standardized_categories]
