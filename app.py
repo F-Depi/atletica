@@ -74,7 +74,7 @@ def rankings():
 ## e le discipline possibili sono caricate a partire da DISCIPLINE_STANDARD
 def handle_standard_rankings(tab):
     # Ottieni i parametri
-    category = request.args.get('category', 'Assoluti')
+    category = request.args.get('category', 'ASS')
     discipline = request.args.get('discipline', '100m')
     year = request.args.get('year', None)
     limit = request.args.get('limit', 50, type=int)
@@ -86,8 +86,7 @@ def handle_standard_rankings(tab):
     gender = 'M' if tab == 'men' else 'F'
     
     # Ottieni le categorie italiane corrispondenti
-    italian_categories = [k for k, v in CATEGORY_MAPPING.items() if v == category]
-    print(f"italian_categories: {italian_categories}")
+    italian_categories = CATEGORY_MAPPING[category]
     
     # Base conditions
     conditions = [
