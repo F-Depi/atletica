@@ -236,41 +236,42 @@
 
 
 <!-- Pagination section in rankings.html -->
-{% if total_pages > 1 %}
-<div class="pagination" data-total-pages="{{ total_pages }}">
-    {% set start = [1, current_page - 2] | max %}
-    {% set end = [total_pages, current_page + 2] | min %}
+<div class="pagination" data-total-pages="{{ total_pages }}" data-current-tab="{{ request.args.get('tab', 'men') }}">
+    {% if total_pages > 1 %}
+        {% set start = [1, current_page - 2] | max %}
+        {% set end = [total_pages, current_page + 2] | min %}
 
-    {% if start > 1 %}
-    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">1</a>
-    {% if start > 2 %}
-    <span class="page-ellipsis">...</span>
-    {% endif %}
-    {% endif %}
+        <!-- Crea una funzione per generare l'URL con tutti i parametri -->
+        {% macro pagination_url(page_num) %}
+            {% set params = request.args.copy() %}
+            {% set _ = params.update({'page': page_num}) %}
+            {{ url_for('rankings', **params) }}
+        {% endmacro %}
 
-    {% for p in range(start, end + 1) %}
-    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=p, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
-    {% endfor %}
+        {% if start > 1 %}
+            <a href="{{ pagination_url(1) }}" class="page-link">1</a>
+            {% if start > 2 %}
+                <span class="page-ellipsis">...</span>
+            {% endif %}
+        {% endif %}
 
-    {% if end < total_pages %}
-    {% if end < total_pages - 1 %}
-    <span class="page-ellipsis">...</span>
-    {% endif %}
-    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">{{ total_pages }}</a>
-    {% endif %}
+        {% for p in range(start, end + 1) %}
+            <a href="{{ pagination_url(p) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
 
-    <div class="page-input-container">
-        <input type="number" 
-        id="pageInput" 
-        min="1" 
-        max="{{ total_pages }}" 
-        class="page-input" 
-        placeholder="Pagina"
-        data-current-tab="{{ request.args.get('tab', 'men') }}">
-        <button onclick="goToPage()" class="page-go-btn">Vai</button>
-    </div>
+        {% if end < total_pages %}
+            {% if end < total_pages - 1 %}
+                <span class="page-ellipsis">...</span>
+            {% endif %}
+            <a href="{{ pagination_url(total_pages) }}" class="page-link">{{ total_pages }}</a>
+        {% endif %}
+
+        <div class="page-input-container">
+            <input type="number" id="pageInput" min="1" max="{{ total_pages }}" class="page-input" placeholder="Pagina">
+            <button onclick="goToPage()" class="page-go-btn">Vai</button>
+        </div>
+    {% endif %}
 </div>
-{% endif %}
 
 
 <!-- Include the external JavaScript file -->
