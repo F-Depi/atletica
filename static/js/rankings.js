@@ -14,7 +14,14 @@ class TabFilterManager {
         // Attiva il tab iniziale basato sull'URL o default a 'men'
         const urlParams = new URLSearchParams(window.location.search);
         const initialTab = urlParams.get('tab') || 'men';
-        this.activateTab(initialTab);
+
+        // Se non ci sono parametri nell'URL, forza il caricamento dei valori di default
+        if (!urlParams.toString()) {
+            this.activateTab('men');
+            this.menFilters.forceLoadDisciplines();
+        } else {
+            this.activateTab(initialTab);
+        }
     }
 
     initializeEventListeners() {
@@ -201,7 +208,7 @@ class StandardFilterManager {
         this.categorySelect.value = 'ASS';
 
         // Forza il caricamento delle discipline
-        this.updateDisciplineSelect().then(() => {
+        return this.updateDisciplineSelect().then(() => {
             // Dopo il caricamento, seleziona i 100m se non c'è una disciplina selezionata
             if (!this.disciplineSelect.value) {
                 const options = Array.from(this.disciplineSelect.options);
@@ -214,6 +221,8 @@ class StandardFilterManager {
                 if (hundred) {
                     this.disciplineSelect.value = hundred.value;
                     this.updateWindCheckboxVisibility();
+                    // Sottometti automaticamente i filtri
+                    this.submitFilters();
                 }
             }
         }).catch(error => {

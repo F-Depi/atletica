@@ -56,12 +56,16 @@ def get_discipline_info(discipline):
 @app.route('/rankings')
 def rankings():
     tab = request.args.get('tab', 'men')
-    
+
+    # Se non ci sono parametri, reindirizza alla configurazione di default
+    # Se non ci sono parametri o manca la disciplina, reindirizza alla configurazione di default
+
+    if not request.args or not request.args.get('discipline'):
+        return redirect(url_for('rankings', tab=tab, discipline='110Hs_h106-9.14', ambiente='P', category='ASS'))
+
     if tab in ['men', 'women']:
-        # Gestione modalità standard
         return handle_standard_rankings(tab)
     else:
-        # Gestione modalità avanzata
         return handle_advanced_rankings()
 
 
