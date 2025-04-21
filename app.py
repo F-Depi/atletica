@@ -264,10 +264,8 @@ def handle_advanced_rankings():
 
     if category:
         italian_categories = CATEGORY_MAPPING[category]
-        print(f"italian_categories: {italian_categories}")
-        if italian_categories:
-            categories_list = "', '".join(italian_categories)
-            conditions.append(f"categoria IN ('{categories_list}')")
+        categories_list = "', '".join(italian_categories)
+        conditions.append(f"categoria IN ('{categories_list}')")
 
     # Join conditions
     where_clause = " AND ".join(conditions)
