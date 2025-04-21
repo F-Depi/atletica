@@ -263,36 +263,12 @@ class AdvancedFilterManager {
     constructor() {
         this.form = document.querySelector('#advancedForm');
         this.disciplineSelect = document.getElementById('advancedDisciplineSelect');
+        this.windCheckbox = this.form.querySelector('.wind-checkbox');
+        this.ambienteSelect = this.form.querySelector('select[name="ambiente"]');
 
         this.initializeEventListeners();
         this.loadDisciplines();
         this.initializeFromUrl();
-    }
-
-    async loadDisciplines() {
-        try {
-            const response = await fetch('/api/disciplines/all');
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const disciplines = await response.json();
-
-            // Popola il select delle discipline
-            Object.entries(disciplines).forEach(([disc, info]) => {
-                const option = document.createElement('option');
-                option.value = disc;
-                option.textContent = disc;
-                this.disciplineSelect.appendChild(option);
-            });
-
-            // Se c'è una disciplina nell'URL, selezionala
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('discipline')) {
-                this.disciplineSelect.value = urlParams.get('discipline');
-            }
-        } catch (error) {
-            console.error('Error loading disciplines:', error);
-            this.disciplineSelect.innerHTML = '<option value="">Errore caricamento discipline</option>';
-        }
     }
 
     initializeEventListeners() {
@@ -300,12 +276,63 @@ class AdvancedFilterManager {
             e.preventDefault();
             this.submitFilters();
         });
+
+        // Update wind checkbox when discipline or ambiente changes
+        [this.disciplineSelect, this.ambienteSelect].forEach(select => {
+            select?.addEventListener('change', () => this.updateWindCheckboxVisibility());
+        });
+    }
+
+    async updateWindCheckboxVisibility() {
+        // Always hide for indoor events
+        if (this.ambienteSelect.value === 'I') {
+            this.windCheckbox.style.display = 'none';
+            return;
+        }
+
+        // Hide if no discipline selected
+        if (!this.disciplineSelect.value) {
+            this.windCheckbox.style.display = 'none';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/discipline_info/${this.disciplineSelect.value}`);
+            const info = await response.json();
+            this.windCheckbox.style.display = info.vento === 'sì' ? 'block' : 'none';
+        } catch (error) {
+            console.error('Error checking wind:', error);
+            this.windCheckbox.style.display = 'none';
+        }
+    }
+
+    async loadDisciplines() {
+        try {
+            const response = await fetch('/api/disciplines/all');
+            const disciplines = await response.json();
+
+            this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
+            Object.entries(disciplines).forEach(([disc]) => {
+                const option = document.createElement('option');
+                option.value = disc;
+                option.textContent = disc;
+                this.disciplineSelect.appendChild(option);
+            });
+
+            // Set initial values from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('discipline')) {
+                this.disciplineSelect.value = urlParams.get('discipline');
+                await this.updateWindCheckboxVisibility();
+            }
+        } catch (error) {
+            console.error('Error loading disciplines:', error);
+            this.disciplineSelect.innerHTML = '<option value="">Error loading disciplines</option>';
+        }
     }
 
     initializeFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-
-        // Imposta i valori dei filtri dall'URL
         for (const [key, value] of urlParams.entries()) {
             const element = this.form.elements[key];
             if (element) {
@@ -316,17 +343,37 @@ class AdvancedFilterManager {
                 }
             }
         }
+        this.updateWindCheckboxVisibility();
     }
 
     submitFilters() {
         const formData = new FormData(this.form);
         const urlParams = new URLSearchParams();
 
+        // Set tab first
+        urlParams.set('tab', 'advanced');
+
+        // Handle all form fields
         for (const [key, value] of formData.entries()) {
-            if (value) urlParams.set(key, value);
+            // Skip empty values except checkboxes
+            if (!value && key !== 'legal_wind') continue;
+
+            
+            // Special handling for wind checkbox
+            if (key === 'legal_wind') {
+                urlParams.set(key, 'true');
+            } else {
+                urlParams.set(key, value);
+            }
         }
 
-        urlParams.set('tab', 'advanced');
+        // If wind checkbox is visible but unchecked, explicitly set it to false
+        const windInput = this.form.querySelector('input[name="legal_wind"]');
+        if (windInput && this.windCheckbox.style.display !== 'none' && !windInput.checked) {
+            urlParams.set('legal_wind', 'false');
+        }
+
+        // Redirect to new URL
         window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
 }
@@ -409,25 +456,30 @@ function formatTime(seconds, classificaType) {
 }
 
 
-// To jump to a specific page of the rankings
 function goToPage() {
     const input = document.getElementById('pageInput');
     const pagination = document.querySelector('.pagination');
     const totalPages = parseInt(pagination.dataset.totalPages);
-
+    
     const page = parseInt(input.value);
     if (page && page >= 1 && page <= totalPages) {
         // Get current URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        // Update the page parameter
+        
+        // Get the tab from the data attribute we added to the input
+        const currentTab = input.dataset.currentTab;
+        
+        // Ensure tab parameter is set
+        urlParams.set('tab', currentTab);
+        
+        // Update page parameter
         urlParams.set('page', page);
+        
         // Construct new URL
         window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
 }
 
-
-// Add event listener when the document is loaded
 document.addEventListener('DOMContentLoaded', function() {
     const pageInput = document.getElementById('pageInput');
     if (pageInput) {

@@ -229,7 +229,8 @@ def handle_advanced_rankings():
     category = request.args.get('category')
     limit = request.args.get('limit', 50, type=int)
     show_all = request.args.get('allResults', '').lower() == 'true'
-    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
+    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'  # Default to true
+    print(f"legal_wind_only: {legal_wind_only}")
     page = request.args.get('page', 1, type=int)
     
     # Get properties of the discipline
@@ -237,11 +238,9 @@ def handle_advanced_rankings():
     sort_direction = 'ASC' if classification_type == 'tempo' else 'DESC'
     show_wind = should_show_wind(discipline, ambiente)
 
-    # Base conditions for both queries
+    # Base conditions for both queries, params contains the parameters for the SQL query
     conditions = ["disciplina = :discipline"]
-    params = {
-        'discipline': discipline
-    }
+    params = {'discipline': discipline}
 
     if ambiente != 'ALL':
         conditions.append("ambiente = :ambiente")
@@ -256,7 +255,6 @@ def handle_advanced_rankings():
             ambiente = 'I' OR
             CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
         )""")
-        params['legal_wind'] = legal_wind_only
 
     if gender:
         conditions.append("sesso = :gender")
