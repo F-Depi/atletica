@@ -175,10 +175,9 @@
             </label>
 
             {% if show_wind %}
-            <label class="wind-checkbox">
-                <input type="checkbox" name="legal_wind" 
-                {% if legal_wind_only or request.args.get('legal_wind') is none %}checked{% endif %}>
-                Esclusi ventosi
+            <label class="wind-checkbox" style="display: none;">
+                <input type="checkbox" name="legal_wind" checked>
+                Escludi ventosi
             </label>
             {% endif %}
 
@@ -243,21 +242,21 @@
     {% set end = [total_pages, current_page + 2] | min %}
 
     {% if start > 1 %}
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">1</a>
+    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=1, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">1</a>
     {% if start > 2 %}
     <span class="page-ellipsis">...</span>
     {% endif %}
     {% endif %}
 
     {% for p in range(start, end + 1) %}
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=p, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
+    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=p, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
     {% endfor %}
 
     {% if end < total_pages %}
     {% if end < total_pages - 1 %}
     <span class="page-ellipsis">...</span>
     {% endif %}
-    <a href="{{ url_for('rankings', discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">{{ total_pages }}</a>
+    <a href="{{ url_for('rankings', tab=request.args.get('tab', 'men'), discipline=discipline, ambiente=ambiente, page=total_pages, limit=limit, year=year, gender=gender, category=category, legal_wind=legal_wind_only, allResults=show_all) }}" class="page-link">{{ total_pages }}</a>
     {% endif %}
 
     <div class="page-input-container">
@@ -266,10 +265,10 @@
         min="1" 
         max="{{ total_pages }}" 
         class="page-input" 
-        placeholder="Pagina">
+        placeholder="Pagina"
+        data-current-tab="{{ request.args.get('tab', 'men') }}">
         <button onclick="goToPage()" class="page-go-btn">Vai</button>
     </div>
-
 </div>
 {% endif %}
 
