@@ -174,12 +174,12 @@
                 <span class="toggle-label">Tutti i risultati</span>
             </label>
 
-            {% if show_wind %}
-            <label class="wind-checkbox" style="display: none;">
-                <input type="checkbox" name="legal_wind" checked>
-                Escludi ventosi
-            </label>
-            {% endif %}
+            <div id="windCheckbox" class="wind-checkbox" style="display: none;">
+                <label>
+                    <input type="checkbox" name="legal_wind" checked>
+                    Escludi ventosi
+                </label>
+            </div>
 
             <button type="submit" class="apply-filters-btn">Applica filtri</button>
         </form>

@@ -276,10 +276,18 @@ class AdvancedFilterManager {
         this.disciplineSelect = document.getElementById('advancedDisciplineSelect');
         this.windCheckbox = this.form.querySelector('.wind-checkbox');
         this.ambienteSelect = this.form.querySelector('select[name="ambiente"]');
+        
+        this.disciplinesLoaded = false;
 
-        this.initializeEventListeners();
-        this.loadDisciplines();
-        this.initializeFromUrl();
+        // Carica le discipline e inizializza
+        this.loadDisciplines().then(() => {
+            this.initializeEventListeners();
+            this.initializeFromUrl();
+            // Forza l'aggiornamento della visibilità del checkbox dopo l'inizializzazione
+            this.updateWindCheckboxVisibility();
+        }).catch(error => {
+            console.error('Error in initial discipline loading:', error);
+        });
     }
 
     initializeEventListeners() {
@@ -288,28 +296,39 @@ class AdvancedFilterManager {
             this.submitFilters();
         });
 
-        // Update wind checkbox when discipline or ambiente changes
-        [this.disciplineSelect, this.ambienteSelect].forEach(select => {
-            select?.addEventListener('change', () => this.updateWindCheckboxVisibility());
+        // Aggiungi event listener per il cambio di disciplina
+        this.disciplineSelect.addEventListener('change', () => {
+            this.updateWindCheckboxVisibility();
+        });
+
+        // Aggiungi event listener per il cambio di ambiente
+        this.ambienteSelect.addEventListener('change', () => {
+            this.updateWindCheckboxVisibility();
         });
     }
 
     async updateWindCheckboxVisibility() {
-        // Always hide for indoor events
-        if (this.ambienteSelect.value === 'I') {
+        // Assicurati che ci siano sia una disciplina che un ambiente selezionati
+        const selectedDiscipline = this.disciplineSelect.value;
+        const selectedAmbiente = this.ambienteSelect.value;
+
+        if (!selectedDiscipline || !selectedAmbiente) {
             this.windCheckbox.style.display = 'none';
             return;
         }
 
-        // Hide if no discipline selected
-        if (!this.disciplineSelect.value) {
+        // Nascondi sempre per eventi indoor
+        if (selectedAmbiente === 'I') {
             this.windCheckbox.style.display = 'none';
             return;
         }
 
         try {
-            const response = await fetch(`/api/discipline_info/${this.disciplineSelect.value}`);
+            const response = await fetch(`/api/discipline_info/${selectedDiscipline}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            
             const info = await response.json();
+            console.log('Discipline info:', info); // Debug log
             this.windCheckbox.style.display = info.vento === 'sì' ? 'block' : 'none';
         } catch (error) {
             console.error('Error checking wind:', error);
@@ -317,33 +336,15 @@ class AdvancedFilterManager {
         }
     }
 
-    async loadDisciplines() {
-        try {
-            const response = await fetch('/api/disciplines/all');
-            const disciplines = await response.json();
-
-            this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
-            Object.entries(disciplines).forEach(([disc]) => {
-                const option = document.createElement('option');
-                option.value = disc;
-                option.textContent = disc;
-                this.disciplineSelect.appendChild(option);
-            });
-
-            // Set initial values from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('discipline')) {
-                this.disciplineSelect.value = urlParams.get('discipline');
-                await this.updateWindCheckboxVisibility();
-            }
-        } catch (error) {
-            console.error('Error loading disciplines:', error);
-            this.disciplineSelect.innerHTML = '<option value="">Error loading disciplines</option>';
-        }
-    }
-
     initializeFromUrl() {
+        if (!this.disciplinesLoaded) {
+            console.warn('Attempting to initialize from URL before disciplines are loaded');
+            return;
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
+        
+        // Imposta i valori dei campi form
         for (const [key, value] of urlParams.entries()) {
             const element = this.form.elements[key];
             if (element) {
@@ -354,10 +355,47 @@ class AdvancedFilterManager {
                 }
             }
         }
-        this.updateWindCheckboxVisibility();
+    }
+
+    async loadDisciplines() {
+        if (this.disciplinesLoaded) return; // Evita caricamenti multipli
+
+        try {
+            const response = await fetch('/api/disciplines/all');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const disciplines = await response.json();
+
+            // Pulisci il select
+            this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
+
+            // Aggiungi le discipline
+            Object.entries(disciplines).forEach(([disc]) => {
+                const option = document.createElement('option');
+                option.value = disc;
+                option.textContent = disc;
+                this.disciplineSelect.appendChild(option);
+            });
+
+            this.disciplinesLoaded = true;
+            this.disciplineSelect.disabled = false;
+
+        } catch (error) {
+            console.error('Error loading disciplines:', error);
+            this.disciplineSelect.innerHTML = '<option value="">Error loading disciplines</option>';
+            this.disciplineSelect.disabled = true;
+            throw error; // Propaga l'errore per gestirlo nel costruttore
+        }
     }
 
     submitFilters() {
+        if (!this.disciplinesLoaded) {
+            console.warn('Attempting to submit before disciplines are loaded');
+            return;
+        }
+
         const formData = new FormData(this.form);
         const urlParams = new URLSearchParams();
 
@@ -366,11 +404,8 @@ class AdvancedFilterManager {
 
         // Handle all form fields
         for (const [key, value] of formData.entries()) {
-            // Skip empty values except checkboxes
             if (!value && key !== 'legal_wind') continue;
-
             
-            // Special handling for wind checkbox
             if (key === 'legal_wind') {
                 urlParams.set(key, 'true');
             } else {
@@ -378,7 +413,7 @@ class AdvancedFilterManager {
             }
         }
 
-        // If wind checkbox is visible but unchecked, explicitly set it to false
+        // Handle wind checkbox
         const windInput = this.form.querySelector('input[name="legal_wind"]');
         if (windInput && this.windCheckbox.style.display !== 'none' && !windInput.checked) {
             urlParams.set('legal_wind', 'false');
