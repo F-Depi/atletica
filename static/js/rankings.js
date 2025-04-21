@@ -25,6 +25,7 @@ class TabFilterManager {
         });
     }
 
+
     activateTab(tabId) {
         this.tabs.forEach(tab => tab.classList.remove('active'));
         this.tabContents.forEach(content => content.classList.remove('active'));
@@ -36,6 +37,16 @@ class TabFilterManager {
             selectedTab.classList.add('active');
             selectedContent.classList.add('active');
             this.currentTab = tabId;
+
+            // Preserve relevant parameters when switching tabs
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('tab', tabId);
+            
+            // Reset page to 1 when switching tabs
+            urlParams.set('page', '1');
+            
+            // Update URL without reloading
+            window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
         }
     }
 }
@@ -460,22 +471,22 @@ function goToPage() {
     const input = document.getElementById('pageInput');
     const pagination = document.querySelector('.pagination');
     const totalPages = parseInt(pagination.dataset.totalPages);
+    const currentTab = pagination.dataset.currentTab;
     
     const page = parseInt(input.value);
     if (page && page >= 1 && page <= totalPages) {
         // Get current URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Get the tab from the data attribute we added to the input
-        const currentTab = input.dataset.currentTab;
-        
-        // Ensure tab parameter is set
-        urlParams.set('tab', currentTab);
-        
         // Update page parameter
         urlParams.set('page', page);
         
-        // Construct new URL
+        // Ensure tab parameter is set
+        if (!urlParams.has('tab')) {
+            urlParams.set('tab', currentTab);
+        }
+        
+        // Construct new URL preserving all parameters
         window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
 }
