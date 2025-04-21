@@ -456,14 +456,22 @@ def format_time(seconds, discipline_info, cronometraggio):
     tot_digits = 5
     decimal_digits = 2
 
+    ## Prove multiple sono un punteggio
+    if discipline_info['tipo'] == 'Prove Multiple':
+        return f"{seconds:.0f}"
+
     ## To manual timings 0.24s is added in prestazione for the rankings, but we
     ## now want to display the original time with 1 decimal digit
     if cronometraggio == 'm':
         seconds -= 0.24
         decimal_digits = 1
         tot_digits = 4
-    if discipline_info['classifica'] == 'tempo' and seconds < 10:
+
+    ## Anche i salti e i lanci non vogliono avere lo 0 se sono < 10
+    if seconds < 10:
             return f"{seconds:0{tot_digits - 1}.{decimal_digits}f}"
+
+    ## I tempi li mettiamo in formato MM:SS.sss altrimenti gliuis si lamenta
     if discipline_info['classifica'] == 'tempo' and seconds >= 60:
         minutes = int(seconds // 60)
         remaining_seconds = seconds % 60
@@ -473,6 +481,7 @@ def format_time(seconds, discipline_info, cronometraggio):
 
 # Category mapping dictionary
 CATEGORY_MAPPING = {
+    'U12': ['EM', 'EF'],
     'U14': ['RM', 'RF'],
     'U16': ['CM', 'CF'],
     'U18': ['AM', 'AF'],
