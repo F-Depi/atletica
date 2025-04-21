@@ -250,7 +250,7 @@ class StandardFilterManager {
                         disciplina: d.disciplina,
                         ambiente: 'P'
                     });
-                    optionOutdoor.textContent = d.disciplina;
+                    optionOutdoor.textContent = d.disciplina.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
                     this.disciplineSelect.appendChild(optionOutdoor);
 
                     const optionIndoor = document.createElement('option');
@@ -258,7 +258,7 @@ class StandardFilterManager {
                         disciplina: d.disciplina,
                         ambiente: 'I'
                     });
-                    optionIndoor.textContent = d.disciplina + ' (indoor)';
+                    optionIndoor.textContent = d.disciplina.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase()) + ' (indoor)';
                     this.disciplineSelect.appendChild(optionIndoor);
                 } else {
                     const option = document.createElement('option');
@@ -266,7 +266,7 @@ class StandardFilterManager {
                         disciplina: d.disciplina,
                         ambiente: d.ambiente
                     });
-                    option.textContent = d.disciplina + (d.ambiente === 'I' ? ' (indoor)' : '');
+                    option.textContent = d.disciplina.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase()) + (d.ambiente === 'I' ? ' (indoor)' : '');
                     this.disciplineSelect.appendChild(option);
                 }
             });
@@ -449,7 +449,7 @@ class AdvancedFilterManager {
             Object.entries(disciplines).forEach(([disc]) => {
                 const option = document.createElement('option');
                 option.value = disc;
-                option.textContent = disc;
+                option.textContent = disc.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
                 this.disciplineSelect.appendChild(option);
             });
 
