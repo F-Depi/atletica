@@ -38,14 +38,74 @@ class TabFilterManager {
             selectedContent.classList.add('active');
             this.currentTab = tabId;
 
-            // Preserve relevant parameters when switching tabs
             const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('tab', tabId);
-            
-            // Reset page to 1 when switching tabs
-            urlParams.set('page', '1');
-            
-            // Update URL without reloading
+            const previousTab = urlParams.get('tab');
+
+            // Gestisci il cambio di tab
+            if (tabId !== previousTab) {
+                // Preserva i parametri quando si passa tra tab standard
+                if (tabId !== 'advanced' && previousTab && previousTab !== 'advanced') {
+                    // Mantieni tutti i parametri esistenti, cambia solo il tab e il gender
+                    urlParams.set('tab', tabId);
+                    
+                    // Aggiorna i form della nuova tab con i valori correnti
+                    const targetFilter = tabId === 'men' ? this.menFilters : this.womenFilters;
+                    
+                    // Imposta i valori nei select
+                    if (urlParams.get('category')) {
+                        targetFilter.categorySelect.value = urlParams.get('category');
+                    }
+                    if (urlParams.get('year')) {
+                        targetFilter.yearSelect.value = urlParams.get('year');
+                    }
+                    if (urlParams.get('limit')) {
+                        targetFilter.limitSelect.value = urlParams.get('limit');
+                    }
+                    if (urlParams.get('allResults')) {
+                        targetFilter.allResultsToggle.checked = urlParams.get('allResults').toLowerCase() === 'true';
+                    }
+
+                    // Forza il caricamento delle discipline mantenendo la disciplina selezionata
+                    const currentDiscipline = urlParams.get('discipline');
+                    const currentAmbiente = urlParams.get('ambiente');
+                    if (currentDiscipline && currentAmbiente) {
+                        targetFilter.updateDisciplineSelect().then(() => {
+                            // Cerca l'opzione corrispondente
+                            const options = Array.from(targetFilter.disciplineSelect.options);
+                            const targetOption = options.find(option => {
+                                if (!option.value) return false;
+                                const data = JSON.parse(option.value);
+                                return data.disciplina === currentDiscipline && 
+                                       data.ambiente === currentAmbiente;
+                            });
+                            
+                            if (targetOption) {
+                                targetFilter.disciplineSelect.value = targetOption.value;
+                                targetFilter.updateWindCheckboxVisibility();
+                            }
+                        });
+                    }
+                } 
+                // Gestione passaggio da/verso tab avanzata
+                else {
+                    urlParams.set('tab', tabId);
+                    
+                    if (tabId !== 'advanced') {
+                        // Se si passa dalla tab avanzata a una standard
+                        urlParams.set('category', 'ASS');
+                        urlParams.delete('page');
+
+                        // Forza il caricamento delle discipline
+                        if (tabId === 'men') {
+                            this.menFilters.forceLoadDisciplines();
+                        } else if (tabId === 'women') {
+                            this.womenFilters.forceLoadDisciplines();
+                        }
+                    }
+                }
+            }
+
+            // Aggiorna l'URL
             window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
         }
     }
@@ -67,7 +127,7 @@ class StandardFilterManager {
         this.allResultsToggle = document.getElementById(`${gender}AllResults`);
 
         this.initializeEventListeners();
-        
+
         // Se non ci sono parametri nell'URL, carica le discipline per la categoria di default
         const urlParams = new URLSearchParams(window.location.search);
         if (!urlParams.get('category') && !urlParams.get('discipline')) {
@@ -93,55 +153,76 @@ class StandardFilterManager {
     }
 
     initializeFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Imposta categoria e carica le discipline
-    if (urlParams.get('category')) {
-        this.categorySelect.value = urlParams.get('category');
-        this.updateDisciplineSelect().then(() => {
-            // Dopo che le discipline sono state caricate, imposta la disciplina selezionata
-            const discipline = urlParams.get('discipline');
-            const ambiente = urlParams.get('ambiente');
+        const urlParams = new URLSearchParams(window.location.search);
 
-            if (discipline && ambiente) {
-                // Cerca l'opzione corrispondente
+        // Imposta categoria e carica le discipline
+        if (urlParams.get('category')) {
+            this.categorySelect.value = urlParams.get('category');
+            this.updateDisciplineSelect().then(() => {
+                // Dopo che le discipline sono state caricate, imposta la disciplina selezionata
+                const discipline = urlParams.get('discipline');
+                const ambiente = urlParams.get('ambiente');
+
+                if (discipline && ambiente) {
+                    // Cerca l'opzione corrispondente
+                    const options = Array.from(this.disciplineSelect.options);
+                    const targetOption = options.find(option => {
+                        if (!option.value) return false;
+                        const data = JSON.parse(option.value);
+                        return data.disciplina === discipline && data.ambiente === ambiente;
+                    });
+
+                    if (targetOption) {
+                        this.disciplineSelect.value = targetOption.value;
+                        this.updateWindCheckboxVisibility();
+                    }
+                }
+            });
+        }
+
+        // Imposta gli altri valori
+        if (urlParams.get('year')) this.yearSelect.value = urlParams.get('year');
+        if (urlParams.get('limit')) this.limitSelect.value = urlParams.get('limit');
+        if (urlParams.get('allResults')) this.allResultsToggle.checked = true;
+
+        // Imposta il checkbox del vento se presente
+        const legalWind = urlParams.get('legal_wind');
+        if (legalWind !== null && this.windCheckbox) {
+            const windInput = this.windCheckbox.querySelector('input');
+            if (windInput) {
+                windInput.checked = legalWind.toLowerCase() === 'true';
+            }
+        }
+    }
+
+
+    forceLoadDisciplines() {
+        // Assicurati che la categoria sia impostata su Assoluti
+        this.categorySelect.value = 'ASS';
+
+        // Forza il caricamento delle discipline
+        this.updateDisciplineSelect().then(() => {
+            // Dopo il caricamento, seleziona i 100m se non c'è una disciplina selezionata
+            if (!this.disciplineSelect.value) {
                 const options = Array.from(this.disciplineSelect.options);
-                const targetOption = options.find(option => {
+                const hundred = options.find(option => {
                     if (!option.value) return false;
                     const data = JSON.parse(option.value);
-                    return data.disciplina === discipline && data.ambiente === ambiente;
+                    return data.disciplina === '100m' && data.ambiente === 'P';
                 });
-                
-                if (targetOption) {
-                    this.disciplineSelect.value = targetOption.value;
+
+                if (hundred) {
+                    this.disciplineSelect.value = hundred.value;
                     this.updateWindCheckboxVisibility();
                 }
             }
+        }).catch(error => {
+            console.error('Error in forceLoadDisciplines:', error);
         });
-    }
-    
-    // Imposta gli altri valori
-    if (urlParams.get('year')) this.yearSelect.value = urlParams.get('year');
-    if (urlParams.get('limit')) this.limitSelect.value = urlParams.get('limit');
-    if (urlParams.get('allResults')) this.allResultsToggle.checked = true;
-    
-    // Imposta il checkbox del vento se presente
-    const legalWind = urlParams.get('legal_wind');
-    if (legalWind !== null && this.windCheckbox) {
-        const windInput = this.windCheckbox.querySelector('input');
-        if (windInput) {
-            windInput.checked = legalWind.toLowerCase() === 'true';
-        }
-    }
     }
 
     async updateDisciplineSelect() {
-        const category = this.categorySelect.value;
-
-        if (!category) {
-            this.disciplineSelect.disabled = true;
-            return;
-        }
+        const category = this.categorySelect.value || 'ASS';
 
         try {
             const response = await fetch(`/api/disciplines/${category}/${this.genderCode}`);
@@ -150,7 +231,7 @@ class StandardFilterManager {
             const disciplines = await response.json();
 
             // Rimuovi tutte le opzioni esistenti
-            this.disciplineSelect.innerHTML = '';
+            this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
 
             disciplines.forEach(d => {
                 if (d.ambiente === 'I-P') {
@@ -171,7 +252,6 @@ class StandardFilterManager {
                     optionIndoor.textContent = d.disciplina + ' (indoor)';
                     this.disciplineSelect.appendChild(optionIndoor);
                 } else {
-                    // Ambiente singolo (I, P o IP)
                     const option = document.createElement('option');
                     option.value = JSON.stringify({
                         disciplina: d.disciplina,
@@ -183,27 +263,12 @@ class StandardFilterManager {
             });
 
             this.disciplineSelect.disabled = false;
+            return disciplines;
 
-            // Se non c'è una disciplina selezionata, seleziona i 100m
-            if (!this.disciplineSelect.value) {
-                // Cerca l'opzione dei 100m outdoor
-                const options = Array.from(this.disciplineSelect.options);
-                const hundred = options.find(option => {
-                    if (!option.value) return false;
-                    const data = JSON.parse(option.value);
-                    return data.disciplina === '100m' && data.ambiente === 'P';
-                });
-
-                if (hundred) {
-                    this.disciplineSelect.value = hundred.value;
-                    this.updateWindCheckboxVisibility();
-                    // Aggiungi questa riga per forzare il submit dei filtri
-                    this.submitFilters();
-                }
-            }
         } catch (error) {
             console.error('Error loading disciplines:', error);
             this.disciplineSelect.disabled = true;
+            throw error;
         }
     }
 
@@ -276,7 +341,7 @@ class AdvancedFilterManager {
         this.disciplineSelect = document.getElementById('advancedDisciplineSelect');
         this.windCheckbox = this.form.querySelector('.wind-checkbox');
         this.ambienteSelect = this.form.querySelector('select[name="ambiente"]');
-        
+
         this.disciplinesLoaded = false;
 
         // Carica le discipline e inizializza
@@ -326,7 +391,7 @@ class AdvancedFilterManager {
         try {
             const response = await fetch(`/api/discipline_info/${selectedDiscipline}`);
             if (!response.ok) throw new Error('Network response was not ok');
-            
+
             const info = await response.json();
             console.log('Discipline info:', info); // Debug log
             this.windCheckbox.style.display = info.vento === 'sì' ? 'block' : 'none';
@@ -343,7 +408,7 @@ class AdvancedFilterManager {
         }
 
         const urlParams = new URLSearchParams(window.location.search);
-        
+
         // Imposta i valori dei campi form
         for (const [key, value] of urlParams.entries()) {
             const element = this.form.elements[key];
@@ -405,7 +470,7 @@ class AdvancedFilterManager {
         // Handle all form fields
         for (const [key, value] of formData.entries()) {
             if (!value && key !== 'legal_wind') continue;
-            
+
             if (key === 'legal_wind') {
                 urlParams.set(key, 'true');
             } else {
@@ -507,24 +572,25 @@ function goToPage() {
     const pagination = document.querySelector('.pagination');
     const totalPages = parseInt(pagination.dataset.totalPages);
     const currentTab = pagination.dataset.currentTab;
-    
+
     const page = parseInt(input.value);
     if (page && page >= 1 && page <= totalPages) {
         // Get current URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        
+
         // Update page parameter
         urlParams.set('page', page);
-        
+
         // Ensure tab parameter is set
         if (!urlParams.has('tab')) {
             urlParams.set('tab', currentTab);
         }
-        
+
         // Construct new URL preserving all parameters
         window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const pageInput = document.getElementById('pageInput');

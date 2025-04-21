@@ -34,16 +34,11 @@ def get_all_disciplines():
 ## Per le tab "Uomni" e "Donne"
 @app.route('/api/disciplines/<category>/<gender>')
 def get_disciplines(category, gender):
-    try:
-        disciplines = [
-            d for d in DISCIPLINE_STANDARD[category] 
-            if gender in d['sesso']
-        ]
-        return jsonify(disciplines)
-
-    except Exception as e:
-        app.logger.error(f"Error loading disciplines: {str(e)}")
-        return jsonify({'error': 'Errore interno del server'}), 500
+    disciplines = [
+        d for d in DISCIPLINE_STANDARD[category] 
+        if gender in d['sesso']
+    ]
+    return jsonify(disciplines)
 
 
 ## Permette a rankings.js di sapere se una disciplina ha il vento e 
@@ -229,7 +224,6 @@ def handle_advanced_rankings():
     limit = request.args.get('limit', 50, type=int)
     show_all = request.args.get('allResults', '').lower() == 'true'
     legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'  # Default to true
-    print(f"legal_wind_only: {legal_wind_only}")
     page = request.args.get('page', 1, type=int)
     
     # Get properties of the discipline
