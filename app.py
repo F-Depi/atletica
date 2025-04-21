@@ -488,59 +488,5 @@ for age in range(35, 100, 5):
     CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
 
 
-
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-#ORDERED_CATEGORIES = [
-#    # Youth categories
-#    'U14', 'U16', 'U18', 'U20',
-#    # Under 23
-#    'U23',
-#    # Senior
-#    'SEN',
-#    # Masters (from M35 to M95)
-#] + [f'M{age}' for age in range(35, 100, 5)]
-
-
-
-#def get_categories(discipline, ambiente):
-#    engine = get_db_engine()
-#    
-#    # Modify query based on ambiente
-#    if ambiente == 'ALL':
-#        query = """
-#            SELECT DISTINCT categoria 
-#            FROM results 
-#            WHERE disciplina = :discipline 
-#            ORDER BY categoria
-#        """
-#        params = {'discipline': discipline}
-#    else:
-#        query = """
-#            SELECT DISTINCT categoria 
-#            FROM results 
-#            WHERE disciplina = :discipline 
-#            AND ambiente = :ambiente 
-#            ORDER BY categoria
-#        """
-#        params = {'discipline': discipline, 'ambiente': ambiente}
-#    
-#    with engine.connect() as conn:
-#        result = pd.read_sql(
-#            text(query), 
-#            conn,
-#            params=params
-#        )
-#    
-#    # Convert Italian categories to standardized ones
-#    standardized_categories = set()
-#    for cat in result['categoria']:
-#        if cat in CATEGORY_MAPPING:
-#            standardized_categories.add(CATEGORY_MAPPING[cat])
-#    
-#    # Return only categories that exist in the database, maintaining our preferred order
-#    return [cat for cat in ORDERED_CATEGORIES if cat in standardized_categories]
