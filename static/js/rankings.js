@@ -142,10 +142,15 @@ class StandardFilterManager {
         }
 
         this.initializeFromUrl();
+        
+        // Store to preserve across category change
+        this.currentDisciplineValue = null;
     }
 
     initializeEventListeners() {
         this.categorySelect.addEventListener('change', () => {
+            // Store current discipline selection before updating
+            this.currentDisciplineValue = this.disciplineSelect.value ? JSON.parse(this.disciplineSelect.value) : null;
             this.updateDisciplineSelect();
         });
 
@@ -272,6 +277,25 @@ class StandardFilterManager {
             });
 
             this.disciplineSelect.disabled = false;
+            
+            // Try to restore previous discipline selection if it exists in the new category
+            if (this.currentDisciplineValue) {
+                // Look for matching discipline in the new options
+                const options = Array.from(this.disciplineSelect.options);
+                const matchingOption = options.find(option => {
+                    if (!option.value) return false;
+                    const optionData = JSON.parse(option.value);
+                    return optionData.disciplina === this.currentDisciplineValue.disciplina && 
+                           optionData.ambiente === this.currentDisciplineValue.ambiente;
+                });
+                
+                if (matchingOption) {
+                    this.disciplineSelect.value = matchingOption.value;
+                    // Also update the wind checkbox visibility for the restored selection
+                    this.updateWindCheckboxVisibility();
+                }
+            }
+            
             return disciplines;
 
         } catch (error) {

@@ -4,3 +4,4 @@ venv/
 .venv/
 *.sh
 *.foo
+config.py

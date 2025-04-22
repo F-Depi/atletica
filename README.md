@@ -6,7 +6,7 @@ Il database dei dati è create e aggiornato da
 La prima volta che si runna il sito:
 
 ```
-export FLASK_APP=app.py                                                                                                                                                     <<<
+export FLASK_APP=app.py
 export FLASK_ENV=development
 flask run
 ```

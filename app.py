@@ -456,14 +456,22 @@ def format_time(seconds, discipline_info, cronometraggio):
     tot_digits = 5
     decimal_digits = 2
 
+    ## Prove multiple sono un punteggio
+    if discipline_info['tipo'] == 'Prove Multiple':
+        return f"{seconds:.0f}"
+
     ## To manual timings 0.24s is added in prestazione for the rankings, but we
     ## now want to display the original time with 1 decimal digit
     if cronometraggio == 'm':
         seconds -= 0.24
         decimal_digits = 1
         tot_digits = 4
-    if discipline_info['classifica'] == 'tempo' and seconds < 10:
+
+    ## Anche i salti e i lanci non vogliono avere lo 0 se sono < 10
+    if seconds < 10:
             return f"{seconds:0{tot_digits - 1}.{decimal_digits}f}"
+
+    ## I tempi li mettiamo in formato MM:SS.sss altrimenti gliuis si lamenta
     if discipline_info['classifica'] == 'tempo' and seconds >= 60:
         minutes = int(seconds // 60)
         remaining_seconds = seconds % 60
@@ -473,6 +481,7 @@ def format_time(seconds, discipline_info, cronometraggio):
 
 # Category mapping dictionary
 CATEGORY_MAPPING = {
+    'U12': ['EM', 'EF'],
     'U14': ['RM', 'RF'],
     'U16': ['CM', 'CF'],
     'U18': ['AM', 'AF'],
@@ -488,59 +497,5 @@ for age in range(35, 100, 5):
     CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
 
 
-
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-#ORDERED_CATEGORIES = [
-#    # Youth categories
-#    'U14', 'U16', 'U18', 'U20',
-#    # Under 23
-#    'U23',
-#    # Senior
-#    'SEN',
-#    # Masters (from M35 to M95)
-#] + [f'M{age}' for age in range(35, 100, 5)]
-
-
-
-#def get_categories(discipline, ambiente):
-#    engine = get_db_engine()
-#    
-#    # Modify query based on ambiente
-#    if ambiente == 'ALL':
-#        query = """
-#            SELECT DISTINCT categoria 
-#            FROM results 
-#            WHERE disciplina = :discipline 
-#            ORDER BY categoria
-#        """
-#        params = {'discipline': discipline}
-#    else:
-#        query = """
-#            SELECT DISTINCT categoria 
-#            FROM results 
-#            WHERE disciplina = :discipline 
-#            AND ambiente = :ambiente 
-#            ORDER BY categoria
-#        """
-#        params = {'discipline': discipline, 'ambiente': ambiente}
-#    
-#    with engine.connect() as conn:
-#        result = pd.read_sql(
-#            text(query), 
-#            conn,
-#            params=params
-#        )
-#    
-#    # Convert Italian categories to standardized ones
-#    standardized_categories = set()
-#    for cat in result['categoria']:
-#        if cat in CATEGORY_MAPPING:
-#            standardized_categories.add(CATEGORY_MAPPING[cat])
-#    
-#    # Return only categories that exist in the database, maintaining our preferred order
-#    return [cat for cat in ORDERED_CATEGORIES if cat in standardized_categories]

@@ -1,4 +1,11 @@
 {
+  "U12": [
+    {"disciplina": "50m", "ambiente": "IP", "sesso": "MF"},
+    {"disciplina": "600m", "ambiente": "I-P", "sesso": "MF"},
+    {"disciplina": "alto", "ambiente": "IP", "sesso": "MF"},
+    {"disciplina": "lungo", "ambiente": "IP", "sesso": "MF"},
+    {"disciplina": "vortex", "ambiente": "P", "sesso": "MF"}
+  ],
   "U14": [
     {"disciplina": "60m", "ambiente": "IP", "sesso": "MF"},
     {"disciplina": "1000m", "ambiente": "I-P", "sesso": "MF"},
