@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from sqlalchemy import create_engine, text
 import json
+import os
+import logging
+from datetime import datetime
 import pandas as pd
 from config import DB_CONFIG
 from flask import Flask, render_template, request, jsonify, redirect, url_for
@@ -495,6 +498,56 @@ CATEGORY_MAPPING = {
 # Add Masters categories (from M35 to M95)
 for age in range(35, 100, 5):
     CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
+
+
+# Configurazione del logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='segnalazioni.log'
+)
+logger = logging.getLogger('segnalazioni')
+
+# Directory per salvare le segnalazioni
+SEGNALAZIONI_DIR = 'segnalazioni'
+os.makedirs(SEGNALAZIONI_DIR, exist_ok=True)
+
+@app.route('/api/segnala-errore', methods=['POST'])
+def segnala_errore():
+    try:
+        # Ottieni i dati dalla richiesta
+        dati = request.get_json()
+        
+        # Verifica che i dati necessari siano presenti
+        required_fields = ['descrizione', 'atleta', 'prestazione']
+        for field in required_fields:
+            if field not in dati:
+                return jsonify({'success': False, 'error': f'Campo mancante: {field}'}), 400
+        
+        # Aggiungi informazioni sul timestamp
+        timestamp = datetime.now().isoformat()
+        dati['timestamp'] = timestamp
+        
+        # Aggiungi informazioni sull'IP del client (opzionale)
+        dati['ip_client'] = request.remote_addr
+        
+        # Crea un nome file basato sul timestamp
+        filename = f"{timestamp.replace(':', '-').replace('.', '-')}.json"
+        filepath = os.path.join(SEGNALAZIONI_DIR, filename)
+        
+        # Salva i dati in un file JSON
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(dati, f, ensure_ascii=False, indent=2)
+        
+        # Log dell'operazione
+        logger.info(f"Nuova segnalazione ricevuta: {dati['atleta']} - {dati['prestazione']}")
+        
+        return jsonify({'success': True, 'message': 'Segnalazione ricevuta correttamente'}), 200
+    
+    except Exception as e:
+        logger.error(f"Errore durante la gestione della segnalazione: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':

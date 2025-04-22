@@ -1,0 +1,24 @@
+2025-04-23 00:44:14,410 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 00:44:14,410 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 00:44:19,181 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1 HTTP/1.1" 200 -
+2025-04-23 00:44:19,244 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,245 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/js/rankings.js HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,248 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/js/theme.js HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,272 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/header.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,273 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,275 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/variables.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,276 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/tables.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,279 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/components.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,280 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/filters.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,285 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/theme-toggle.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,285 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/footer.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,287 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/responsive.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,288 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "[36mGET /static/css/utilities.css HTTP/1.1[0m" 304 -
+2025-04-23 00:44:19,342 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/disciplines/ASS/M HTTP/1.1" 200 -
+2025-04-23 00:44:19,343 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/disciplines/ASS/F HTTP/1.1" 200 -
+2025-04-23 00:44:19,345 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/disciplines/all HTTP/1.1" 200 -
+2025-04-23 00:44:19,388 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 00:44:19,404 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 00:44:25,245 - segnalazioni - INFO - Nuova segnalazione ricevuta: SIMONELLI Lorenzo ndele - 13.05
+2025-04-23 00:44:25,245 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:25] "POST /api/segnala-errore HTTP/1.1" 200 -
