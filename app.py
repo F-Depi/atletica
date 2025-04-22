@@ -1,4 +1,7 @@
 from flask import Flask, render_template, request, jsonify
+from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from sqlalchemy import create_engine, text
 import json
 import os
@@ -117,7 +120,7 @@ def handle_standard_rankings(tab):
     # Aggiungi filtro anno
     if year:
         conditions.append("EXTRACT(YEAR FROM data) = :year")
-        params['year'] = int(year)
+        params['year'] = int(year) #pyright: ignore
 
     # Aggiungi filtro vento se necessario
     if legal_wind_only and should_show_wind(discipline, 'P'):
@@ -142,8 +145,8 @@ def handle_standard_rankings(tab):
     # Calcola paginazione
     total_pages = (total_count + limit - 1) // limit
     offset = (page - 1) * limit
-    params['limit'] = limit
-    params['offset'] = offset
+    params['limit'] = limit #pyright: ignore
+    params['offset'] = offset #pyright: ignore
 
     # Costruisci la query principale
     sort_direction = 'ASC' if DISCIPLINES[discipline]['classifica'] == 'tempo' else 'DESC'
@@ -248,7 +251,7 @@ def handle_advanced_rankings():
 
     if year:
         conditions.append("EXTRACT(YEAR FROM data) = :year")
-        params['year'] = int(year)
+        params['year'] = int(year) #pyright: ignore
 
     if legal_wind_only and show_wind:
         conditions.append("""(
@@ -289,8 +292,8 @@ def handle_advanced_rankings():
     # Calculate pagination
     total_pages = (total_count + limit - 1) // limit
     offset = (page - 1) * limit
-    params['limit'] = limit
-    params['offset'] = offset
+    params['limit'] = limit #pyright: ignore
+    params['offset'] = offset #pyright: ignore
 
     # Main query
     if show_all:
@@ -500,6 +503,21 @@ for age in range(35, 100, 5):
     CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
 
 
+"""Questa è la parte per la gestione delle segnalazioni"""
+# Configurazione del logging
+app.config['SECRET_KEY'] = 'chiave-sicura-da-cambiare-in-production'
+
+# Inizializza CSRF protection
+csrf = CSRFProtect(app)
+
+# Inizializza rate limiter (usando la memoria invece di Redis)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per day", "30 per hour"],
+    storage_uri="memory://"
+)
+
 # Configurazione del logging
 logging.basicConfig(
     level=logging.INFO,
@@ -512,7 +530,20 @@ logger = logging.getLogger('segnalazioni')
 SEGNALAZIONI_DIR = 'segnalazioni'
 os.makedirs(SEGNALAZIONI_DIR, exist_ok=True)
 
+# Rotta per la pagina principale con il token CSRF incorporato
+#@app.route('/')
+#def index():
+#    return render_template('index.html')
+
+# API per ottenere il token CSRF
+@app.route('/get-csrf-token', methods=['GET'])
+def get_csrf_token():
+    token = generate_csrf()
+    return jsonify({'csrf_token': token})
+
+# API per segnalare errori
 @app.route('/api/segnala-errore', methods=['POST'])
+@limiter.limit("5/minute")  # Limite di 5 richieste al minuto
 def segnala_errore():
     try:
         # Ottieni i dati dalla richiesta
@@ -524,14 +555,12 @@ def segnala_errore():
             if field not in dati:
                 return jsonify({'success': False, 'error': f'Campo mancante: {field}'}), 400
         
-        # Aggiungi informazioni sul timestamp
+        # Aggiungi timestamp e info client
         timestamp = datetime.now().isoformat()
         dati['timestamp'] = timestamp
-        
-        # Aggiungi informazioni sull'IP del client (opzionale)
         dati['ip_client'] = request.remote_addr
         
-        # Crea un nome file basato sul timestamp
+        # Crea un nome file per la segnalazione
         filename = f"{timestamp.replace(':', '-').replace('.', '-')}.json"
         filepath = os.path.join(SEGNALAZIONI_DIR, filename)
         
@@ -550,5 +579,6 @@ def segnala_errore():
 
 
 
+print("\n\nHAI CAMBIATO LA CHIAVE DI SICUREZZA PER CSFR?\n\n")
 if __name__ == '__main__':
     app.run(debug=True)

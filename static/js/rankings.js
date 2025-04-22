@@ -654,6 +654,22 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentRowData = null;
     let currentAtleta = '';
     let currentPrestazione = '';
+    let csrfToken = '';
+    
+    // Ottieni il token CSRF all'avvio
+    fetchCsrfToken();
+    
+    function fetchCsrfToken() {
+        fetch('/get-csrf-token')
+            .then(response => response.json())
+            .then(data => {
+                csrfToken = data.csrf_token;
+                console.log('CSRF token ottenuto');
+            })
+            .catch(error => {
+                console.error('Errore nel recupero del CSRF token:', error);
+            });
+    }
     
     if (!detailBox || !closeBtn) {
         console.error('Detail box o close button non trovati!');
@@ -716,6 +732,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gestione del form di segnalazione
     btnMostraSegnala.addEventListener('click', function() {
         formSegnalazione.style.display = 'block';
+        // Assicurati di avere un token CSRF aggiornato quando mostri il form
+        if (!csrfToken) {
+            fetchCsrfToken();
+        }
     });
     
     btnAnnullaSegnalazione.addEventListener('click', function() {
@@ -735,6 +755,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const testoErrore = testoSegnalazione.value.trim();
         if (!testoErrore) return;
         
+        if (!csrfToken) {
+            messaggioInvio.textContent = 'Errore di sicurezza, ricarica la pagina.';
+            messaggioInvio.className = 'messaggio-invio error';
+            return;
+        }
+        
         // Dati da inviare con informazioni aggiuntive
         const datiSegnalazione = {
             atleta: currentAtleta,
@@ -745,11 +771,16 @@ document.addEventListener('DOMContentLoaded', function() {
             queryParams: window.location.search  // Parametri della query
         };
         
+        // Mostra indicatore di caricamento
+        messaggioInvio.textContent = 'Invio in corso...';
+        messaggioInvio.className = 'messaggio-invio';
+        
         // Utilizza fetch per inviare i dati
         fetch('/api/segnala-errore', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify(datiSegnalazione),
         })
@@ -764,6 +795,9 @@ document.addEventListener('DOMContentLoaded', function() {
             messaggioInvio.textContent = 'Segnalazione inviata con successo!';
             messaggioInvio.className = 'messaggio-invio success';
             
+            // Refresha il token CSRF dopo l'uso
+            fetchCsrfToken();
+            
             // Pulisci il form e nascondi dopo 2 secondi
             setTimeout(() => {
                 formSegnalazione.style.display = 'none';
@@ -776,6 +810,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Errore:', error);
             messaggioInvio.textContent = 'Errore nell\'invio della segnalazione. Riprova.';
             messaggioInvio.className = 'messaggio-invio error';
+            
+            // Refresha il token CSRF in caso di errore
+            fetchCsrfToken();
         });
     });
     
