@@ -22,3 +22,126 @@
 2025-04-23 00:44:19,404 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:19] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
 2025-04-23 00:44:25,245 - segnalazioni - INFO - Nuova segnalazione ricevuta: SIMONELLI Lorenzo ndele - 13.05
 2025-04-23 00:44:25,245 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 00:44:25] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:09:31,894 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:09:31,894 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:09:37,489 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "GET /rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1 HTTP/1.1" 200 -
+2025-04-23 01:09:37,555 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,557 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "GET /static/js/rankings.js HTTP/1.1" 200 -
+2025-04-23 01:09:37,558 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/js/theme.js HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,585 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/variables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,586 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,586 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/header.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,589 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/components.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,590 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/tables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,593 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/filters.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,594 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/theme-toggle.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,598 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/utilities.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,599 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/footer.css HTTP/1.1[0m" 304 -
+2025-04-23 01:09:37,599 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:09:37] "[36mGET /static/css/responsive.css HTTP/1.1[0m" 304 -
+2025-04-23 01:10:58,249 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:10:58,249 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:11:09,188 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1 HTTP/1.1" 200 -
+2025-04-23 01:11:09,259 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /static/js/rankings.js HTTP/1.1" 200 -
+2025-04-23 01:11:09,260 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,261 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/js/theme.js HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,275 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/variables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,279 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,282 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/header.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,283 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/components.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,285 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/tables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,289 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/filters.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,290 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/utilities.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,291 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/theme-toggle.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,295 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/footer.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,295 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "[36mGET /static/css/responsive.css HTTP/1.1[0m" 304 -
+2025-04-23 01:11:09,378 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /api/disciplines/ASS/M HTTP/1.1" 200 -
+2025-04-23 01:11:09,380 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /api/disciplines/ASS/F HTTP/1.1" 200 -
+2025-04-23 01:11:09,382 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /api/disciplines/all HTTP/1.1" 200 -
+2025-04-23 01:11:09,384 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:09,415 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:11:09,429 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:09] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:11:20,765 - segnalazioni - INFO - Nuova segnalazione ricevuta: DAL MOLIN Paolo - 13.27
+2025-04-23 01:11:20,765 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:20] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:11:20,772 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:20] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:44,767 - segnalazioni - INFO - Nuova segnalazione ricevuta: DAL MOLIN Paolo - 13.27
+2025-04-23 01:11:44,767 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:44] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:11:44,774 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:44] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:46,013 - segnalazioni - INFO - Nuova segnalazione ricevuta: DAL MOLIN Paolo - 13.27
+2025-04-23 01:11:46,013 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:46] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:11:46,020 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:46] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:51,668 - segnalazioni - INFO - Nuova segnalazione ricevuta: SIMONELLI Lorenzo ndele - 13.05
+2025-04-23 01:11:51,668 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:51] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:11:51,674 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:51] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:53,260 - segnalazioni - INFO - Nuova segnalazione ricevuta: SIMONELLI Lorenzo ndele - 13.05
+2025-04-23 01:11:53,260 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:53] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:11:53,279 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:53] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:11:58,193 - flask-limiter - INFO - ratelimit 5 per 1 minute (127.0.0.1) exceeded at endpoint: segnala_errore
+2025-04-23 01:11:58,194 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:58] "[31m[1mPOST /api/segnala-errore HTTP/1.1[0m" 429 -
+2025-04-23 01:11:58,211 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:11:58] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:00,443 - flask-limiter - INFO - ratelimit 5 per 1 minute (127.0.0.1) exceeded at endpoint: segnala_errore
+2025-04-23 01:12:00,443 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:00] "[31m[1mPOST /api/segnala-errore HTTP/1.1[0m" 429 -
+2025-04-23 01:12:00,459 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:00] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:01,832 - flask-limiter - INFO - ratelimit 5 per 1 minute (127.0.0.1) exceeded at endpoint: segnala_errore
+2025-04-23 01:12:01,833 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:01] "[31m[1mPOST /api/segnala-errore HTTP/1.1[0m" 429 -
+2025-04-23 01:12:01,868 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:01] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:22,743 - segnalazioni - INFO - Nuova segnalazione ricevuta: SIMONELLI Lorenzo ndele - 13.05
+2025-04-23 01:12:22,743 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:22] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:12:22,750 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:22] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:29,095 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
+2025-04-23 01:12:29,095 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:29] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:12:29,119 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:29] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:30,658 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
+2025-04-23 01:12:30,658 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:30] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:12:30,664 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:30] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:35,917 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
+2025-04-23 01:12:35,917 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:35] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:12:35,932 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:35] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:36,937 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
+2025-04-23 01:12:36,937 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:36] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:12:36,944 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:36] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:12:37,716 - flask-limiter - INFO - ratelimit 5 per 1 minute (127.0.0.1) exceeded at endpoint: segnala_errore
+2025-04-23 01:12:37,717 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:37] "[31m[1mPOST /api/segnala-errore HTTP/1.1[0m" 429 -
+2025-04-23 01:12:37,723 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:12:37] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:13:09,872 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "GET /rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1 HTTP/1.1" 200 -
+2025-04-23 01:13:09,917 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/js/rankings.js HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,918 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,920 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/js/theme.js HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,944 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/variables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,944 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,948 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/components.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,950 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/header.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,951 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/tables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,956 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/filters.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,958 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/theme-toggle.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,959 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/utilities.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,961 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/footer.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:09,962 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:09] "[36mGET /static/css/responsive.css HTTP/1.1[0m" 304 -
+2025-04-23 01:13:10,011 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /api/disciplines/ASS/M HTTP/1.1" 200 -
+2025-04-23 01:13:10,012 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /api/disciplines/ASS/F HTTP/1.1" 200 -
+2025-04-23 01:13:10,014 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /api/disciplines/all HTTP/1.1" 200 -
+2025-04-23 01:13:10,015 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:13:10,041 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:13:10,057 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:10] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:13:35,618 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
+2025-04-23 01:13:35,618 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:35] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:13:35,626 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:35] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:13:45,063 - segnalazioni - INFO - Nuova segnalazione ricevuta: MACH DI PALMSTEIN Ivan - 13.79
+2025-04-23 01:13:45,063 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:45] "POST /api/segnala-errore HTTP/1.1" 200 -
+2025-04-23 01:13:45,069 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:13:45] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:14:17,574 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:14:17,574 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:14:34,832 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:14:34,832 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:14:56,960 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:14:56,960 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:15:13,359 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:15:13,359 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:15:28,299 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:15:28,299 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
