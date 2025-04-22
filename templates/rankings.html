@@ -223,10 +223,10 @@
                 {% if ambiente == "ALL" and not show_wind %}
                 <td>{{ 'Indoor' if result.ambiente == 'I' else 'Outdoor' }}</td>
                 {% endif %}
-                <td><a href="{{ result.link_atleta }}">{{ result.atleta }}</a></td>
+                <td><a href="{{ result.link_atleta }}" target="_blank">{{ result.atleta }}</a></td>
                 <td>{{ result.anno }}</td>
                 <td>{{ result.categoria }}</td>
-                <td><a href="{{ result.link_società }}">{{ result.società }}</a></td>
+                <td><a href="{{ result.link_società }}" target="_blank">{{ result.società }}</a></td>
                 <td>{{ result.luogo }}</td>
                 <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
             </tr>
