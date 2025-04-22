@@ -10,6 +10,8 @@ from datetime import datetime
 import pandas as pd
 from config import DB_CONFIG
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+import secrets
+
 
 
 app = Flask(__name__)
@@ -505,7 +507,7 @@ for age in range(35, 100, 5):
 
 """Questa è la parte per la gestione delle segnalazioni"""
 # Configurazione del logging
-app.config['SECRET_KEY'] = 'chiave-sicura-da-cambiare-in-production'
+app.config['SECRET_KEY'] = secrets.token_hex(32)
 
 # Inizializza CSRF protection
 csrf = CSRFProtect(app)
@@ -579,6 +581,5 @@ def segnala_errore():
 
 
 
-print("\n\nHAI CAMBIATO LA CHIAVE DI SICUREZZA PER CSFR?\n\n")
 if __name__ == '__main__':
     app.run(debug=True)

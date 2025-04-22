@@ -256,7 +256,13 @@
         <!-- Form di segnalazione errori - inizialmente nascosto -->
         <div id="formSegnalazione" class="form-segnalazione" style="display: none;">
             <h4>Segnala un errore</h4>
-            <textarea id="testoSegnalazione" placeholder="Descrivi l'errore che hai riscontrato..." rows="4" required></textarea>
+            <textarea
+              id="testoSegnalazione"
+              name="testoSegnalazione"
+              rows="4"
+              required
+              placeholder="Descrivi l'errore che hai riscontrato... (Inserisci una mail se vuoi essere ricontattato)">
+            </textarea>
             <div class="form-actions">
                 <button id="annullaSegnalazione" class="form-btn cancel-btn">Annulla</button>
                 <button id="inviaSegnalazione" class="form-btn submit-btn" disabled>Invia segnalazione</button>
