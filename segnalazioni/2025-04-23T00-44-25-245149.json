@@ -1,0 +1,17 @@
+{
+  "atleta": "SIMONELLI Lorenzo ndele",
+  "prestazione": "13.05",
+  "descrizione": "GOAT",
+  "rowData": {
+    "atleta": "SIMONELLI Lorenzo ndele",
+    "linkAtleta": "https://www.fidal.it/atleta/SIMONELLI-Lorenzo-ndele/f6yRkpqnbGg%3D",
+    "societa": "C.S. ESERCITO",
+    "linkSocieta": "https://www.fidal.it/societa/C-S--ESERCITO/RM052",
+    "prestazione": "13.05",
+    "position": "1"
+  },
+  "pageUrl": "http://localhost:5000/rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1",
+  "queryParams": "?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=1",
+  "timestamp": "2025-04-23T00:44:25.245149",
+  "ip_client": "127.0.0.1"
+}
