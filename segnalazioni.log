@@ -148,3 +148,40 @@
 2025-04-23 01:22:37,545 - flask_wtf.csrf - INFO - The CSRF session token is missing.
 2025-04-23 01:22:51,491 - segnalazioni - INFO - Nuova segnalazione ricevuta: PERINI Lorenzo - 13.46
 2025-04-23 01:23:02,673 - segnalazioni - INFO - Nuova segnalazione ricevuta: NALOCCA John mark - 13.89
+2025-04-23 01:32:57,337 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-23 01:32:57,337 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-23 01:33:01,965 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:01] "GET /rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS&page=3 HTTP/1.1" 200 -
+2025-04-23 01:33:02,057 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/main.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,058 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/js/rankings.js HTTP/1.1" 200 -
+2025-04-23 01:33:02,059 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/js/theme.js HTTP/1.1" 200 -
+2025-04-23 01:33:02,083 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,085 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/header.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,086 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/variables.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,087 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/components.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,089 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/tables.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,090 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/filters.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,091 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/theme-toggle.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,094 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/utilities.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,096 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/footer.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,098 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /static/css/responsive.css HTTP/1.1" 200 -
+2025-04-23 01:33:02,229 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /api/disciplines/ASS/M HTTP/1.1" 200 -
+2025-04-23 01:33:02,230 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /api/disciplines/ASS/F HTTP/1.1" 200 -
+2025-04-23 01:33:02,231 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /api/disciplines/all HTTP/1.1" 200 -
+2025-04-23 01:33:02,233 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /get-csrf-token HTTP/1.1" 200 -
+2025-04-23 01:33:02,328 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:33:02,368 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "GET /api/discipline_info/110Hs_h106-9.14 HTTP/1.1" 200 -
+2025-04-23 01:33:02,428 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:02] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-04-23 01:33:05,742 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "GET / HTTP/1.1" 200 -
+2025-04-23 01:33:05,791 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/js/theme.js HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,791 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,815 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/variables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,818 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,820 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/header.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,824 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/filters.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,824 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/components.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,825 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/tables.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,828 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/theme-toggle.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,832 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/utilities.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,833 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/footer.css HTTP/1.1[0m" 304 -
+2025-04-23 01:33:05,835 - werkzeug - INFO - 127.0.0.1 - - [23/Apr/2025 01:33:05] "[36mGET /static/css/responsive.css HTTP/1.1[0m" 304 -
