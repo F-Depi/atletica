@@ -635,3 +635,158 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+// Apertura e gestione del Box con link atleta, società e segnalazione errore
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.result-row');
+    const detailBox = document.getElementById('detailBox');
+    const closeBtn = document.querySelector('.close-btn');
+
+    // Elementi per la segnalazione errori
+    const btnMostraSegnala = document.getElementById('mostraSegnalaErrore');
+    const formSegnalazione = document.getElementById('formSegnalazione');
+    const testoSegnalazione = document.getElementById('testoSegnalazione');
+    const btnAnnullaSegnalazione = document.getElementById('annullaSegnalazione');
+    const btnInviaSegnalazione = document.getElementById('inviaSegnalazione');
+    const messaggioInvio = document.getElementById('messaggioInvio');
+
+    let currentAtleta = '';
+    let currentPrestazione = '';
+
+    if (!detailBox || !closeBtn) {
+        console.error('Detail box o close button non trovati!');
+        return;
+    }
+
+    // Crea un overlay per facilitare la chiusura al tocco
+    const overlay = document.createElement('div');
+    overlay.className = 'detail-overlay';
+    document.body.appendChild(overlay);
+
+    function showDetailBox() {
+        detailBox.style.display = 'block';
+        overlay.style.display = 'block';
+        // Nascondi il form di segnalazione quando si apre il box
+        formSegnalazione.style.display = 'none';
+        testoSegnalazione.value = '';
+        messaggioInvio.textContent = '';
+        messaggioInvio.className = 'messaggio-invio';
+    }
+
+    function hideDetailBox() {
+        detailBox.style.display = 'none';
+        overlay.style.display = 'none';
+    }
+
+    rows.forEach(row => {
+        row.addEventListener('click', function() {
+            const atleta = this.getAttribute('data-atleta');
+            const linkAtleta = this.getAttribute('data-link-atleta');
+            const societa = this.getAttribute('data-societa');
+            const linkSocieta = this.getAttribute('data-link-societa');
+            const prestazione = this.getAttribute('data-prestazione');
+            const position = this.getAttribute('data-position');
+
+            // Memorizza i dati per la segnalazione
+            currentAtleta = atleta;
+            currentPrestazione = prestazione;
+
+            // Popola il box con i dati
+            document.getElementById('detailAtleta').textContent = `${atleta} - ${prestazione} (${position}°)`;
+            document.getElementById('linkAtleta').href = linkAtleta;
+            document.getElementById('linkSocieta').href = linkSocieta;
+
+            // Mostra il box
+            showDetailBox();
+        });
+    });
+
+    // Gestione del form di segnalazione
+    btnMostraSegnala.addEventListener('click', function() {
+        formSegnalazione.style.display = 'block';
+    });
+
+    btnAnnullaSegnalazione.addEventListener('click', function() {
+        formSegnalazione.style.display = 'none';
+        testoSegnalazione.value = '';
+        messaggioInvio.textContent = '';
+        messaggioInvio.className = 'messaggio-invio';
+    });
+
+    // Controllo input per abilitare/disabilitare il bottone di invio
+    testoSegnalazione.addEventListener('input', function() {
+        btnInviaSegnalazione.disabled = this.value.trim().length === 0;
+    });
+
+    // Invio della segnalazione
+    btnInviaSegnalazione.addEventListener('click', function() {
+        const testoErrore = testoSegnalazione.value.trim();
+        if (!testoErrore) return;
+
+        // Dati da inviare
+        const datiSegnalazione = {
+            atleta: currentAtleta,
+            prestazione: currentPrestazione,
+            descrizione: testoErrore
+        };
+
+        // Utilizza fetch per inviare i dati
+        fetch('/api/segnala-errore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datiSegnalazione),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore nell\'invio della segnalazione');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Mostra messaggio di successo
+                messaggioInvio.textContent = 'Segnalazione inviata con successo!';
+                messaggioInvio.className = 'messaggio-invio success';
+
+                // Pulisci il form e nascondi dopo 2 secondi
+                setTimeout(() => {
+                    formSegnalazione.style.display = 'none';
+                    testoSegnalazione.value = '';
+                    messaggioInvio.textContent = '';
+                    messaggioInvio.className = 'messaggio-invio';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                messaggioInvio.textContent = 'Errore nell\'invio della segnalazione. Riprova.';
+                messaggioInvio.className = 'messaggio-invio error';
+            });
+    });
+
+    // Chiudi il box quando si clicca sulla X
+    closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        hideDetailBox();
+    });
+
+    // Chiudi il box quando si clicca sull'overlay
+    overlay.addEventListener('click', function() {
+        hideDetailBox();
+    });
+
+    // Previeni la chiusura quando si clicca sul box stesso
+    detailBox.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    // Supporto per chiusura con tasto ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && detailBox.style.display === 'block') {
+            hideDetailBox();
+        }
+    });
+
+    console.log('Script di dettaglio risultati inizializzato');
+});

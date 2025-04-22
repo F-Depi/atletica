@@ -241,7 +241,8 @@
     </table>
 </div>
 
-<!-- Sposta il modal/box per i dettagli qui, FUORI dalla tabella -->
+
+<!-- Box per link atleta, società e segnalazione -->
 <div id="detailBox" class="detail-box" style="display: none;">
     <div class="detail-content">
         <span class="close-btn">&times;</span>
@@ -249,58 +250,21 @@
         <div class="detail-links">
             <a id="linkAtleta" href="#" target="_blank">Profilo atleta</a>
             <a id="linkSocieta" href="#" target="_blank">Pagina società</a>
-            <a id="segnalaErrore" href="#" target="_blank">Segnala errore</a>
+            <button id="mostraSegnalaErrore" class="segnala-btn">Segnala errore</button>
+        </div>
+        
+        <!-- Form di segnalazione errori - inizialmente nascosto -->
+        <div id="formSegnalazione" class="form-segnalazione" style="display: none;">
+            <h4>Segnala un errore</h4>
+            <textarea id="testoSegnalazione" placeholder="Descrivi l'errore che hai riscontrato..." rows="4" required></textarea>
+            <div class="form-actions">
+                <button id="annullaSegnalazione" class="form-btn cancel-btn">Annulla</button>
+                <button id="inviaSegnalazione" class="form-btn submit-btn" disabled>Invia segnalazione</button>
+            </div>
+            <div id="messaggioInvio" class="messaggio-invio"></div>
         </div>
     </div>
 </div>
-
-<!-- Sposta lo script qui, idealmente prima della chiusura del body -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('.result-row');
-        const detailBox = document.getElementById('detailBox');
-        const closeBtn = document.querySelector('.close-btn');
-        
-        if (!detailBox || !closeBtn) {
-            console.error('Detail box o close button non trovati!');
-            return;
-        }
-        
-        rows.forEach(row => {
-            row.addEventListener('click', function() {
-                const atleta = this.getAttribute('data-atleta');
-                const linkAtleta = this.getAttribute('data-link-atleta');
-                const societa = this.getAttribute('data-societa');
-                const linkSocieta = this.getAttribute('data-link-societa');
-                const prestazione = this.getAttribute('data-prestazione');
-                const position = this.getAttribute('data-position');
-                
-                // Popola il box con i dati
-                document.getElementById('detailAtleta').textContent = `${atleta} - ${prestazione} (${position}°)`;
-                document.getElementById('linkAtleta').href = linkAtleta;
-                document.getElementById('linkSocieta').href = linkSocieta;
-                document.getElementById('segnalaErrore').href = `/segnala-errore?atleta=${encodeURIComponent(atleta)}&prestazione=${encodeURIComponent(prestazione)}`;
-                
-                // Mostra il box
-                detailBox.style.display = 'block';
-            });
-        });
-        
-        // Chiudi il box quando si clicca sulla X
-        closeBtn.addEventListener('click', function() {
-            detailBox.style.display = 'none';
-        });
-        
-        // Chiudi il box quando si clicca fuori da esso
-        window.addEventListener('click', function(event) {
-            if (event.target === detailBox) {
-                detailBox.style.display = 'none';
-            }
-        });
-        
-        console.log('Script di dettaglio risultati inizializzato');
-    });
-</script>
 
 
 <!-- Pagination section in rankings.html -->
