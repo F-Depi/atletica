@@ -245,6 +245,8 @@
         <!-- Crea una funzione per generare l'URL con tutti i parametri -->
         {% macro pagination_url(page_num) %}
             {% set params = request.args.copy() %}
+            {# Questo linguaggio di merda aggiunge un'altra key invece che aggiornare il valore di quella esistente#}
+            {% set _ = params.pop('page', None) %}
             {% set _ = params.update({'page': page_num}) %}
             {{ url_for('rankings', **params) }}
         {% endmacro %}
