@@ -192,6 +192,7 @@
     <!-- Stats will be loaded here -->
 </div>
 
+<!-- La parte della tabella dovrebbe restare così, ma sposta gli elementi modal e script fuori dal tbody -->
 <div class="rankings-table-container">
     <table class="rankings-table">
         <thead>
@@ -201,7 +202,7 @@
                 {% if show_wind %}
                 <th>Vento</th>
                 {% endif %}
-                {% if ambiente == "ALL" and not show_wind%}
+                {% if ambiente == "ALL" and not show_wind %}
                 <th>Ambiente</th>
                 {% endif %}
                 <th>Atleta</th>
@@ -214,7 +215,12 @@
         </thead>
         <tbody>
             {% for result in results %}
-            <tr>
+            <tr class="result-row" data-atleta="{{ result.atleta }}"
+                data-link-atleta="{{ result.link_atleta }}"
+                data-societa="{{ result.società }}"
+                data-link-societa="{{ result.link_società }}"
+                data-prestazione="{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}"
+                data-position="{{ result.position }}">
                 <td><b>{{ result.position }}</b></td>
                 <td>{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}</td>
                 {% if show_wind %}
@@ -223,10 +229,10 @@
                 {% if ambiente == "ALL" and not show_wind %}
                 <td>{{ 'Indoor' if result.ambiente == 'I' else 'Outdoor' }}</td>
                 {% endif %}
-                <td><a href="{{ result.link_atleta }}" target="_blank">{{ result.atleta }}</a></td>
+                <td>{{ result.atleta }}</td>
                 <td>{{ result.anno }}</td>
                 <td>{{ result.categoria }}</td>
-                <td><a href="{{ result.link_società }}" target="_blank">{{ result.società }}</a></td>
+                <td>{{ result.società }}</td>
                 <td>{{ result.luogo }}</td>
                 <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
             </tr>
@@ -235,44 +241,105 @@
     </table>
 </div>
 
+<!-- Sposta il modal/box per i dettagli qui, FUORI dalla tabella -->
+<div id="detailBox" class="detail-box" style="display: none;">
+    <div class="detail-content">
+        <span class="close-btn">&times;</span>
+        <h3 id="detailAtleta"></h3>
+        <div class="detail-links">
+            <a id="linkAtleta" href="#" target="_blank">Profilo atleta</a>
+            <a id="linkSocieta" href="#" target="_blank">Pagina società</a>
+            <a id="segnalaErrore" href="#" target="_blank">Segnala errore</a>
+        </div>
+    </div>
+</div>
+
+<!-- Sposta lo script qui, idealmente prima della chiusura del body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.result-row');
+        const detailBox = document.getElementById('detailBox');
+        const closeBtn = document.querySelector('.close-btn');
+        
+        if (!detailBox || !closeBtn) {
+            console.error('Detail box o close button non trovati!');
+            return;
+        }
+        
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                const atleta = this.getAttribute('data-atleta');
+                const linkAtleta = this.getAttribute('data-link-atleta');
+                const societa = this.getAttribute('data-societa');
+                const linkSocieta = this.getAttribute('data-link-societa');
+                const prestazione = this.getAttribute('data-prestazione');
+                const position = this.getAttribute('data-position');
+                
+                // Popola il box con i dati
+                document.getElementById('detailAtleta').textContent = `${atleta} - ${prestazione} (${position}°)`;
+                document.getElementById('linkAtleta').href = linkAtleta;
+                document.getElementById('linkSocieta').href = linkSocieta;
+                document.getElementById('segnalaErrore').href = `/segnala-errore?atleta=${encodeURIComponent(atleta)}&prestazione=${encodeURIComponent(prestazione)}`;
+                
+                // Mostra il box
+                detailBox.style.display = 'block';
+            });
+        });
+        
+        // Chiudi il box quando si clicca sulla X
+        closeBtn.addEventListener('click', function() {
+            detailBox.style.display = 'none';
+        });
+        
+        // Chiudi il box quando si clicca fuori da esso
+        window.addEventListener('click', function(event) {
+            if (event.target === detailBox) {
+                detailBox.style.display = 'none';
+            }
+        });
+        
+        console.log('Script di dettaglio risultati inizializzato');
+    });
+</script>
+
 
 <!-- Pagination section in rankings.html -->
 <div class="pagination" data-total-pages="{{ total_pages }}" data-current-tab="{{ request.args.get('tab', 'men') }}">
     {% if total_pages > 1 %}
-        {% set start = [1, current_page - 2] | max %}
-        {% set end = [total_pages, current_page + 2] | min %}
+    {% set start = [1, current_page - 2] | max %}
+    {% set end = [total_pages, current_page + 2] | min %}
 
-        <!-- Crea una funzione per generare l'URL con tutti i parametri -->
-        {% macro pagination_url(page_num) %}
-            {% set params = request.args.copy() %}
-            {# Questo linguaggio di merda aggiunge un'altra key invece che aggiornare il valore di quella esistente#}
-            {% set _ = params.pop('page', None) %}
-            {% set _ = params.update({'page': page_num}) %}
-            {{ url_for('rankings', **params) }}
-        {% endmacro %}
+    <!-- Crea una funzione per generare l'URL con tutti i parametri -->
+    {% macro pagination_url(page_num) %}
+    {% set params = request.args.copy() %}
+    {# Questo linguaggio di merda aggiunge un'altra key invece che aggiornare il valore di quella esistente#}
+    {% set _ = params.pop('page', None) %}
+    {% set _ = params.update({'page': page_num}) %}
+    {{ url_for('rankings', **params) }}
+    {% endmacro %}
 
-        {% if start > 1 %}
-            <a href="{{ pagination_url(1) }}" class="page-link">1</a>
-            {% if start > 2 %}
-                <span class="page-ellipsis">...</span>
-            {% endif %}
-        {% endif %}
+    {% if start > 1 %}
+    <a href="{{ pagination_url(1) }}" class="page-link">1</a>
+    {% if start > 2 %}
+    <span class="page-ellipsis">...</span>
+    {% endif %}
+    {% endif %}
 
-        {% for p in range(start, end + 1) %}
-            <a href="{{ pagination_url(p) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
-        {% endfor %}
+    {% for p in range(start, end + 1) %}
+    <a href="{{ pagination_url(p) }}" class="page-link {% if p == current_page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
 
-        {% if end < total_pages %}
-            {% if end < total_pages - 1 %}
-                <span class="page-ellipsis">...</span>
-            {% endif %}
-            <a href="{{ pagination_url(total_pages) }}" class="page-link">{{ total_pages }}</a>
-        {% endif %}
+    {% if end < total_pages %}
+    {% if end < total_pages - 1 %}
+    <span class="page-ellipsis">...</span>
+    {% endif %}
+    <a href="{{ pagination_url(total_pages) }}" class="page-link">{{ total_pages }}</a>
+    {% endif %}
 
-        <div class="page-input-container">
-            <input type="number" id="pageInput" min="1" max="{{ total_pages }}" class="page-input" placeholder="Pagina">
-            <button onclick="goToPage()" class="page-go-btn">Vai</button>
-        </div>
+    <div class="page-input-container">
+        <input type="number" id="pageInput" min="1" max="{{ total_pages }}" class="page-input" placeholder="Pagina">
+        <button onclick="goToPage()" class="page-go-btn">Vai</button>
+    </div>
     {% endif %}
 </div>
 
