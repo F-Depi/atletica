@@ -1,0 +1,17 @@
+{
+  "atleta": "TANO Leonardo",
+  "prestazione": "13.73",
+  "descrizione": "I",
+  "rowData": {
+    "atleta": "TANO Leonardo",
+    "linkAtleta": "https://www.fidal.it/atleta/TANO-Leonardo/dq2Rm5WicWU%3D",
+    "societa": "ATLETICA MENEGHINA",
+    "linkSocieta": "https://www.fidal.it/societa/ATLETICA-MENEGHINA/MI770",
+    "prestazione": "13.73",
+    "position": "8"
+  },
+  "pageUrl": "https://atletica.mooo.com/rankings?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS",
+  "queryParams": "?tab=men&discipline=110Hs_h106-9.14&ambiente=P&category=ASS",
+  "timestamp": "2025-04-23T02:23:15.095570",
+  "ip_client": "127.0.0.1"
+}

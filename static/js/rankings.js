@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Errore:', error);
-            messaggioInvio.textContent = 'Errore nell\'invio della segnalazione. Riprova.';
+            messaggioInvio.textContent = 'Errore nell\'invio. Riprova.';
             messaggioInvio.className = 'messaggio-invio error';
             
             // Refresha il token CSRF in caso di errore
