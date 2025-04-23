@@ -8,9 +8,8 @@ import os
 import logging
 from datetime import datetime
 import pandas as pd
-from config import DB_CONFIG
+from config import DB_CONFIG, SECRET_KEY
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-import secrets
 
 
 
@@ -507,7 +506,7 @@ for age in range(35, 100, 5):
 
 """Questa è la parte per la gestione delle segnalazioni"""
 # Configurazione del logging
-app.config['SECRET_KEY'] = secrets.token_hex(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 
 # Inizializza CSRF protection
 csrf = CSRFProtect(app)
