@@ -6,3 +6,6 @@ venv/
 *.foo
 *.log
 config.py
+segnalazioni/
+segnalazioni/*
+segnalazioni.log
