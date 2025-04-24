@@ -1,4 +1,6 @@
 Flask
+flask_wtf
+flask_limiter
 SQLAlchemy
 psycopg2-binary
 pandas
