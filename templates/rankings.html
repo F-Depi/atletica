@@ -117,33 +117,6 @@
     <!-- Advanced tab content -->
     <div id="advancedTab" class="tab-content">
         <form id="advancedForm" class='filter-form'>
-            <!-- Discipline filter -->
-            <select name="discipline" class="filter-select" id="advancedDisciplineSelect">
-                <option value="">Disciplina</option>
-            </select>
-
-            <!-- Indoor/Outdoor filter -->
-            <select name="ambiente" class="filter-select">
-                <option value="ALL" {% if ambiente == 'ALL' %}selected{% endif %}>Tutti (I/O)</option>
-                <option value="I" {% if ambiente == 'I' %}selected{% endif %}>Indoor</option>
-                <option value="P" {% if ambiente == 'P' %}selected{% endif %}>Outdoor</option>
-            </select>
-
-            <!-- Year filter -->
-            <select name="year" class="filter-select">
-                <option value="">Tutti gli anni</option>
-                {% for y in range(2025, 2004, -1) %}
-                <option value="{{ y }}" {% if year == y|string %}selected{% endif %}>{{ y }}</option>
-                {% endfor %}
-            </select>
-
-            <!-- Gender filter -->
-            <select name="gender" class="filter-select">
-                <option value="">Misto</option>
-                <option value="M" {% if gender == 'M' %}selected{% endif %}>Uomini</option>
-                <option value="F" {% if gender == 'F' %}selected{% endif %}>Donne</option>
-            </select>
-
             <!-- Category filter -->
             <select name="category" class="filter-select">
                 <option value="">Tutte le categorie</option>
@@ -158,6 +131,33 @@
                 <!-- Master from 35 to 85 -->
                 {% for i in range(35, 100, 5) %}
                 <option value="M{{ i }}" {% if category == 'M' + i|string %}selected{% endif %}>Master {{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Discipline filter -->
+            <select name="discipline" class="filter-select" id="advancedDisciplineSelect">
+                <option value="">Disciplina</option>
+            </select>
+
+            <!-- Indoor/Outdoor filter -->
+            <select name="ambiente" class="filter-select">
+                <option value="ALL" {% if ambiente == 'ALL' %}selected{% endif %}>Tutti (I/O)</option>
+                <option value="I" {% if ambiente == 'I' %}selected{% endif %}>Indoor</option>
+                <option value="P" {% if ambiente == 'P' %}selected{% endif %}>Outdoor</option>
+            </select>
+
+            <!-- Gender filter -->
+            <select name="gender" class="filter-select">
+                <option value="">Misto</option>
+                <option value="M" {% if gender == 'M' %}selected{% endif %}>Uomini</option>
+                <option value="F" {% if gender == 'F' %}selected{% endif %}>Donne</option>
+            </select>
+
+            <!-- Year filter -->
+            <select name="year" class="filter-select">
+                <option value="">Tutti gli anni</option>
+                {% for y in range(2025, 2004, -1) %}
+                <option value="{{ y }}" {% if year == y|string %}selected{% endif %}>{{ y }}</option>
                 {% endfor %}
             </select>
 
