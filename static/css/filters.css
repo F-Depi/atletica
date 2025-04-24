@@ -40,7 +40,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 8px 8px;
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -84,6 +84,7 @@
 .apply-filters-btn:hover {
     background-color: var(--secondary-color);
 }
+
 
 /* static/css/rankings.css */
 .tabs {
