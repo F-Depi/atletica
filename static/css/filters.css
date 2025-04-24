@@ -1,10 +1,10 @@
 .filters {
     background-color: var(--card-background);
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin: 20px 0;
-    top: 20px;
+    margin: 10px 0;
+    top: 10px;
     z-index: 100;
 }
 
@@ -16,10 +16,10 @@
 }
 
 .filter-select {
-    padding: 8px 12px;
+    padding: 8px 8px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    min-width: 120px;
+    min-width: 60px;
     background-color: var(--background-color);
     color: var(--text-color);
     font-size: 0.9rem;
@@ -122,20 +122,13 @@
 
 .tab-content {
     display: none;
-    padding: 20px;
+    padding: 5px;
     background: var(--card-background);
     border-radius: 5px;
 }
 
 .tab-content.active {
     display: block;
-}
-
-.filter-select {
-    margin: 10px 0;
-    padding: 8px;
-    width: 100%;
-    max-width: 300px;
 }
 
 [data-theme="dark"] .filter-select {
