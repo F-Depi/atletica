@@ -1,5 +1,6 @@
-# app/routes/statistiche.py
 from flask import render_template, Blueprint
+import matplotlib
+matplotlib.use('Agg')  # Imposta il backend non interattivo PRIMA di importare pyplot
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -54,7 +55,7 @@ def genera_plot_distribuzione():
     plt.tight_layout()
     plt.savefig(img, format='png', dpi=100)
     img.seek(0)
-    plt.close()
+    plt.close(fig)  # Importante: chiudi esplicitamente la figura
     
     # Converte l'immagine in base64 per l'inclusione nel HTML
     encoded = base64.b64encode(img.getvalue()).decode('utf-8')
@@ -86,7 +87,7 @@ def genera_plot_categorie():
     plt.tight_layout()
     plt.savefig(img, format='png', dpi=100)
     img.seek(0)
-    plt.close()
+    plt.close(fig)  # Importante: chiudi esplicitamente la figura
     
     # Converte l'immagine in base64 per l'inclusione nel HTML
     encoded = base64.b64encode(img.getvalue()).decode('utf-8')
@@ -118,7 +119,7 @@ def genera_plot_record():
     plt.tight_layout()
     plt.savefig(img, format='png', dpi=100)
     img.seek(0)
-    plt.close()
+    plt.close(fig)  # Importante: chiudi esplicitamente la figura
     
     # Converte l'immagine in base64 per l'inclusione nel HTML
     encoded = base64.b64encode(img.getvalue()).decode('utf-8')

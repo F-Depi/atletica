@@ -3,7 +3,7 @@
 {% block content %}
 <div class="statistics-header">
     <h1>Statistiche dell'atletica italiana</h1>
-    <p class="subtitle">Analisi e visualizzazioni dei dati raccolti dal 2005 ad oggi</p>
+    <p class="subtitle">Analisi dei dati raccolti dal 2005 ad oggi</p>
 </div>
 
 <div class="statistics-grid">
@@ -12,7 +12,9 @@
         <h2>{{ stat.titolo }}</h2>
         <p>{{ stat.descrizione }}</p>
         <div class="statistic-visualization">
-            <img src="{{ stat.immagine }}" alt="{{ stat.titolo }}" class="statistic-image">
+            <div class="responsive-image-container">
+                <img src="{{ stat.immagine }}" alt="{{ stat.titolo }}" class="statistic-image">
+            </div>
         </div>
     </div>
     {% endfor %}
