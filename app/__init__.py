@@ -35,10 +35,10 @@ def create_app():
     os.makedirs(SEGNALAZIONI_DIR, exist_ok=True)
     
     # Load blueprints
-    from app.routes import main_bp, rankings_bp, api_bp, statistics_bp
+    from app.routes import main_bp, rankings_bp, api_bp, statistiche_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(rankings_bp)
     app.register_blueprint(api_bp)
-    app.register_blueprint(statistics_bp)
+    app.register_blueprint(statistiche_bp)
     
     return app
