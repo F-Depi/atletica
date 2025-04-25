@@ -529,64 +529,64 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function loadStats(discipline, queryParams) {
-    // Create a copy of queryParams to avoid modifying the original
-    const params = new URLSearchParams(queryParams);
-
-    // Ensure the category parameter is properly encoded
-    const category = params.get('category');
-    if (category) {
-        params.set('category', encodeURIComponent(category));
-    }
-
-    // Add legal_wind parameter if checkbox exists
-    const legalWindCheckbox = document.querySelector('input[name="legal_wind"]');
-    if (legalWindCheckbox) {
-        params.set('legal_wind', legalWindCheckbox.checked);
-    }
-
-    // Add year parameter if it exists
-    const yearSelect = document.querySelector('select[name="year"]');
-    if (yearSelect && yearSelect.value) {
-        params.set('year', yearSelect.value);
-    }
-
-    fetch(`/api/stats/${encodeURIComponent(discipline)}?${params.toString()}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const classificaType = document.getElementById('disciplineInfo').dataset.classificaType;
-            const isBestTime = classificaType === 'tempo';
-            const statsHtml = `
-                <div class="stat-box">
-                <h3>Migliore</h3>
-                <p>${formatTime(data.best, classificaType)}</p>
-                </div>
-                <div class="stat-box">
-                <h3>Media</h3>
-                <p>${formatTime(data.average, classificaType)}</p>
-                </div>
-                <div class="stat-box">
-                <h3>Atleti totali</h3>
-                <p>${data.athletes}</p>
-                </div>
-                <div class="stat-box">
-                <h3>Risultati totali</h3>
-                <p>${data.performances}</p>
-                </div>
-                `;
-            document.getElementById('statsContainer').innerHTML = statsHtml;
-        })
-        .catch(error => {
-            console.error('Error fetching stats:', error);
-            document.getElementById('statsContainer').innerHTML = '<p>Error loading statistics</p>';
-        });
-}
-
+//function loadStats(discipline, queryParams) {
+//    // Create a copy of queryParams to avoid modifying the original
+//    const params = new URLSearchParams(queryParams);
+//
+//    // Ensure the category parameter is properly encoded
+//    const category = params.get('category');
+//    if (category) {
+//        params.set('category', encodeURIComponent(category));
+//    }
+//
+//    // Add legal_wind parameter if checkbox exists
+//    const legalWindCheckbox = document.querySelector('input[name="legal_wind"]');
+//    if (legalWindCheckbox) {
+//        params.set('legal_wind', legalWindCheckbox.checked);
+//    }
+//
+//    // Add year parameter if it exists
+//    const yearSelect = document.querySelector('select[name="year"]');
+//    if (yearSelect && yearSelect.value) {
+//        params.set('year', yearSelect.value);
+//    }
+//
+//    fetch(`/api/stats/${encodeURIComponent(discipline)}?${params.toString()}`)
+//        .then(response => {
+//            if (!response.ok) {
+//                throw new Error('Network response was not ok');
+//            }
+//            return response.json();
+//        })
+//        .then(data => {
+//            const classificaType = document.getElementById('disciplineInfo').dataset.classificaType;
+//            const isBestTime = classificaType === 'tempo';
+//            const statsHtml = `
+//                <div class="stat-box">
+//                <h3>Migliore</h3>
+//                <p>${formatTime(data.best, classificaType)}</p>
+//                </div>
+//                <div class="stat-box">
+//                <h3>Media</h3>
+//                <p>${formatTime(data.average, classificaType)}</p>
+//                </div>
+//                <div class="stat-box">
+//                <h3>Atleti totali</h3>
+//                <p>${data.athletes}</p>
+//                </div>
+//                <div class="stat-box">
+//                <h3>Risultati totali</h3>
+//                <p>${data.performances}</p>
+//                </div>
+//                `;
+//            document.getElementById('statsContainer').innerHTML = statsHtml;
+//        })
+//        .catch(error => {
+//            console.error('Error fetching stats:', error);
+//            document.getElementById('statsContainer').innerHTML = '<p>Error loading statistics</p>';
+//        });
+//}
+//
 
 function formatTime(seconds, classificaType) {
     if (!seconds) return '-';
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchCsrfToken();
     
     function fetchCsrfToken() {
-        fetch('/get-csrf-token')
+        fetch('/api/get-csrf-token')
             .then(response => response.json())
             .then(data => {
                 csrfToken = data.csrf_token;

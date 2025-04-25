@@ -287,7 +287,7 @@
     {# Questo linguaggio di merda aggiunge un'altra key invece che aggiornare il valore di quella esistente#}
     {% set _ = params.pop('page', None) %}
     {% set _ = params.update({'page': page_num}) %}
-    {{ url_for('rankings', **params) }}
+    {{ url_for('rankings.rankings', **params) }}
     {% endmacro %}
 
     {% if start > 1 %}
