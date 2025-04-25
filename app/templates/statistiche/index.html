@@ -1,16 +1,20 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
+<div class="statistics-header">
+    <h1>Statistiche dell'atletica italiana</h1>
+    <p class="subtitle">Analisi e visualizzazioni dei dati raccolti dal 2005 ad oggi</p>
+</div>
 
-    <!-- Statistica 1 -->
-    <div class="box">
-        <img src="{{ url_for('static', filename='images/stat_60_MF.png') }}"
-        alt="Partecipazioni annuali">
+<div class="statistics-grid">
+    {% for key, stat in stats.items() %}
+    <div class="statistic-card">
+        <h2>{{ stat.titolo }}</h2>
+        <p>{{ stat.descrizione }}</p>
+        <div class="statistic-visualization">
+            <img src="{{ stat.immagine }}" alt="{{ stat.titolo }}" class="statistic-image">
+        </div>
     </div>
-
-
-  <!-- Placeholder -->
-  <div class="text-center mt-16 text-gray-500">
-    <p>Altre statistiche in arrivo...</p>
-  </div>
+    {% endfor %}
+</div>
 {% endblock %}

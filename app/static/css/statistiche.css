@@ -1,10 +1,72 @@
-.box {
-  width: 30%;
-  height: 200px;
-  border: 5px dashed #f7a239;
+.statistics-header {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-img {
-  width: 100%; /* takes the 100 % width of its container (.box div)*/
-  height: 100%; /* takes the 100 % height of its container (.box div)*/
+.statistics-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.statistics-header .subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.statistic-card {
+    background-color: var(--background-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.statistic-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.statistic-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.statistic-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.statistic-visualization {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.statistic-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+/* Responsive per schermi più grandi */
+@media (min-width: 768px) {
+    .statistics-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .statistics-grid {
+        grid-template-columns: repeat(1, 1fr);
+        max-width: 900px;
+        margin: 0 auto 2rem auto;
+    }
 }
