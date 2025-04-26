@@ -24,6 +24,7 @@ Il database ha la seguente struttura.
  - ambiente CHAR(1)
 
 ## TO DO
+ - Calcolare il vento per i risultati delle prove multiple outdoor
  - Creare una pagina con le statistiche attualmente contenute 
  [qui](https://github.com/F-Depi/database-atletica-italiana/tree/main/statistiche)
  - Aggiungere una sezione per fare query direttamente sul database

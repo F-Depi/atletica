@@ -588,50 +588,50 @@
         "codice": "41",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Decathlon_JM": {
         "codice": "20",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
         "categoria": "JM",
-        "vento": "sì"
+        "vento": "no"
     },
     "Decathlon_AM": {
         "codice": "91",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Esathlon_CM_(disco)": {
         "codice": "O1",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Esathlon_CM_(asta)": {
         "codice": "O2",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Eptathlon_JF_PF_SF": {
         "codice": "O4",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Eptathlon_AF": {
         "codice": "81",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Pentathlon_CF": {
         "codice": "O3",
         "tipo": "Prove Multiple",
         "classifica": "distanza",
-        "vento": "sì"
+        "vento": "no"
     },
     "Eptathlon_PM_SM": {
         "codice": "I5",

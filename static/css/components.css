@@ -92,6 +92,54 @@
     text-align: center;
 }
 
+
+/* Stile per la sezione disclaimer */
+.data-disclaimer {
+    background: var(--card-background);
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-disclaimer h3 {
+    color: var(--primary-color);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.disclaimer-content p {
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.disclaimer-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.disclaimer-content a:hover {
+    text-decoration: underline;
+    color: var(--secondary-color);
+}
+
+
+/* Stile per la sezione contatti */
+.contact-section {
+    margin: 32px auto;
+    text-align: center;
+    padding: 16px;
+    max-width: 600px;
+}
+
+.contact-section p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
