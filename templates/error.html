@@ -1,0 +1,39 @@
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Errore</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .error-message {
+            color: #d9534f;
+            font-size: 18px;
+            padding: 20px;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #5bc0de;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>Errore</h1>
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        <button class="back-button" onclick="window.history.back()">Torna indietro</button>
+    </div>
+</body>
+</html>

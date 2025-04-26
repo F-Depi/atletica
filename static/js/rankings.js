@@ -770,11 +770,11 @@ document.addEventListener('DOMContentLoaded', function() {
             pageUrl: window.location.href,      // URL completo della pagina corrente
             queryParams: window.location.search  // Parametri della query
         };
-        
+
         // Mostra indicatore di caricamento
         messaggioInvio.textContent = 'Invio in corso...';
         messaggioInvio.className = 'messaggio-invio';
-        
+
         // Utilizza fetch per inviare i dati
         fetch('/api/segnala-errore', {
             method: 'POST',
@@ -785,8 +785,13 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(datiSegnalazione),
         })
         .then(response => {
+            // First check if response is ok
             if (!response.ok) {
-                throw new Error('Errore nell\'invio della segnalazione');
+                // For any error response, try to parse the JSON first
+                return response.json().then(errorData => {
+                    // Throw the error data for the catch block
+                    throw errorData;
+                });
             }
             return response.json();
         })
@@ -808,9 +813,18 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Errore:', error);
-            messaggioInvio.textContent = 'Errore nell\'invio. Riprova.';
+
+            // Check if the error has specific information from the server
+            if (error && error.error) {
+                // Display the specific error message from the server
+                messaggioInvio.textContent = error.error;
+            } else {
+                // Fall back to generic error
+                messaggioInvio.textContent = 'Errore nell\'invio. Riprova.';
+            }
+
             messaggioInvio.className = 'messaggio-invio error';
-            
+
             // Refresha il token CSRF in caso di errore
             fetchCsrfToken();
         });
