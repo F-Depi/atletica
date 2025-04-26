@@ -25,6 +25,8 @@ Il database ha la seguente struttura.
 
 ## TO DO
  - Calcolare il vento per i risultati delle prove multiple outdoor
+ - Aggiungere i risultati delle liste all time fornite dalla FIDAL 
+ [qui](https://www.fidal.it/content/Statistiche/25404)
  - Creare una pagina con le statistiche attualmente contenute 
  [qui](https://github.com/F-Depi/database-atletica-italiana/tree/main/statistiche)
  - Aggiungere una sezione per fare query direttamente sul database

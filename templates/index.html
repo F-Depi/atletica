@@ -4,7 +4,7 @@
 {% block content %}
 <!-- Introduzione al sito -->
 <div class="site-intro">
-    <h1>Benvenuto</h1>
+    <h1>Benvenuto su AtleticaDB</h1>
     <p>Questo sito raccoglie e organizza le graduatorie nazionali italiane dal 2005 ad oggi, offrendo uno strumento di
     consultazione semplice, veloce e il più completo possibile.</p>
     <p>Il mio obiettivo è rendere accessibili questi dati ad atleti, allenatori e appassionati.</p>
@@ -17,14 +17,13 @@
         <div class="section-content">
             <div class="section-primary">
                 <h2>Rankings</h2>
-                <p>Esplora le graduatorie nazionali con tutti i risultati dal 2005 in poi</p>
                 <a href="{{ url_for('rankings') }}" class="button">Vai alla pagina</a>
             </div>
             <div class="section-features">
                 <ul class="features-list">
+                    <li>Un'unica pagina per tutti i risultati dal 2005 ad oggi</li>
                     <li>Graduatorie nazionali anche per ragazzi ed esordienti</li>
                     <li>Filtri per regione, provincia e società</li>
-                    <li>Un'unica pagina per tutti i risultati dal 2005 ad oggi</li>
                 </ul>
             </div>
         </div>
@@ -32,9 +31,15 @@
 
     <!-- Statistics Section (placeholder) -->
     <div class="section-card">
-        <h2>Statistiche</h2>
-        <p>Prossimamente...</p>
-        <button class="button" disabled>Prossimamente</button>
+        <div class="section-content">
+            <div class="section-primary">
+                <h2>Statistiche</h2>
+                <button class="button" disabled>Prossimamente</button>
+            </div>
+            <div class="section-features">
+                <p>Prossimamente...</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -62,7 +67,7 @@
 </div>
 
 <div class="contact-section">
-    <p>Per altre informazioni ti invito a contattarmi: [inserire contatto].</p>
+    <p>Per altre informazioni ti invito a contattarmi: <a href="mailto:atleticadb@proton.me">atleticadb@proton.me</a></p>
 </div>
 
 
