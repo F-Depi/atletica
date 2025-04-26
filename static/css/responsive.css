@@ -3,6 +3,22 @@
         padding: 16px;
     }
 
+    .section-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .section-features {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .features-list {
+        display: inline-block;
+        text-align: left;
+    }
+
     h1 {
         font-size: 2rem;
     }
@@ -10,10 +26,6 @@
     .rankings-table {
         display: block;
         overflow-x: auto;
-    }
-
-    .stats-container {
-        grid-template-columns: 1fr 1fr;
     }
 
     .apply-filters-btn {
