@@ -23,12 +23,9 @@ def index():
         'atleti_per_categoria': {
             'titolo': 'Numero di atleti per categoria',
             'descrizione': 'Confronto tra il numero di atleti attivi nelle diverse categorie',
-            'immagine': genera_plot_categorie()
-        },
-        'record_evoluzione': {
-            'titolo': 'Evoluzione dei record nazionali',
-            'descrizione': 'Andamento dei record nazionali nelle discipline principali',
-            'immagine': genera_plot_record()
+            'immagine': '/static/images/normal/test.png',  # Normal size
+            'immagine_small': '/static/images/small/test.png',  # Small size
+            'immagine_really_small': '/static/images/really_small/test.png'  # Really small size
         }
     }
     
@@ -37,7 +34,7 @@ def index():
 def genera_plot_distribuzione():
     """Genera un grafico di distribuzione delle prestazioni"""
     # Esempio di grafico - in produzione dovresti usare dati reali dal DB
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(5, 3))
     
     years = range(2005, 2026)
     performances_100m = [10.2, 10.15, 10.17, 10.12, 10.08, 10.05, 10.04, 10.02, 10.01, 10.0, 
@@ -61,66 +58,51 @@ def genera_plot_distribuzione():
     encoded = base64.b64encode(img.getvalue()).decode('utf-8')
     return f"data:image/png;base64,{encoded}"
 
-def genera_plot_categorie():
-    """Genera un grafico a barre con il numero di atleti per categoria"""
-    # Esempio di grafico - in produzione dovresti usare dati reali dal DB
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    categories = ['U14', 'U16', 'U18', 'U20', 'U23', 'SEN', 'ASS']
-    num_athletes = [2500, 3200, 2800, 1900, 1200, 900, 2000]
-    
-    bars = ax.bar(categories, num_athletes, color='#e74c3c')
-    
-    # Aggiungi i valori sopra le barre
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2., height + 50,
-                f'{int(height)}', ha='center', va='bottom')
-    
-    ax.set_title('Numero di atleti attivi per categoria (2024)', fontsize=14)
-    ax.set_xlabel('Categoria', fontsize=12)
-    ax.set_ylabel('Numero di atleti', fontsize=12)
-    ax.grid(True, axis='y', linestyle='--', alpha=0.7)
-    
-    # Salva l'immagine in memoria
-    img = io.BytesIO()
-    plt.tight_layout()
-    plt.savefig(img, format='png', dpi=100)
-    img.seek(0)
-    plt.close(fig)  # Importante: chiudi esplicitamente la figura
-    
-    # Converte l'immagine in base64 per l'inclusione nel HTML
-    encoded = base64.b64encode(img.getvalue()).decode('utf-8')
-    return f"data:image/png;base64,{encoded}"
+import matplotlib.pyplot as plt
+from PIL import Image
+import os
 
-def genera_plot_record():
-    """Genera un grafico dell'evoluzione dei record nazionali"""
-    # Esempio di grafico - in produzione dovresti usare dati reali dal DB
-    fig, ax = plt.subplots(figsize=(10, 6))
+# Generate and save the chart at different sizes
+def generate_chart(data, title, save_path):
+    # Your existing chart generation code
+    fig, ax = plt.subplots(figsize=(12, 8))
+    years = range(2005, 2026)
+    performances_100m = [10.2, 10.15, 10.17, 10.12, 10.08, 10.05, 10.04, 10.02, 10.01, 10.0, 
+                       9.99, 9.98, 9.97, 9.96, 9.95, 9.94, 9.93, 9.92, 9.91, 9.9, 9.89]
     
-    years = [2005, 2008, 2012, 2016, 2020, 2024]
-    records_100m = [10.01, 9.99, 9.97, 9.95, 9.93, 9.89]
-    records_200m = [20.2, 20.12, 20.08, 20.05, 20.02, 19.98]
-    records_400m = [45.69, 45.52, 45.41, 45.33, 45.20, 45.12]
-    
-    ax.plot(years, records_100m, marker='o', linestyle='-', label='100m', color='#3498db')
-    ax.plot(years, records_200m, marker='s', linestyle='-', label='200m', color='#e74c3c')
-    ax.plot(years, records_400m, marker='^', linestyle='-', label='400m', color='#2ecc71')
-    
-    ax.set_title('Evoluzione dei record nazionali (velocità)', fontsize=14)
+    ax.plot(years, performances_100m, marker='o', linestyle='-', color='#3498db')
+    ax.set_title('Evoluzione prestazioni 100m (1° classificato)', fontsize=14)
     ax.set_xlabel('Anno', fontsize=12)
     ax.set_ylabel('Tempo (secondi)', fontsize=12)
     ax.grid(True, linestyle='--', alpha=0.7)
-    ax.legend()
     ax.invert_yaxis()  # Inverti l'asse Y in modo che i tempi migliori siano più in alto
+    plt.title(title)
     
-    # Salva l'immagine in memoria
-    img = io.BytesIO()
-    plt.tight_layout()
-    plt.savefig(img, format='png', dpi=100)
-    img.seek(0)
-    plt.close(fig)  # Importante: chiudi esplicitamente la figura
+    # Create directories if they don't exist
+    os.makedirs(os.path.dirname(save_path + '/normal/'), exist_ok=True)
+    os.makedirs(os.path.dirname(save_path + '/small/'), exist_ok=True)
+    os.makedirs(os.path.dirname(save_path + '/really_small/'), exist_ok=True)
     
-    # Converte l'immagine in base64 per l'inclusione nel HTML
-    encoded = base64.b64encode(img.getvalue()).decode('utf-8')
-    return f"data:image/png;base64,{encoded}"
+    # Save the normal size image
+    normal_path = save_path + '/normal/' + title.replace(' ', '_') + '.png'
+    plt.savefig(normal_path, dpi=100, bbox_inches='tight')
+    plt.close()
+    
+    # Create smaller versions with PIL
+    img = Image.open(normal_path)
+    
+    # Small version (768px width)
+    small_width = 768
+    ratio = small_width / img.width
+    small_height = int(img.height * ratio)
+    small_img = img.resize((small_width, small_height), Image.LANCZOS)
+    small_img.save(save_path + '/small/' + title.replace(' ', '_') + '.png')
+    
+    # Really small version (320px width)
+    really_small_width = 320
+    ratio = really_small_width / img.width
+    really_small_height = int(img.height * ratio)
+    really_small_img = img.resize((really_small_width, really_small_height), Image.LANCZOS)
+    really_small_img.save(save_path + '/really_small/' + title.replace(' ', '_') + '.png')
+
+generate_chart(None, "test", "app/static/images")

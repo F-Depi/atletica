@@ -13,7 +13,16 @@
         <p>{{ stat.descrizione }}</p>
         <div class="statistic-visualization">
             <div class="responsive-image-container">
-                <img src="{{ stat.immagine }}" alt="{{ stat.titolo }}" class="statistic-image">
+                <img 
+                src="{{ stat.immagine }}" 
+                srcset="{{ stat.immagine_really_small }} 320w, 
+                {{ stat.immagine_small }} 768w, 
+                {{ stat.immagine }} 1200w"
+                sizes="(max-width: 480px) 100vw, 
+                (max-width: 768px) 700px,
+                800px"
+                alt="{{ stat.titolo }}" 
+                class="statistic-image">
             </div>
         </div>
     </div>

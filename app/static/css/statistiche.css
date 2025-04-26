@@ -49,20 +49,41 @@
 }
 
 .statistic-visualization {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Centra verticalmente */
+    width: 50%;
+    display: block; /* Changed from flex to block */
     margin-top: 0.5rem;
-    overflow-x: auto; /* Aggiunge scroll orizzontale se necessario */
+    overflow: hidden; /* Prevent any overflow */
 }
+
 
 .statistic-image {
     max-width: 100%;
     height: auto;
+    width: 100%;
     border-radius: 6px;
-    display: block; /* Elimina spazio extra sotto l'immagine */
+    display: block;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.responsive-image-container {
+    width: 50%;
+    display: block; /* Changed from flex to block */
+    overflow: hidden; /* Prevent any overflow */
+    padding-bottom: 5px;
+}
+
+/* Stile per la scrollbar su dispositivi che la mostrano */
+.responsive-image-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.responsive-image-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.responsive-image-container::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 /* Responsive per schermi medio-piccoli */
@@ -105,28 +126,5 @@
     .statistic-card {
         padding: 1.5rem;
     }
-}
-
-.responsive-image-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    overflow-x: auto; /* Permette lo scorrimento orizzontale su schermi molto piccoli se necessario */
-    -webkit-overflow-scrolling: touch; /* Scorrimento più fluido su iOS */
-    padding-bottom: 5px; /* Spazio per lo scrollbar se mostrato */
-}
-
-/* Stile per la scrollbar su dispositivi che la mostrano */
-.responsive-image-container::-webkit-scrollbar {
-    height: 4px;
-}
-
-.responsive-image-container::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 4px;
-}
-
-.responsive-image-container::-webkit-scrollbar-track {
-    background: transparent;
 }
 
