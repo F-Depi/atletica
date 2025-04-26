@@ -6,7 +6,7 @@
     "CAM": ["AV", "BN", "CE", "NA", "SA"],      
     "EMI": ["BO", "FE", "FC", "MO", "PR", "PC", "RA", "RE", "RN"],  
     "FVG": ["GO", "PN", "TS", "UD"],           
-    "LAZ": ["FR", "LT", "RI", "RM", "VT"],     
+    "LAZ": ["FR", "LT", "RI", "RM", "RS", "VT"],     
     "LIG": ["GE", "IM", "SP", "SV"],           
     "LOM": ["BG", "BS", "CO", "CR", "LC", "LO", "MB", "MI", "MN", "PV", "SO", "VA"],  
     "MAR": ["AN", "AP", "FM", "MC", "PU"],    
@@ -19,5 +19,5 @@
     "TOS": ["AR", "FI", "GR", "LI", "LU", "MS", "PI", "PO", "PT", "SI"],  
     "UMB": ["PG", "TR"],                        
     "VAO": ["AO"],                             
-    "VEN": ["BL", "PD", "RO", "TV", "VE", "VR", "VI"]  
+    "VEN": ["BL", "PD", "RO", "TV", "VE", "VR", "VI"]
 }

@@ -161,6 +161,45 @@
                 {% endfor %}
             </select>
 
+            <!-- Filtro regioni -->
+            <select name="regione" class="filter-select">
+                <option value="">Tutte le regioni</option>
+                <option value="ABR">Abruzzo</option>
+                <option value="BAS">Basilicata</option>
+                <option value="BZ">Bolzano</option>
+                <option value="CAL">Calabria</option>
+                <option value="CAM">Campania</option>
+                <option value="EMI">Emilia-Romagna</option>
+                <option value="FVG">Friuli-Venezia Giulia</option>
+                <option value="LAZ">Lazio</option>
+                <option value="LIG">Liguria</option>
+                <option value="LOM">Lombardia</option>
+                <option value="MAR">Marche</option>
+                <option value="MOL">Molise</option>
+                <option value="PIE">Piemonte</option>
+                <option value="PUG">Puglia</option>
+                <option value="SAR">Sardegna</option>
+                <option value="SIC">Sicilia</option>
+                <option value="TN">Trento</option>
+                <option value="TOS">Toscana</option>
+                <option value="UMB">Umbria</option>
+                <option value="VAO">Valle d'Aosta</option>
+                <option value="VEN">Veneto</option>
+            </select>
+
+            <!-- Filtro per società -->
+            <input 
+                type="text" 
+                name="provincia_societa" 
+                class="filter-select" 
+                placeholder="Provincia o Codice società (es: RM o RS100)" 
+                pattern="[A-Z]{2}|[A-Z]{2}[0-9]{3}" 
+                maxlength="5" 
+                minlength="2"
+                title="Inserisci due lettere per la provincia o due lettere seguite da tre numeri per il codice società"
+                oninput="this.value = this.value.toUpperCase();"
+            >
+
             <!-- Limit filter -->
             <select name="limit" class="filter-select">
                 <option value="50" {% if limit == 50 %}selected{% endif %}>50 risultati</option>

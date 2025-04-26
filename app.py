@@ -24,6 +24,8 @@ with open('data/dizionario_gare.json') as f:
     DISCIPLINES = json.load(f)
 with open('data/discipline_standard.json') as f:
     DISCIPLINE_STANDARD = json.load(f)
+with open('data/regioni_province.json') as f:
+    REGIONI_PROVINCE = json.load(f)
 
 @app.route('/')
 def index():
@@ -232,6 +234,8 @@ def handle_advanced_rankings():
     year = request.args.get('year', None)
     gender = request.args.get('gender', None)
     category = request.args.get('category')
+    regione = request.args.get('regione', None)
+    provincia_societa = request.args.get('provincia_societa', None)
     limit = request.args.get('limit', 50, type=int)
     show_all = request.args.get('allResults', '').lower() == 'true'
     legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'  # Default to true
@@ -253,6 +257,29 @@ def handle_advanced_rankings():
     if year:
         conditions.append("EXTRACT(YEAR FROM data) = :year")
         params['year'] = int(year) #pyright: ignore
+
+    if regione:
+        province = REGIONI_PROVINCE[regione]
+        province_list = "', '".join(province)
+        conditions.append(f"LEFT(cod_società, 2) IN ('{province_list}')")
+    
+    if provincia_societa:
+
+        # Provincia
+        if len(provincia_societa) == 2:
+            # Caso speciale Roma, provincia divisa in RM e RS
+            if provincia_societa == "RM":
+                conditions.append("(LEFT(cod_società, 2) = 'RM' OR LEFT(cod_società, 2) = 'RS')")
+            else:
+                conditions.append("LEFT(cod_società, 2) = :provincia_societa")
+            params['provincia_societa'] = provincia_societa
+
+        # Società
+        elif len(provincia_societa) == 5:
+            conditions.append("cod_società = :provincia_societa")
+            params['provincia_societa'] = provincia_societa
+        else:
+            print("MMMMMMMMMMMMMMMMMMMMMMMM")
 
     if legal_wind_only and show_wind:
         conditions.append("""(
@@ -361,6 +388,8 @@ def handle_advanced_rankings():
         results=result.to_dict('records'),
         ambiente=ambiente,
         year=year,
+        regione=regione,
+        provincia_societa=provincia_societa,
         sort_direction=sort_direction.lower(),
         current_page=page,
         total_pages=total_pages,
