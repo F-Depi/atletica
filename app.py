@@ -511,9 +511,17 @@ app.config['SECRET_KEY'] = SECRET_KEY
 # Inizializza CSRF protection
 csrf = CSRFProtect(app)
 
+# Restituisce l'IP con cui arriva la richiesta a nginx
+def get_real_ip():
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    elif request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    return request.remote_addr
+
 # Inizializza rate limiter (usando la memoria invece di Redis)
 limiter = Limiter(
-    get_remote_address,
+    get_real_ip,
     app=app,
     default_limits=["100 per day", "30 per hour"],
     storage_uri="memory://"
@@ -559,7 +567,21 @@ def segnala_errore():
         # Aggiungi timestamp e info client
         timestamp = datetime.now().isoformat()
         dati['timestamp'] = timestamp
-        dati['ip_client'] = request.remote_addr
+        
+        # Ottieni l'IP reale dal forward header
+        if request.headers.get('X-Forwarded-For'):
+            dati['ip_client'] = request.headers.get('X-Forwarded-For').split(',')[0].strip()
+        elif request.headers.get('X-Real-IP'):
+            dati['ip_client'] = request.headers.get('X-Real-IP')
+        else:
+            dati['ip_client'] = request.remote_addr
+            
+        # Aggiungi anche gli header pertinenti per debug
+        dati['headers'] = {
+            'X-Forwarded-For': request.headers.get('X-Forwarded-For', ''),
+            'X-Real-IP': request.headers.get('X-Real-IP', ''),
+            'User-Agent': request.headers.get('User-Agent', '')
+        }
         
         # Crea un nome file per la segnalazione
         filename = f"{timestamp.replace(':', '-').replace('.', '-')}.json"
