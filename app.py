@@ -347,7 +347,7 @@ def handle_standard_rankings(tab):
 def handle_advanced_rankings():
     # Get all query parameters with defaults
     discipline = request.args.get('discipline', '100m')
-    ambiente = request.args.get('ambiente', 'P')
+    ambiente = request.args.get('ambiente', None)
     year = request.args.get('year', None)
     gender = request.args.get('gender', None)
     category = request.args.get('category')
@@ -367,7 +367,7 @@ def handle_advanced_rankings():
     conditions = ["disciplina = :discipline"]
     params = {'discipline': discipline}
 
-    if ambiente != 'ALL':
+    if ambiente:
         conditions.append("ambiente = :ambiente")
         params['ambiente'] = ambiente
 
@@ -395,8 +395,6 @@ def handle_advanced_rankings():
         elif len(provincia_societa) == 5:
             conditions.append("cod_società = :provincia_societa")
             params['provincia_societa'] = provincia_societa
-        else:
-            print("MMMMMMMMMMMMMMMMMMMMMMMM")
 
     if legal_wind_only and show_wind:
         conditions.append("""(
