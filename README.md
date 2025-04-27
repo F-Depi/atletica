@@ -33,5 +33,5 @@ Il database ha la seguente struttura.
  - Aggiungere i risultati all time riportati sul
  [sito fidal](https://www.fidal.it/content/Statistiche/25404)
  - Aggiungere i risultati delle gare in diretta. Ho già contruito il
- [programma](https://github.com/F-Depi/stats-athletic/tree/main/database_new),
+ [programma](https://github.com/F-Depi/AtleticaDB-live),
  ma devo renderlo più accurato.
