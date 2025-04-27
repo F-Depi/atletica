@@ -1,4 +1,4 @@
-# Initialization
+# Introduzione 
 Questo sito utilizza un database di dati che ho creato e continuo ad aggiornare
 con quest'altro progetto:
 [database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana)
