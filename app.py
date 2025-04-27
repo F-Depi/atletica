@@ -57,7 +57,7 @@ limiter = Limiter(
 def ratelimit_handler(e):
     # Determine which endpoint triggered the rate limit
     if request.path == '/api/segnala-errore':
-        message = 'Limite di utilizzo superato: massimo 10 segnalazioni al minuto.'
+        message = 'Limite di utilizzo superato: massimo 5 segnalazioni al minuto.'
     else:
         # Generic message for other rate-limited endpoints
         message = 'Troppe richieste. Riprova più tardi.'
@@ -92,7 +92,7 @@ def get_csrf_token():
 
 # API per segnalare errori
 @app.route('/api/segnala-errore', methods=['POST'])
-@limiter.limit("10/minute")  # Limite di 10 richieste al minuto
+@limiter.limit("5/minute")  # Limite di 5 richieste al minuto
 def segnala_errore():
     try:
         # Ottieni i dati dalla richiesta
