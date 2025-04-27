@@ -152,7 +152,7 @@ def index():
 ## Per la tab "Tutti i filtri e le gare"
 @app.route('/api/disciplines/all')
 def get_all_disciplines():
-    return jsonify(DISCIPLINES)
+    return jsonify(list(DISCIPLINES.keys()))
 
 
 ## Carichiamo le discipline in funzione della categoria

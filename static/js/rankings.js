@@ -456,37 +456,38 @@ class AdvancedFilterManager {
     }
 
     async loadDisciplines() {
-        if (this.disciplinesLoaded) return; // Evita caricamenti multipli
+    if (this.disciplinesLoaded) return; // Evita caricamenti multipli
 
-        try {
-            const response = await fetch('/api/disciplines/all');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const disciplines = await response.json();
-
-            // Pulisci il select
-            this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
-
-            // Aggiungi le discipline
-            Object.entries(disciplines).forEach(([disc]) => {
-                const option = document.createElement('option');
-                option.value = disc;
-                option.textContent = disc.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
-                this.disciplineSelect.appendChild(option);
-            });
-
-            this.disciplinesLoaded = true;
-            this.disciplineSelect.disabled = false;
-
-        } catch (error) {
-            console.error('Error loading disciplines:', error);
-            this.disciplineSelect.innerHTML = '<option value="">Error loading disciplines</option>';
-            this.disciplineSelect.disabled = true;
-            throw error; // Propaga l'errore per gestirlo nel costruttore
+    try {
+        const response = await fetch('/api/disciplines/all');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+
+        const disciplines = await response.json();
+
+        // Pulisci il select
+        this.disciplineSelect.innerHTML = '<option value="">Disciplina</option>';
+
+        // Aggiungi le discipline
+        disciplines.forEach(disc => {
+            const option = document.createElement('option');
+            option.value = disc;
+            option.textContent = disc.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+            this.disciplineSelect.appendChild(option);
+        });
+
+        this.disciplinesLoaded = true;
+        this.disciplineSelect.disabled = false;
+
+    } catch (error) {
+        console.error('Error loading disciplines:', error);
+        this.disciplineSelect.innerHTML = '<option value="">Error loading disciplines</option>';
+        this.disciplineSelect.disabled = true;
+        throw error;
     }
+}
+
 
     submitFilters() {
         if (!this.disciplinesLoaded) {
