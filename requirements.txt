@@ -5,3 +5,5 @@ SQLAlchemy
 psycopg2-binary
 pandas
 python-dotenv
+gunicorn
+cssmin
