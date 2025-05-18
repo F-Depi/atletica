@@ -345,7 +345,7 @@
                 <td>{{ result.categoria }}</td>
                 <td>{{ result.società }}</td>
                 <td>{{ result.luogo }}</td>
-                <td>{{ result.data.strftime('"%d/%m/%Y') if result.data else '' }}</td>
+                <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
             </tr>
             {% endfor %}
         </tbody>
