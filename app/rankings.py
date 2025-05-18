@@ -1,165 +1,26 @@
-from flask import Flask, render_template, request, jsonify
-from flask_wtf.csrf import CSRFProtect, generate_csrf
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from sqlalchemy import create_engine, text
-import json
-import os
-import logging
-from datetime import datetime
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from sqlalchemy import text
 import pandas as pd
-from config import DB_CONFIG, SECRET_KEY
-from flask import Flask, render_template, request, jsonify, redirect, url_for
 
+from app.app import DISCIPLINES, DISCIPLINE_STANDARD, REGIONI_PROVINCE, CATEGORY_MAPPING
+from app.models import get_db_engine
+from app.utils import should_show_wind, format_time
+from app.error_reporting import limiter
 
+# Create blueprint
+rankings_bp = Blueprint('rankings', __name__)
 
-app = Flask(__name__)
-
-# Create SQLAlchemy engine
-def get_db_engine():
-    return create_engine(f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}/{DB_CONFIG['database']}")
-
-# Load disciplines data
-with open('data/dizionario_gare.json') as f:
-    DISCIPLINES = json.load(f)
-with open('data/discipline_standard.json') as f:
-    DISCIPLINE_STANDARD = json.load(f)
-with open('data/regioni_province.json') as f:
-    REGIONI_PROVINCE = json.load(f)
-with open('data/category_mapping.json') as f:
-    CATEGORY_MAPPING = json.load(f)
-
-
-"""Questa è la parte per la gestione delle segnalazioni"""
-# Configurazione del logging
-app.config['SECRET_KEY'] = SECRET_KEY
-
-# Inizializza CSRF protection
-csrf = CSRFProtect(app)
-
-# Restituisce l'IP con cui arriva la richiesta a nginx
-def get_real_ip():
-    if request.headers.get('X-Forwarded-For'):
-        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
-    elif request.headers.get('X-Real-IP'):
-        return request.headers.get('X-Real-IP')
-    return request.remote_addr
-
-# Inizializza rate limiter (usando la memoria invece di Redis)
-# Questo è un limiter GLOBALE
-limiter = Limiter(
-    get_real_ip,
-    app=app,
-    #default_limits=["100 per day", "30 per hour"],
-    storage_uri="memory://"
-)
-
-# Custom error handler specifically for rate limiting
-@app.errorhandler(429)
-def ratelimit_handler(e):
-    # Determine which endpoint triggered the rate limit
-    if request.path == '/api/segnala-errore':
-        message = 'Limite di utilizzo superato: massimo 5 segnalazioni al minuto.'
-    else:
-        # Generic message for other rate-limited endpoints
-        message = 'Troppe richieste. Riprova più tardi.'
-    
-    return jsonify({
-        'success': False,
-        'error': message,
-    }), 429
-
-# Configurazione del logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    filename='segnalazioni.log'
-)
-logger = logging.getLogger('segnalazioni')
-
-# Directory per salvare le segnalazioni
-SEGNALAZIONI_DIR = 'segnalazioni'
-os.makedirs(SEGNALAZIONI_DIR, exist_ok=True)
-
-# Rotta per la pagina principale con il token CSRF incorporato
-#@app.route('/')
-#def index():
-#    return render_template('index.html')
-
-# API per ottenere il token CSRF
-@app.route('/get-csrf-token', methods=['GET'])
-def get_csrf_token():
-    token = generate_csrf()
-    return jsonify({'csrf_token': token})
-
-# API per segnalare errori
-@app.route('/api/segnala-errore', methods=['POST'])
-@limiter.limit("5/minute")  # Limite di 5 richieste al minuto
-def segnala_errore():
-    try:
-        # Ottieni i dati dalla richiesta
-        dati = request.get_json()
-        
-        # Verifica che i dati necessari siano presenti
-        required_fields = ['descrizione', 'atleta', 'prestazione']
-        for field in required_fields:
-            if field not in dati:
-                return jsonify({'success': False, 'error': f'Campo mancante: {field}'}), 400
-        
-        # Aggiungi timestamp e info client
-        timestamp = datetime.now().isoformat()
-        dati['timestamp'] = timestamp
-        
-        # Ottieni l'IP reale dal forward header
-        if request.headers.get('X-Forwarded-For'):
-            dati['ip_client'] = request.headers.get('X-Forwarded-For').split(',')[0].strip()
-        elif request.headers.get('X-Real-IP'):
-            dati['ip_client'] = request.headers.get('X-Real-IP')
-        else:
-            dati['ip_client'] = request.remote_addr
-            
-        # Aggiungi anche gli header pertinenti per debug
-        dati['headers'] = {
-            'X-Forwarded-For': request.headers.get('X-Forwarded-For', ''),
-            'X-Real-IP': request.headers.get('X-Real-IP', ''),
-            'User-Agent': request.headers.get('User-Agent', '')
-        }
-        
-        # Crea un nome file per la segnalazione
-        filename = f"{timestamp.replace(':', '-').replace('.', '-')}.json"
-        filepath = os.path.join(SEGNALAZIONI_DIR, filename)
-        
-        # Salva i dati in un file JSON
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(dati, f, ensure_ascii=False, indent=2)
-        
-        # Log dell'operazione
-        logger.info(f"Nuova segnalazione ricevuta: {dati['atleta']} - {dati['prestazione']}")
-        
-        return jsonify({'success': True, 'message': 'Segnalazione ricevuta correttamente'}), 200
-    
-    except Exception as e:
-        logger.error(f"Errore durante la gestione della segnalazione: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/')
-def index():
-    return render_template('index.html', disciplines=DISCIPLINES)
-
-
-"""Da qui comincia la gestione della pagina dei rankings"""
 
 ## Invia tutte le discipline alla tab con tutti i filtri
 ## Per la tab "Tutti i filtri e le gare"
-@app.route('/api/disciplines/all')
+@rankings_bp.route('/api/disciplines/all')
 def get_all_disciplines():
     return jsonify(list(DISCIPLINES.keys()))
 
 
 ## Carichiamo le discipline in funzione della categoria
 ## Per le tab "Uomni" e "Donne"
-@app.route('/api/disciplines/<category>/<gender>')
+@rankings_bp.route('/api/disciplines/<category>/<gender>')
 def get_disciplines(category, gender):
     disciplines = [
         d for d in DISCIPLINE_STANDARD[category] 
@@ -170,8 +31,8 @@ def get_disciplines(category, gender):
 
 ## Permette a rankings.js di sapere se una disciplina ha il vento e 
 ## visualizzare il checkbox di conseguenza
-@app.route('/api/discipline_info/<discipline>')
-def get_discipline_info(discipline):
+@rankings_bp.route('/api/discipline_info/<discipline>')
+def get_wind_info(discipline):
     if discipline in DISCIPLINES:
         return jsonify({
             'vento': DISCIPLINES[discipline].get('vento', 'no')
@@ -180,16 +41,14 @@ def get_discipline_info(discipline):
 
 
 ## Questa è quella che gestisce le query quando si preme invio
-@app.route('/rankings')
-@limiter.limit("50/minute")  # Limite di 50 richieste al minuto
+@rankings_bp.route('/rankings')
+@limiter.limit("50/minute")
 def rankings():
     tab = request.args.get('tab', 'men')
 
-    # Se non ci sono parametri, reindirizza alla configurazione di default
     # Se non ci sono parametri o manca la disciplina, reindirizza alla configurazione di default
-
     if not request.args or not request.args.get('discipline'):
-        return redirect(url_for('rankings', tab=tab, discipline='110Hs_h106-9.14', ambiente='P', category='ASS'))
+        return redirect(url_for('rankings.rankings', tab=tab, discipline='110Hs_h106-9.14', ambiente='P', category='ASS'))
 
     if tab in ['men', 'women']:
         return handle_standard_rankings(tab)
@@ -544,117 +403,3 @@ def handle_advanced_rankings():
         format_time=format_time,
         show_all=show_all
 )
-
-
-#@app.route('/api/stats/<discipline>')
-#def discipline_stats(discipline):
-#    engine = get_db_engine()
-#    ambiente = request.args.get('ambiente', 'I').split('?')[0]
-#    gender = request.args.get('gender')
-#    category = request.args.get('category')
-#    year = request.args.get('year')
-#    legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
-#
-#    classification_type = DISCIPLINES[discipline]['classifica']
-#    best_function = 'MIN' if classification_type == 'tempo' else 'MAX'
-#    show_wind = should_show_wind(discipline, 'P')  # Always check for outdoor wind
-#    
-#    query = f"""
-#        SELECT 
-#            {best_function}(prestazione) as best,
-#            AVG(prestazione) as average,
-#            COUNT(DISTINCT atleta) as athletes,
-#            COUNT(*) as performances
-#        FROM results 
-#        WHERE disciplina = :discipline
-#    """
-#
-#    params = {
-#        'discipline': discipline
-#    }
-#
-#    # Only add ambiente condition if not 'ALL'
-#    if ambiente != 'ALL':
-#        query += " AND ambiente = :ambiente"
-#        params['ambiente'] = ambiente
-#
-#    if year:
-#        query += " AND EXTRACT(YEAR FROM data) = :year"
-#        params['year'] = int(year)
-#
-#    if gender:
-#        query += """ 
-#        AND sesso = :gender
-#        """
-#        params['gender'] = gender
-#
-#    if category:
-#        italian_categories = [k for k, v in CATEGORY_MAPPING.items() if v == category]
-#        if italian_categories:
-#            categories_list = "', '".join(italian_categories)
-#            query += f" AND categoria IN ('{categories_list}')"
-#
-#    if legal_wind_only and show_wind:
-#        query += """ 
-#        AND (
-#            ambiente = 'I' OR
-#            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
-#        )
-#        """
-#
-#    with engine.connect() as conn:
-#        result = pd.read_sql(
-#            text(query), 
-#            conn,
-#            params=params
-#        )
-#    
-#    return jsonify(result.to_dict('records')[0])
-
-
-def should_show_wind(discipline, ambiente):
-    # Don't show wind for indoor events
-    if ambiente == 'I':
-        return False
-    
-    # Get discipline info
-    discipline_info = DISCIPLINES[discipline]
-    
-    # Don't show wind if discipline doesn't use it
-    if discipline_info.get('vento') != 'sì':
-        return False
-    
-    return True
-
-
-def format_time(seconds, discipline_info, cronometraggio):
-    """Format time based on discipline type, duration and cronometraggio"""
-    tot_digits = 5
-    decimal_digits = 2
-
-    ## Prove multiple sono un punteggio
-    if discipline_info['tipo'] == 'Prove Multiple':
-        return f"{seconds:.0f}"
-
-    ## To manual timings 0.24s is added in prestazione for the rankings, but we
-    ## now want to display the original time with 1 decimal digit
-    if cronometraggio == 'm':
-        seconds -= 0.24
-        decimal_digits = 1
-        tot_digits = 4
-
-    ## Anche i salti e i lanci non vogliono avere lo 0 se sono < 10
-    if seconds < 10:
-            return f"{seconds:0{tot_digits - 1}.{decimal_digits}f}"
-
-    ## I tempi li mettiamo in formato MM:SS.sss altrimenti gliuis si lamenta
-    if discipline_info['classifica'] == 'tempo' and seconds >= 60:
-        minutes = int(seconds // 60)
-        remaining_seconds = seconds % 60
-        return f"{minutes}:{remaining_seconds:0{tot_digits}.{decimal_digits}f}"
-    return f"{seconds:0{tot_digits}.{decimal_digits}f}"
-
-
-
-if __name__ == '__main__':
-    app.run(debug=False)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the CSS folder
-cd static/css || { echo "Directory static/css not found!"; exit 1; }
+cd app/static/css || { echo "Directory app/static/css not found!"; exit 1; }
 
 # List of files in order — you control the order here
 files=(
