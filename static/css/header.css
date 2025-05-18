@@ -1,6 +1,7 @@
 header {
     background-color: var(--card-background);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-weight: 800;
 }
 
 nav {
@@ -18,7 +19,6 @@ nav {
 
 .nav-logo {
     font-size: 1.5rem;
-    font-weight: 500;
     color: var(--primary-color);
     text-decoration: none;
 }
