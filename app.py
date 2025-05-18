@@ -26,6 +26,8 @@ with open('data/discipline_standard.json') as f:
     DISCIPLINE_STANDARD = json.load(f)
 with open('data/regioni_province.json') as f:
     REGIONI_PROVINCE = json.load(f)
+with open('data/category_mapping.json') as f:
+    CATEGORY_MAPPING = json.load(f)
 
 
 """Questa è la parte per la gestione delle segnalazioni"""
@@ -628,25 +630,6 @@ def format_time(seconds, discipline_info, cronometraggio):
         remaining_seconds = seconds % 60
         return f"{minutes}:{remaining_seconds:0{tot_digits}.{decimal_digits}f}"
     return f"{seconds:0{tot_digits}.{decimal_digits}f}"
-
-
-# Category mapping dictionary
-CATEGORY_MAPPING = {
-    'U12': ['EM', 'EF'],
-    'U14': ['RM', 'RF'],
-    'U16': ['CM', 'CF'],
-    'U18': ['AM', 'AF'],
-    'U20': ['JM', 'JF'],
-    'U23': ['PM', 'PF'],
-    'SEN': ['SM', 'SF'],
-    'ASS': ['AM', 'AF', 'JM', 'JF', 'PM', 'PF', 'SM', 'SF']
-    + [f'SM{age}' for age in range(35, 100, 5)]
-    + [f'SF{age}' for age in range(35, 100, 5)]
-}
-# Add Masters categories (from M35 to M95)
-for age in range(35, 100, 5):
-    CATEGORY_MAPPING[f'M{age}'] = [f'SM{age}', f'SF{age}']
-
 
 
 
