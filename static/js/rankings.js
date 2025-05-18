@@ -735,7 +735,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Popola il box con i dati
             document.getElementById('detailAtleta').textContent = `${atleta} - ${prestazione} (${position}°)`;
             document.getElementById('linkAtleta').href = linkAtleta;
+
+            const clubCode = linkSocieta.slice(-5);
             document.getElementById('linkSocieta').href = linkSocieta;
+            document.getElementById('linkSocieta').textContent = `Pagina società (${clubCode})`;
+
             
             // Mostra il box
             showDetailBox();

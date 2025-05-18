@@ -345,7 +345,7 @@
                 <td>{{ result.categoria }}</td>
                 <td>{{ result.società }}</td>
                 <td>{{ result.luogo }}</td>
-                <td>{{ result.data.strftime('%d/%m/%Y') if result.data else '' }}</td>
+                <td>{{ result.data.strftime('"%d/%m/%Y') if result.data else '' }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -360,7 +360,7 @@
         <h3 id="detailAtleta"></h3>
         <div class="detail-links">
             <a id="linkAtleta" href="#" target="_blank">Profilo atleta</a>
-            <a id="linkSocieta" href="#" target="_blank">Pagina società</a>
+            <a id="linkSocieta" href="#" target="_blank"></a>
             <button id="mostraSegnalaErrore" class="segnala-btn">Segnala errore</button>
         </div>
         
