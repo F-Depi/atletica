@@ -129,6 +129,8 @@ class StandardFilterManager {
         this.categorySelect = document.getElementById(`${gender}CategorySelect`);
         this.disciplineSelect = document.getElementById(`${gender}DisciplineSelect`);
         this.yearSelect = document.getElementById(`${gender}YearSelect`);
+        this.regionSelect = document.getElementById(`${gender}RegionSelect`);
+        this.provinceClubSelect = document.getElementById(`${gender}ProvinceClubSelect`);
         this.limitSelect = document.getElementById(`${gender}LimitSelect`);
         this.windCheckbox = document.getElementById(`${gender}WindCheckbox`);
         this.allResultsToggle = document.getElementById(`${gender}AllResults`);
@@ -192,8 +194,18 @@ class StandardFilterManager {
             });
         }
 
+        if (urlParams.get('provincia_societa') && this.provinceClubSelect) {
+            this.provinceClubSelect.value = urlParams.get('provincia_societa');
+        }
+
+
         // Imposta gli altri valori
         if (urlParams.get('year')) this.yearSelect.value = urlParams.get('year');
+        if (urlParams.get('regione')) this.regionSelect.value = urlParams.get('regione');
+        if (this.provinceClubSelect && this.provinceClubSelect.value) {
+            urlParams.set('provincia_societa', this.provinceClubSelect.value);
+        }
+
         if (urlParams.get('limit')) this.limitSelect.value = urlParams.get('limit');
         if (urlParams.get('allResults')) this.allResultsToggle.checked = true;
 

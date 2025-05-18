@@ -204,6 +204,8 @@ def handle_standard_rankings(tab):
     category = request.args.get('category', 'ASS')
     discipline = request.args.get('discipline', '100m')
     year = request.args.get('year', None)
+    regione = request.args.get('regione', None)
+    provincia_societa = request.args.get('provincia_societa', None)
     limit = request.args.get('limit', 50, type=int)
     show_all = request.args.get('allResults', '').lower() == 'true'
     legal_wind_only = request.args.get('legal_wind', 'true').lower() == 'true'
@@ -243,6 +245,27 @@ def handle_standard_rankings(tab):
     if year:
         conditions.append("EXTRACT(YEAR FROM data) = :year")
         params['year'] = int(year) #pyright: ignore
+
+    if regione:
+        province = REGIONI_PROVINCE[regione]
+        province_list = "', '".join(province)
+        conditions.append(f"LEFT(cod_società, 2) IN ('{province_list}')")
+    
+    if provincia_societa:
+
+        # Provincia
+        if len(provincia_societa) == 2:
+            # Caso speciale Roma, provincia divisa in RM e RS
+            if provincia_societa == "RM":
+                conditions.append("(LEFT(cod_società, 2) = 'RM' OR LEFT(cod_società, 2) = 'RS')")
+            else:
+                conditions.append("LEFT(cod_società, 2) = :provincia_societa")
+            params['provincia_societa'] = provincia_societa
+
+        # Società
+        elif len(provincia_societa) == 5:
+            conditions.append("cod_società = :provincia_societa")
+            params['provincia_societa'] = provincia_societa
 
     # Aggiungi filtro vento se necessario
     if legal_wind_only and should_show_wind(discipline, 'P'):
