@@ -120,7 +120,7 @@
         {% if not recent_results %}
         <p class="no-results">Nessun risultato recente disponibile.</p>
         {% else %}
-        <table class="recent-results-table">
+        <table class="rankings-table">
             <thead>
                 <tr>
                     <th>Data</th>
@@ -364,24 +364,27 @@
         padding: 0;
         background-color: var(--card-background);
         overflow: hidden;
-        max-height: 0;
+        overflow-y: auto;
         transition: max-height 0.3s ease-out;
     }
 
     .pb-details-container.active {
         display: block;
-        max-height: 500px;
+        max-height: 400px;
         transition: max-height 0.5s ease-in;
     }
 
     /* Tables */
-    .results-table, .recent-results-table {
+    .results-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.9rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px; /* optional for rounded corners */
+        overflow: hidden;   /* keeps the border radius clean with table rows */
     }
 
-    .results-table th, .recent-results-table th {
+    .results-table th {
         text-align: left;
         padding: 8px;
         border-bottom: 1px solid var(--border-color);
@@ -391,13 +394,13 @@
         color: var(--text-color);
     }
 
-    .results-table td, .recent-results-table td {
+    .results-table td {
         padding: 8px;
         border-bottom: 1px solid var(--border-color);
         color: var(--text-color);
     }
 
-    .results-table tr:hover, .recent-results-table tr:hover {
+    .results-table tr:hover {
         background-color: var(--hover-bg);
     }
 
