@@ -5,6 +5,7 @@ from app.error_reporting import limiter
 from app.models import get_db_engine
 from app.utils import format_time
 import re
+from datetime import datetime
 
 # Create blueprint for athletes
 athletes_bp = Blueprint('athletes', __name__, url_prefix='/athlete')
@@ -45,7 +46,6 @@ def search_athletes():
             for row in result:
                 # Extract name + unique code from link_atleta
                 identifier = '_'.join(row[1].split('/')[-2:])
-                print(identifier)
                 athletes.append({"name": row[0], "link": identifier})
             
         return jsonify(athletes)
@@ -86,6 +86,28 @@ def athlete_profile(athlete_path):
             athlete_name = athlete_data[0]
             full_link_atleta = athlete_data[1]
             
+            # Try to get additional athlete info (birthdate, current club, category)
+            athlete_info_sql = text("""
+                SELECT 
+                    anno, categoria, società, link_società
+                FROM results
+                WHERE link_atleta = :link_atleta
+                ORDER BY data DESC
+                LIMIT 1
+            """)
+            
+            athlete_info_result = conn.execute(athlete_info_sql, {"link_atleta": full_link_atleta})
+            athlete_info = athlete_info_result.fetchone()
+            
+            athlete_additional_data = None
+            if athlete_info:
+                athlete_additional_data = {
+                    "anno_nascita": athlete_info[0],
+                    "categoria": athlete_info[1],
+                    "societa": athlete_info[2],
+                    "link_societa": athlete_info[3]
+                }
+            
             # Get all results for the athlete using the full link_atleta
             results_sql = text("""
                 SELECT 
@@ -120,31 +142,78 @@ def athlete_profile(athlete_path):
                 for discipline in df['disciplina'].unique():
                     discipline_df = df[df['disciplina'] == discipline].copy()
                     
-                    # Get best result for this discipline
+                    # Get best result for this discipline (considering wind)
                     best_result = None
                     if not discipline_df.empty:
-                        if 'corsa' in discipline.lower():
-                            # For running events, lower is better
-                            best_idx = discipline_df['prestazione'].idxmin()
-                        else:
-                            # For field events, higher is better
-                            best_idx = discipline_df['prestazione'].idxmax()
+                        # Check if this is a wind-affected discipline
+                        is_wind_affected = 'corsa' in discipline.lower() or 'salto' in discipline.lower()
+                        
+                        if is_wind_affected:
+                            # For wind-affected events, get the legal wind best performance
+                            # Filter for legal wind performances (vento <= 2.0 or indoor)
+                            legal_wind_df = discipline_df[
+                                (discipline_df['vento'].isna()) | 
+                                (discipline_df['vento'] == '') | 
+                                (discipline_df['vento'].astype(str).str.contains('NV')) |
+                                (discipline_df['vento'].astype(str).str.replace(',', '.').astype(float) <= 2.0) |
+                                (discipline_df['ambiente'] == 'I')
+                            ]
                             
-                        best_result = discipline_df.loc[best_idx].to_dict()
+                            if not legal_wind_df.empty:
+                                if 'corsa' in discipline.lower():
+                                    # For running, lower is better
+                                    best_idx = legal_wind_df['prestazione'].idxmin()
+                                else:
+                                    # For jumps, higher is better
+                                    best_idx = legal_wind_df['prestazione'].idxmax()
+                                
+                                best_result = legal_wind_df.loc[best_idx].to_dict()
+                            else:
+                                # If no legal wind, use any result
+                                if 'corsa' in discipline.lower():
+                                    best_idx = discipline_df['prestazione'].idxmin()
+                                else:
+                                    best_idx = discipline_df['prestazione'].idxmax()
+                                
+                                best_result = discipline_df.loc[best_idx].to_dict()
+                        else:
+                            # For non-wind affected events
+                            if 'corsa' in discipline.lower():
+                                # For running events, lower is better
+                                best_idx = discipline_df['prestazione'].idxmin()
+                            else:
+                                # For field events, higher is better
+                                best_idx = discipline_df['prestazione'].idxmax()
+                                
+                            best_result = discipline_df.loc[best_idx].to_dict()
+                    
+                    # Sort the results appropriately
+                    if 'corsa' in discipline.lower():
+                        # For running events, sort from fastest to slowest
+                        discipline_df = discipline_df.sort_values('prestazione', ascending=True)
+                    else:
+                        # For field events, sort from best to worst
+                        discipline_df = discipline_df.sort_values('prestazione', ascending=False)
                     
                     # Convert to list of dictionaries for the template
                     disciplines[discipline] = {
                         'results': discipline_df.to_dict('records'),
                         'best': best_result
                     }
+                
+                # Get recent results (last 10 performances)
+                recent_results = df.sort_values('data', ascending=False).head(10).to_dict('records')
             else:
                 disciplines = {}
+                recent_results = []
                 
         return render_template(
             'athlete/profile.html',
             athlete_name=athlete_name,
+            athlete_data=athlete_additional_data,
             athlete_link=athlete_path,  # Use the original path for linking
-            disciplines=disciplines
+            disciplines=disciplines,
+            recent_results=recent_results
         )
         
     except Exception as e:
