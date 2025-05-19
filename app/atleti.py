@@ -18,7 +18,7 @@ def index():
 @atleti_bp.route('/ricerca', methods=['GET'])
 @limiter.limit("30 per minute")
 def trova_atleti():
-    """API endpoint for searching atleti"""
+    """API endpoint for searching atleti with improved name matching"""
     query = request.args.get('q', '').strip()
     
     if not query or len(query) < 3:
@@ -27,33 +27,71 @@ def trova_atleti():
     engine = get_db_engine()
     
     try:
-        # Use ILIKE for case-insensitive matching
-        sql = text("""
-            SELECT DISTINCT atleta, link_atleta 
-            FROM atleti 
-            WHERE atleta ILIKE :query
-            ORDER BY atleta
-            LIMIT 10
-        """)
+        # Split the query into terms to search independently
+        terms = query.split()
         
-        # Add wildcards to ricerca for partial matches
-        search_query = f"%{query}%"
+        if len(terms) > 1:
+            # Multi-word search - create conditions where each term must be present
+            # but can be in any order
+            conditions = []
+            params = {}
+            
+            for i, term in enumerate(terms):
+                param_name = f"term_{i}"
+                conditions.append(f"atleta ILIKE :{param_name}")
+                params[param_name] = f"%{term}%"
+            
+            where_clause = " AND ".join(conditions)
+            
+            sql = text(f"""
+                SELECT DISTINCT atleta, link_atleta 
+                FROM atleti 
+                WHERE {where_clause}
+                ORDER BY atleta
+                LIMIT 10
+            """)
+            
+            with engine.connect() as conn:
+                result = conn.execute(sql, params)
+                atleti = []
+                
+                for row in result:
+                    # Extract name + unique code from link_atleta
+                    identifier = '_'.join(row[1].split('/')[-2:])
+                    identifier = identifier[:-3] + '='
+                    atleti.append({"name": row[0], "link": identifier})
+                
+            return jsonify(atleti)
         
-        with engine.connect() as conn:
-            result = conn.execute(sql, {"query": search_query})
-            atleti = []
+        else:
+            # Single-word search - use simple pattern matching
+            sql = text("""
+                SELECT DISTINCT atleta, link_atleta 
+                FROM atleti 
+                WHERE atleta ILIKE :query
+                ORDER BY atleta
+                LIMIT 10
+            """)
             
-            for row in result:
-                # Extract name + unique code from link_atleta
-                identifier = '_'.join(row[1].split('/')[-2:])
-                identifier = identifier[:-3] + '='
-                atleti.append({"name": row[0], "link": identifier})
+            # Add wildcards for partial matches
+            search_query = f"%{query}%"
             
-        return jsonify(atleti)
-    
+            with engine.connect() as conn:
+                result = conn.execute(sql, {"query": search_query})
+                atleti = []
+                
+                for row in result:
+                    # Extract name + unique code from link_atleta
+                    identifier = '_'.join(row[1].split('/')[-2:])
+                    identifier = identifier[:-3] + '='
+                    atleti.append({"name": row[0], "link": identifier})
+                
+            return jsonify(atleti)
+        
     except Exception as e:
         print(f"Error searching atleti: {e}")
         return jsonify([])
+
 
 @atleti_bp.route('/<path:atleta_path>', methods=['GET'])
 def atleta_profilo(atleta_path):
