@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="athlete-profile">
+    <div class="athlete-header">
+        <h1>{{ athlete_name }}</h1>
+        <div class="athlete-meta">
+            {% if disciplines %}
+                <p>Discipline: {{ disciplines.keys()|list|join(', ') }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if disciplines %}
+        <div class="performance-summary">
+            <h2>Migliori Prestazioni</h2>
+            <div class="best-performances">
+                {% for discipline, data in disciplines.items() %}
+                    {% if data.best %}
+                        <div class="best-card">
+                            <h3>{{ discipline }}</h3>
+                            <div class="best-result">
+                                <span class="result">{{ data.best.prestazione_display }}</span>
+                                {% if data.best.vento %}
+                                    <span class="wind">({{ data.best.vento }})</span>
+                                {% endif %}
+                            </div>
+                            <div class="result-meta">
+                                <p>{{ data.best.luogo }}, {{ data.best.data.strftime('%d/%m/%Y') }}</p>
+                                <p>{{ data.best.categoria }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="discipline-tabs">
+            <div class="tabs-header">
+                {% for discipline in disciplines.keys() %}
+                    <button class="tab-button" data-tab="{{ discipline|replace(' ', '-')|lower }}">
+                        {{ discipline }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div class="tabs-content">
+                {% for discipline, data in disciplines.items() %}
+                    <div id="{{ discipline|replace(' ', '-')|lower }}" class="tab-content">
+                        <h3>{{ discipline }}</h3>
+                        
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Prestazione</th>
+                                    {% if 'corsa' in discipline.lower() %}
+                                        <th>Vento</th>
+                                    {% endif %}
+                                    <th>Categoria</th>
+                                    <th>Posizione</th>
+                                    <th>Luogo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in data.results %}
+                                    <tr {% if result == data.best %}class="best-result-row"{% endif %}>
+                                        <td>{{ result.data.strftime('%d/%m/%Y') }}</td>
+                                        <td class="result">{{ result.prestazione_display }}</td>
+                                        {% if 'corsa' in discipline.lower() %}
+                                            <td>{{ result.vento or '-' }}</td>
+                                        {% endif %}
+                                        <td>{{ result.categoria }}</td>
+                                        <td>{{ result.posizione or '-' }}</td>
+                                        <td>{{ result.luogo }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="no-results">
+            <p>Nessun risultato trovato per questo atleta.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all tab buttons and content sections
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Hide all tab contents initially
+        tabContents.forEach(content => {
+            content.style.display = 'none';
+        });
+        
+        // Show the first tab by default
+        if (tabButtons.length > 0 && tabContents.length > 0) {
+            tabButtons[0].classList.add('active');
+            document.getElementById(tabButtons[0].dataset.tab).style.display = 'block';
+        }
+        
+        // Add click event to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Show the selected tab content
+                const tabId = this.dataset.tab;
+                document.getElementById(tabId).style.display = 'block';
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}
+
