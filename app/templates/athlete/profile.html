@@ -1,132 +1,433 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="athlete-profile">
+    <!-- Athlete header information -->
     <div class="athlete-header">
-        <h1>{{ athlete_name }}</h1>
-        <div class="athlete-meta">
-            {% if disciplines %}
-                <p>Discipline: {{ disciplines.keys()|list|join(', ') }}</p>
+        <h1 class="athlete-name">{{ athlete_name }}</h1>
+
+        <div class="athlete-info">
+            {% if athlete_data %}
+                <div class="info-item">
+                    <span class="label">Anno di nascita:</span>
+                    <span class="value">{{ athlete_data.anno_nascita or 'N/D' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Categoria:</span>
+                    <span class="value">{{ athlete_data.categoria or 'N/D' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Società:</span>
+                    <span class="value"></span>
+                </div>
+            {% else %}
+                <div class="info-item">Informazioni atleta non disponibili</div>
             {% endif %}
         </div>
     </div>
 
-    {% if disciplines %}
-        <div class="performance-summary">
-            <h2>Migliori Prestazioni</h2>
-            <div class="best-performances">
-                {% for discipline, data in disciplines.items() %}
-                    {% if data.best %}
-                        <div class="best-card">
-                            <h3>{{ discipline }}</h3>
-                            <div class="best-result">
-                                <span class="result">{{ data.best.prestazione_display }}</span>
-                                {% if data.best.vento %}
-                                    <span class="wind">({{ data.best.vento }})</span>
-                                {% endif %}
+    <!-- Toggle buttons for sections -->
+    <div class="section-toggle">
+        <button id="show-pbs-btn" class="toggle-btn active">Primati personali</button>
+        <button id="show-recent-btn" class="toggle-btn">Ultimi risultati</button>
+    </div>
+
+    <!-- Personal Bests Section -->
+    <section id="pbs-section" class="results-section active">
+        <h2 class="section-title">Primati personali</h2>
+        
+        {% if not disciplines %}
+            <p class="no-results">Nessun risultato disponibile per questo atleta.</p>
+        {% else %}
+            <div class="pbs-list">
+                {% for discipline_name, discipline_data in disciplines.items() %}
+                    {% if discipline_data.best %}
+                        <div class="pb-row" data-discipline="{{ discipline_name }}">
+                            <div class="pb-header" onclick="toggleResults(this)">
+                                <div class="discipline-name">{{ discipline_name }}</div>
+                                <div class="pb-result">
+                                    <span class="result">{{ discipline_data.best.prestazione_display }}</span>
+                                    {% if 'vento' in discipline_data.best and discipline_data.best.vento %}
+                                        <span class="wind">({{ discipline_data.best.vento }})</span>
+                                    {% endif %}
+                                </div>
+                                <div class="pb-details">
+                                    <span class="date">{{ discipline_data.best.data.strftime('%d/%m/%Y') if discipline_data.best.data else '-' }}</span>
+                                    <span class="location">{{ discipline_data.best.luogo }}</span>
+                                </div>
+                                <span class="toggle-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 9l6 6 6-6"/>
+                                    </svg>
+                                </span>
                             </div>
-                            <div class="result-meta">
-                                <p>{{ data.best.luogo }}, {{ data.best.data.strftime('%d/%m/%Y') }}</p>
-                                <p>{{ data.best.categoria }}</p>
+                            
+                            <div class="pb-details-container">
+                                <table class="results-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Risultato</th>
+                                            {% if 'corsa' in discipline_name.lower() or 'salto' in discipline_name.lower() %}
+                                                <th>Vento</th>
+                                            {% endif %}
+                                            <th>Data</th>
+                                            <th>Luogo</th>
+                                            <th>Categoria</th>
+                                            <th>Posizione</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in discipline_data.results %}
+                                            <tr>
+                                                <td class="result">{{ result.prestazione_display }}</td>
+                                                {% if 'corsa' in discipline_name.lower() or 'salto' in discipline_name.lower() %}
+                                                    <td class="wind">{{ result.vento or '-' }}</td>
+                                                {% endif %}
+                                                <td class="date">{{ result.data.strftime('%d/%m/%Y') if result.data else '-' }}</td>
+                                                <td class="location">{{ result.luogo or '-' }}</td>
+                                                <td class="category">{{ result.categoria or '-' }}</td>
+                                                <td class="position">{{ result.posizione or '-' }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     {% endif %}
                 {% endfor %}
             </div>
-        </div>
+        {% endif %}
+    </section>
 
-        <div class="discipline-tabs">
-            <div class="tabs-header">
-                {% for discipline in disciplines.keys() %}
-                    <button class="tab-button" data-tab="{{ discipline|replace(' ', '-')|lower }}">
-                        {{ discipline }}
-                    </button>
-                {% endfor %}
-            </div>
+    <!-- Recent Results Section -->
+    <section id="recent-section" class="results-section">
+        <h2 class="section-title">Ultimi risultati</h2>
+        
+        {% if not recent_results %}
+            <p class="no-results">Nessun risultato recente disponibile.</p>
+        {% else %}
+            <table class="recent-results-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Disciplina</th>
+                        <th>Risultato</th>
+                        <th>Vento</th>
+                        <th>Luogo</th>
+                        <th>Categoria</th>
+                        <th>Posizione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in recent_results %}
+                        <tr>
+                            <td class="date">{{ result.data.strftime('%d/%m/%Y') if result.data else '-' }}</td>
+                            <td class="discipline">{{ result.disciplina }}</td>
+                            <td class="result">{{ result.prestazione_display }}</td>
+                            <td class="wind">{{ result.vento if result.vento else '-' }}</td>
+                            <td class="location">{{ result.luogo }}</td>
+                            <td class="category">{{ result.categoria }}</td>
+                            <td class="position">{{ result.posizione }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
 
-            <div class="tabs-content">
-                {% for discipline, data in disciplines.items() %}
-                    <div id="{{ discipline|replace(' ', '-')|lower }}" class="tab-content">
-                        <h3>{{ discipline }}</h3>
-                        
-                        <table class="results-table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Prestazione</th>
-                                    {% if 'corsa' in discipline.lower() %}
-                                        <th>Vento</th>
-                                    {% endif %}
-                                    <th>Categoria</th>
-                                    <th>Posizione</th>
-                                    <th>Luogo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for result in data.results %}
-                                    <tr {% if result == data.best %}class="best-result-row"{% endif %}>
-                                        <td>{{ result.data.strftime('%d/%m/%Y') }}</td>
-                                        <td class="result">{{ result.prestazione_display }}</td>
-                                        {% if 'corsa' in discipline.lower() %}
-                                            <td>{{ result.vento or '-' }}</td>
-                                        {% endif %}
-                                        <td>{{ result.categoria }}</td>
-                                        <td>{{ result.posizione or '-' }}</td>
-                                        <td>{{ result.luogo }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% else %}
-        <div class="no-results">
-            <p>Nessun risultato trovato per questo atleta.</p>
-        </div>
-    {% endif %}
 </div>
 
 <script>
+    // Toggle between sections
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all tab buttons and content sections
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
+        const pbsBtn = document.getElementById('show-pbs-btn');
+        const recentBtn = document.getElementById('show-recent-btn');
+        const pbsSection = document.getElementById('pbs-section');
+        const recentSection = document.getElementById('recent-section');
         
-        // Hide all tab contents initially
-        tabContents.forEach(content => {
-            content.style.display = 'none';
+        pbsBtn.addEventListener('click', function() {
+            pbsBtn.classList.add('active');
+            recentBtn.classList.remove('active');
+            pbsSection.classList.add('active');
+            recentSection.classList.remove('active');
         });
         
-        // Show the first tab by default
-        if (tabButtons.length > 0 && tabContents.length > 0) {
-            tabButtons[0].classList.add('active');
-            document.getElementById(tabButtons[0].dataset.tab).style.display = 'block';
-        }
-        
-        // Add click event to tab buttons
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Hide all tab contents
-                tabContents.forEach(content => {
-                    content.style.display = 'none';
-                });
-                
-                // Show the selected tab content
-                const tabId = this.dataset.tab;
-                document.getElementById(tabId).style.display = 'block';
-                
-                // Add active class to clicked button
-                this.classList.add('active');
-            });
+        recentBtn.addEventListener('click', function() {
+            recentBtn.classList.add('active');
+            pbsBtn.classList.remove('active');
+            recentSection.classList.add('active');
+            pbsSection.classList.remove('active');
         });
     });
+    
+    // Toggle individual PB details
+    function toggleResults(element) {
+        const container = element.closest('.pb-row');
+        const detailsContainer = container.querySelector('.pb-details-container');
+        const toggleIcon = container.querySelector('.toggle-icon');
+        
+        if (detailsContainer.classList.contains('active')) {
+            detailsContainer.classList.remove('active');
+            toggleIcon.classList.remove('expanded');
+        } else {
+            detailsContainer.classList.add('active');
+            toggleIcon.classList.add('expanded');
+        }
+    }
 </script>
+
+<style>
+    /* Athlete Profile Styles */
+    .athlete-profile {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .athlete-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color, #ddd);
+    }
+    
+    .athlete-name {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .athlete-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .label {
+        font-size: 0.9rem;
+        color: var(--text-color-secondary, #666);
+    }
+    
+    .value {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    
+    /* Section toggle buttons */
+    .section-toggle {
+        display: flex;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .toggle-btn {
+        flex: 1;
+        padding: 10px 15px;
+        background-color: var(--background-color-light, #f5f5f5);
+        border: 1px solid var(--border-color, #ddd);
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    
+    .toggle-btn:first-child {
+        border-right: none;
+        border-radius: 4px 0 0 4px;
+    }
+    
+    .toggle-btn:last-child {
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .toggle-btn.active {
+        background-color: var(--primary-color, #3498db);
+        color: white;
+        border-color: var(--primary-color, #3498db);
+    }
+    
+    /* Results sections */
+    .results-section {
+        display: none;
+    }
+    
+    .results-section.active {
+        display: block;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        margin: 0 0 15px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--primary-color, #3498db);
+        display: inline-block;
+    }
+    
+    /* PB rows */
+    .pbs-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pb-row {
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .pb-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 2fr auto;
+        align-items: center;
+        padding: 12px 15px;
+        cursor: pointer;
+        background-color: var(--background-color-light, #f9f9f9);
+        transition: background-color 0.2s;
+    }
+    
+    .pb-header:hover {
+        background-color: var(--background-color-hover, #f0f0f0);
+    }
+    
+    .discipline-name {
+        font-weight: 600;
+    }
+    
+    .pb-result {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .pb-details {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.9rem;
+        color: var(--text-color-secondary, #666);
+    }
+    
+    .toggle-icon {
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s;
+    }
+    
+    .toggle-icon.expanded {
+        transform: rotate(180deg);
+    }
+    
+    .pb-details-container {
+        display: none;
+        padding: 0;
+        background-color: white;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease-out;
+    }
+    
+    .pb-details-container.active {
+        display: block;
+        max-height: 500px;
+        transition: max-height 0.5s ease-in;
+    }
+    
+    /* Tables */
+    .results-table, .recent-results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+    
+    .results-table th, .recent-results-table th {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid var(--border-color, #ddd);
+        background-color: var(--background-color-light, #f5f5f5);
+        position: sticky;
+        top: 0;
+    }
+    
+    .results-table td, .recent-results-table td {
+        padding: 8px;
+        border-bottom: 1px solid var(--border-color-light, #eee);
+    }
+    
+    .result {
+        font-weight: 500;
+    }
+    
+    .wind {
+        font-size: 0.9rem;
+        color: var(--text-color-secondary, #666);
+    }
+    
+    .no-results {
+        font-style: italic;
+        color: var(--text-color-secondary, #666);
+        margin: 20px 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .pb-header {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 5px;
+        }
+        
+        .discipline-name {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        .pb-result {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .pb-details {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            align-items: flex-end;
+        }
+        
+        .toggle-icon {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+        }
+        
+        .athlete-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .results-table, .recent-results-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+    
+    /* Dark mode support */
+    html[data-theme='dark'] .pb-header {
+        background-color: var(--background-color-secondary, #2a2a2a);
+    }
+    
+    html[data-theme='dark'] .pb-header:hover {
+        background-color: var(--background-color-hover-dark, #333);
+    }
+    
+    html[data-theme='dark'] .toggle-btn {
+        background-color: var(--background-color-secondary, #2a2a2a);
+        border-color: var(--border-color-dark, #444);
+    }
+    
+    html[data-theme='dark'] .pb-details-container {
+        background-color: var(--background-color-dark, #1e1e1e);
+    }
+</style>
+
 {% endblock %}
 
