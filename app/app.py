@@ -64,14 +64,10 @@ def index():
 """ Register blueprints """
 from app.rankings import rankings_bp
 from app.error_reporting import error_reporting_bp
+from app.atleti import atleti_bp
 app.register_blueprint(rankings_bp)
 app.register_blueprint(error_reporting_bp)
-
-# This will be where you can register the athletes blueprint when you create it
-# from athletes import athletes_bp
-# app.register_blueprint(athletes_bp)
-from app.athletes import athletes_bp
-app.register_blueprint(athletes_bp)
+app.register_blueprint(atleti_bp)
 
 
 if __name__ == '__main__':
