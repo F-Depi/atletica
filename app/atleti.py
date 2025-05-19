@@ -44,7 +44,7 @@ def trova_atleti():
             where_clause = " AND ".join(conditions)
             
             sql = text(f"""
-                SELECT DISTINCT atleta, link_atleta 
+                SELECT DISTINCT atleta, link_atleta, categoria
                 FROM atleti 
                 WHERE {where_clause}
                 ORDER BY atleta
@@ -59,7 +59,7 @@ def trova_atleti():
                     # Extract name + unique code from link_atleta
                     identifier = '_'.join(row[1].split('/')[-2:])
                     identifier = identifier[:-3] + '='
-                    atleti.append({"name": row[0], "link": identifier})
+                    atleti.append({"name": f"{row[0]} ({row[2]})", "link": identifier})
                 
             return jsonify(atleti)
         
