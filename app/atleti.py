@@ -21,7 +21,7 @@ def trova_atleti():
     """API endpoint for searching atleti"""
     query = request.args.get('q', '').strip()
     
-    if not query or len(query) < 2:
+    if not query or len(query) < 3:
         return jsonify([])
     
     engine = get_db_engine()
@@ -46,6 +46,7 @@ def trova_atleti():
             for row in result:
                 # Extract name + unique code from link_atleta
                 identifier = '_'.join(row[1].split('/')[-2:])
+                identifier = identifier[:-3] + '='
                 atleti.append({"name": row[0], "link": identifier})
             
         return jsonify(atleti)
@@ -56,6 +57,7 @@ def trova_atleti():
 
 @atleti_bp.route('/<path:atleta_path>', methods=['GET'])
 def atleta_profilo(atleta_path):
+    atleta_path = atleta_path[:-1] + "%3D"
     """ Display atleta profilo and performances """
 
     engine = get_db_engine()
@@ -171,8 +173,8 @@ def atleta_profilo(atleta_path):
                 'best': best_result
             }
         
-        # Get recent results (last 20 performances)
-        recent_results = df.sort_values('data', ascending=False).head(20).to_dict('records')
+        # Get recent results (ALL of them)
+        recent_results = df.sort_values('data', ascending=False).to_dict('records')
             
     return render_template(
         'atleta/profilo.html',
@@ -180,5 +182,6 @@ def atleta_profilo(atleta_path):
         atleta_data=atleta_additional_data,
         atleta_link=atleta_path,
         disciplines=disciplines,
-        recent_results=recent_results
+        recent_results=recent_results,
+        link_atleta_fidal=link_atleta_fidal
     )

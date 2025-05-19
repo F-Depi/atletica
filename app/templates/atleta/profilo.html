@@ -18,7 +18,17 @@
                 <span class="label">Società:</span>
                 {% if atleta_data.link_societa %}
                 <span class="value">
-                    <a href="{{ atleta_data.link_societa }}"> {{ atleta_data.nome_societa}} </a>
+                    <a href="{{ atleta_data.link_societa }}" target="_blank"> {{ atleta_data.nome_societa}} </a>
+                </span>
+                {% else %}
+                <span class="value">N/D</span>
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <span class="label">Profilo Ufficale:</span>
+                {% if atleta_data.link_societa %}
+                <span class="value">
+                    <a href="{{ link_atleta_fidal }}" target="_blank"> FIDAL </a>
                 </span>
                 {% else %}
                 <span class="value">N/D</span>
@@ -47,9 +57,9 @@
         <div class="pbs-list">
             {% for discipline_name, discipline_data in disciplines.items() %}
             {% if discipline_data.best %}
-            <div class="pb-row" data-discipline="{{ discipline_name }}">
+            <div class="pb-row" data-discipline="{{ discipline_name.replace('_',' ') }}">
                 <div class="pb-header" onclick="toggleResults(this)">
-                    <div class="discipline-name">{{ discipline_name }}</div>
+                    <div class="discipline-name">{{ discipline_name.replace('_',' ') }}</div>
                     <div class="pb-result">
                         <span class="result">{{ discipline_data.best.prestazione_display }}</span>
                         {% if 'vento' in discipline_data.best and discipline_data.best.vento %}
@@ -116,7 +126,6 @@
                     <th>Data</th>
                     <th>Disciplina</th>
                     <th>Risultato</th>
-                    <th>Vento</th>
                     <th>Luogo</th>
                     <th>Categoria</th>
                     <th>Posizione</th>
@@ -126,9 +135,13 @@
                 {% for result in recent_results %}
                 <tr>
                     <td class="date">{{ result.data.strftime('%d/%m/%Y') if result.data else '-' }}</td>
-                    <td class="discipline">{{ result.disciplina }}</td>
-                    <td class="result">{{ result.prestazione_display }}</td>
-                    <td class="wind">{{ result.vento if result.vento else '-' }}</td>
+                    <td class="discipline">{{ result.disciplina.replace('_', ' ') }}</td>
+                    <td class="result">
+                        {{ result.prestazione_display }}
+                        {% if result.vento %}
+                        <span class="wind"> ({{ result.vento }})</span>
+                        {% endif %}
+                    </td>
                     <td class="location">{{ result.luogo }}</td>
                     <td class="category">{{ result.categoria }}</td>
                     <td class="position">{{ result.posizione }}</td>
