@@ -199,17 +199,19 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    color: var(--text-color);
 }
 
     .atleta-header {
         margin-bottom: 20px;
         padding-bottom: 15px;
-        border-bottom: 1px solid var(--border-color, #ddd);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .atleta-name {
         font-size: 2.2rem;
         margin-bottom: 10px;
+        color: var(--text-color);
     }
 
     .atleta-info {
@@ -228,9 +230,22 @@
         color: var(--text-color-secondary, #666);
     }
 
+    [data-theme="dark"] .label {
+        color: #aaa;
+    }
+
     .value {
         font-size: 1.1rem;
         font-weight: 500;
+    }
+
+    .value a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .value a:hover {
+        text-decoration: underline;
     }
 
     /* Section toggle buttons */
@@ -244,11 +259,12 @@
     .toggle-btn {
         flex: 1;
         padding: 10px 15px;
-        background-color: var(--background-color-light, #f5f5f5);
-        border: 1px solid var(--border-color, #ddd);
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
         cursor: pointer;
         font-weight: 500;
         transition: background-color 0.2s;
+        color: var(--text-color);
     }
 
     .toggle-btn:first-child {
@@ -261,9 +277,9 @@
     }
 
     .toggle-btn.active {
-        background-color: var(--primary-color, #3498db);
+        background-color: var(--primary-color);
         color: white;
-        border-color: var(--primary-color, #3498db);
+        border-color: var(--primary-color);
     }
 
     /* Results sections */
@@ -279,8 +295,9 @@
         font-size: 1.5rem;
         margin: 0 0 15px 0;
         padding-bottom: 8px;
-        border-bottom: 2px solid var(--primary-color, #3498db);
+        border-bottom: 2px solid var(--primary-color);
         display: inline-block;
+        color: var(--text-color);
     }
 
     /* PB rows */
@@ -291,7 +308,7 @@
     }
 
     .pb-row {
-        border: 1px solid var(--border-color, #ddd);
+        border: 1px solid var(--border-color);
         border-radius: 6px;
         overflow: hidden;
     }
@@ -302,12 +319,12 @@
         align-items: center;
         padding: 12px 15px;
         cursor: pointer;
-        background-color: var(--background-color-light, #f9f9f9);
+        background-color: var(--input-bg);
         transition: background-color 0.2s;
     }
 
     .pb-header:hover {
-        background-color: var(--background-color-hover, #f0f0f0);
+        background-color: var(--hover-bg);
     }
 
     .discipline-name {
@@ -328,6 +345,10 @@
         color: var(--text-color-secondary, #666);
     }
 
+    [data-theme="dark"] .pb-details {
+        color: #aaa;
+    }
+
     .toggle-icon {
         display: flex;
         align-items: center;
@@ -341,7 +362,7 @@
     .pb-details-container {
         display: none;
         padding: 0;
-        background-color: white;
+        background-color: var(--card-background);
         overflow: hidden;
         max-height: 0;
         transition: max-height 0.3s ease-out;
@@ -363,15 +384,21 @@
     .results-table th, .recent-results-table th {
         text-align: left;
         padding: 8px;
-        border-bottom: 1px solid var(--border-color, #ddd);
-        background-color: var(--background-color-light, #f5f5f5);
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--table-header-background);
         position: sticky;
         top: 0;
+        color: var(--text-color);
     }
 
     .results-table td, .recent-results-table td {
         padding: 8px;
-        border-bottom: 1px solid var(--border-color-light, #eee);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .results-table tr:hover, .recent-results-table tr:hover {
+        background-color: var(--hover-bg);
     }
 
     .result {
@@ -383,10 +410,18 @@
         color: var(--text-color-secondary, #666);
     }
 
+    [data-theme="dark"] .wind {
+        color: #aaa;
+    }
+
     .no-results {
         font-style: italic;
         color: var(--text-color-secondary, #666);
         margin: 20px 0;
+    }
+
+    [data-theme="dark"] .no-results {
+        color: #aaa;
     }
 
     /* Responsive adjustments */
@@ -427,24 +462,6 @@
             display: block;
             overflow-x: auto;
         }
-    }
-
-    /* Dark mode support */
-    html[data-theme='dark'] .pb-header {
-        background-color: var(--background-color-secondary, #2a2a2a);
-    }
-
-    html[data-theme='dark'] .pb-header:hover {
-        background-color: var(--background-color-hover-dark, #333);
-    }
-
-    html[data-theme='dark'] .toggle-btn {
-        background-color: var(--background-color-secondary, #2a2a2a);
-        border-color: var(--border-color-dark, #444);
-    }
-
-    html[data-theme='dark'] .pb-details-container {
-        background-color: var(--background-color-dark, #1e1e1e);
     }
 </style>
 
