@@ -32,6 +32,26 @@
             <nav>
                 <div class="nav-container">
                     <a href="/" class="nav-logo">AtleticaDB</a>
+
+                    <div class="nav-right">
+                        <!-- Search box -->
+                        <div class="search-container">
+
+                            <div class="search-box">
+                                <input type="text" id="atletaSearch" placeholder="Cerca un atleta..." autocomplete="off">
+                                <button id="searchButton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                    </div>
+
+                    <!-- Links + Theme -->
                     <div class="nav-links">
                         <a href="/">Home</a>
                         <!--a href="/about">About</a-->
@@ -75,7 +95,80 @@
             </div>
         </footer>
         <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
+        <!-- Search bar behaviour -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('atletaSearch');
+                const searchResults = document.getElementById('searchResults');
+                const searchButton = document.getElementById('searchButton');
+
+                let debounceTimer;
+
+                // Function to fetch search results
+                function performSearch() {
+                    const query = searchInput.value.trim();
+
+                    if (query.length < 2) {
+                        searchResults.innerHTML = '';
+                        return;
+                    }
+
+                    fetch(`/atleta/ricerca?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+
+                            if (data.length === 0) {
+                                searchResults.innerHTML = '<p class="no-results">Nessun risultato trovato</p>';
+                                return;
+                            }
+
+                            const resultsList = document.createElement('ul');
+
+                            data.forEach(atleta => {
+                                const listItem = document.createElement('li');
+                                const link = document.createElement('a');
+
+                                // Use the extracted path part from the URL
+                                link.href = `/atleta/${encodeURIComponent(atleta.link)}`;
+                                link.textContent = atleta.name;
+
+                                listItem.appendChild(link);
+                                resultsList.appendChild(listItem);
+                            });
+
+                            searchResults.appendChild(resultsList);
+                        })
+                        .catch(error => {
+                            console.error('Error performing search:', error);
+                            searchResults.innerHTML = '<p class="error">Errore durante la ricerca</p>';
+                        });
+                }
+
+                // Debounce search input
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(performSearch, 300);
+                });
+
+                // Handle search button click
+                searchButton.addEventListener('click', performSearch);
+
+                // Handle Enter key
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+
+                // Close results when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchButton.contains(e.target)) {
+                        searchResults.innerHTML = '';
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
-
-
