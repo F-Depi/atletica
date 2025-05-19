@@ -5,7 +5,7 @@
     <h1>Cerca Atleti</h1>
     
     <div class="search-box">
-        <input type="text" id="athleteSearch" placeholder="Cerca un atleta..." autocomplete="off">
+        <input type="text" id="atletaSearch" placeholder="Cerca un atleta..." autocomplete="off">
         <button id="searchButton">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -19,7 +19,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('athleteSearch');
+        const searchInput = document.getElementById('atletaSearch');
         const searchResults = document.getElementById('searchResults');
         const searchButton = document.getElementById('searchButton');
         
@@ -34,7 +34,7 @@
                 return;
             }
             
-            fetch(`/athlete/search?q=${encodeURIComponent(query)}`)
+            fetch(`/atleta/ricerca?q=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     searchResults.innerHTML = '';
@@ -46,13 +46,13 @@
                     
                     const resultsList = document.createElement('ul');
                     
-                    data.forEach(athlete => {
+                    data.forEach(atleta => {
                         const listItem = document.createElement('li');
                         const link = document.createElement('a');
                         
                         // Use the extracted path part from the URL
-                        link.href = `/athlete/${encodeURIComponent(athlete.link)}`;
-                        link.textContent = athlete.name;
+                        link.href = `/atleta/${encodeURIComponent(atleta.link)}`;
+                        link.textContent = atleta.name;
                         
                         listItem.appendChild(link);
                         resultsList.appendChild(listItem);
