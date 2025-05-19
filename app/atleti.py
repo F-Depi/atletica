@@ -44,7 +44,7 @@ def trova_atleti():
             where_clause = " AND ".join(conditions)
             
             sql = text(f"""
-                SELECT DISTINCT atleta, link_atleta, categoria
+                SELECT DISTINCT atleta, link_atleta, anno
                 FROM atleti 
                 WHERE {where_clause}
                 ORDER BY atleta
@@ -66,7 +66,7 @@ def trova_atleti():
         else:
             # Single-word search - use simple pattern matching
             sql = text("""
-                SELECT DISTINCT atleta, link_atleta 
+                SELECT DISTINCT atleta, link_atleta, anno
                 FROM atleti 
                 WHERE atleta ILIKE :query
                 ORDER BY atleta
@@ -84,7 +84,7 @@ def trova_atleti():
                     # Extract name + unique code from link_atleta
                     identifier = '_'.join(row[1].split('/')[-2:])
                     identifier = identifier[:-3] + '='
-                    atleti.append({"name": row[0], "link": identifier})
+                    atleti.append({"name": f"{row[0]} ({row[2]})", "link": identifier})
                 
             return jsonify(atleti)
         
