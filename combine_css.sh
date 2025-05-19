@@ -15,7 +15,6 @@ files=(
     "utilities.css"
     "footer.css"
     "responsive.css"
-    "athlete.css"
 )
 
 # Output file
