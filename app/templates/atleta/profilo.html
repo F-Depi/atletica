@@ -81,11 +81,11 @@
                     <table class="results-table sortable">
                         <thead>
                             <tr>
-                                <th class="sortable-header sort-default" data-sort="result">Risultato <span class="sort-icon">▼</span></th>
+                                <th class="sortable-header sort-default" data-sort="result">Ris. <span class="sort-icon">▼</span></th>
                                 <th class="sortable-header" data-sort="date">Data <span class="sort-icon"></span></th>
                                 <th>Luogo</th>
-                                <th>Categoria</th>
-                                <th>Posizione</th>
+                                <th>Cat.</th>
+                                <th>Pos.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,21 +120,18 @@
         {% if not recent_results %}
         <p class="no-results">Nessun risultato recente disponibile.</p>
         {% else %}
-        <table class="rankings-table">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Disciplina</th>
-                    <th>Risultato</th>
-                    <th>Luogo</th>
-                    <th>Categoria</th>
-                    <th>Posizione</th>
-                </tr>
-            </thead>
+        <table class="recent-results-table">
             <tbody>
+                {% set ns = namespace(last_group=None) %}
                 {% for result in recent_results %}
-                <tr>
-                    <td class="date">{{ result.data.strftime('%d/%m/%Y') if result.data else '-' }}</td>
+                {% set current_group = result.data.strftime('%d/%m/%Y') ~ ' - ' ~ result.luogo %}
+                {% if current_group != ns.last_group %}
+                <tr class="group-header">
+                    <td colspan="3">{{ current_group }}</td>
+                </tr>
+                {% set ns.last_group = current_group %}
+                {% endif %}
+                <tr class="result-row">
                     <td class="discipline">{{ result.disciplina.replace('_', ' ') }}</td>
                     <td class="result">
                         {{ result.prestazione_display }}
@@ -142,8 +139,6 @@
                         <span class="wind"> ({{ result.vento }})</span>
                         {% endif %}
                     </td>
-                    <td class="location">{{ result.luogo }}</td>
-                    <td class="category">{{ result.categoria }}</td>
                     <td class="position">{{ result.posizione }}</td>
                 </tr>
                 {% endfor %}
@@ -282,299 +277,336 @@
     color: var(--text-color);
 }
 
-    .atleta-header {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--border-color);
+.atleta-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.atleta-name {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.atleta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary, #666);
+}
+
+[data-theme="dark"] .label {
+    color: #aaa;
+}
+
+.value {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.value a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.value a:hover {
+    text-decoration: underline;
+}
+
+
+/* Section toggle buttons */
+.section-toggle {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px 15px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    color: var(--text-color);
+}
+
+.toggle-btn:first-child {
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+
+.toggle-btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
+
+.toggle-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+
+/* Results sections */
+.results-section {
+    display: none;
+}
+
+.results-section.active {
+    display: block;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+    color: var(--text-color);
+}
+
+
+/* PB rows */
+.pbs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pb-row {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.pb-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr auto;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    background-color: var(--input-bg);
+    transition: background-color 0.2s;
+}
+
+.pb-header:hover {
+    background-color: var(--hover-bg);
+}
+
+.discipline-name {
+    font-weight: 600;
+}
+
+.pb-result {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pb-details {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+    color: var(--text-color-secondary, #666);
+}
+
+[data-theme="dark"] .pb-details {
+    color: #aaa;
+}
+
+.toggle-icon {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.toggle-icon.expanded {
+    transform: rotate(180deg);
+}
+
+.pb-details-container {
+    display: none;
+    padding: 0;
+    background-color: var(--card-background);
+    overflow: hidden;
+    overflow-y: auto;
+    transition: max-height 0.3s ease-out;
+}
+
+.pb-details-container.active {
+    display: block;
+    max-height: 400px;
+    transition: max-height 0.5s ease-in;
+}
+
+
+/* Tables */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* optional for rounded corners */
+    overflow: hidden;   /* keeps the border radius clean with table rows */
+}
+
+.results-table th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--table-header-background);
+    position: sticky;
+    top: 0;
+    color: var(--text-color);
+}
+
+.results-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.results-table tr:hover {
+    background-color: var(--hover-bg);
+}
+
+
+/* Additional styling for sortable tables */
+.sortable .sortable-header {
+    cursor: pointer;
+    position: relative;
+}
+
+.sortable .sort-icon {
+    margin-left: 5px;
+    opacity: 0.5;
+}
+
+.sortable .sort-default .sort-icon {
+    opacity: 1;
+}
+
+.sortable-header.sort-asc .sort-icon {
+    content: "▲";
+    opacity: 1;
+}
+
+.sortable-header.sort-desc .sort-icon {
+    content: "▼";
+    opacity: 1;
+}
+
+.result {
+    font-weight: 500;
+}
+
+.wind {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary, #666);
+}
+
+[data-theme="dark"] .wind {
+    color: #aaa;
+}
+
+.no-results {
+    font-style: italic;
+    color: var(--text-color-secondary, #666);
+    margin: 20px 0;
+}
+
+[data-theme="dark"] .no-results {
+    color: #aaa;
+}
+
+
+/* Recent results table */
+.recent-results-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 24px;
+    font-size: 14px;
+}
+
+.recent-results-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.recent-results-table .group-header td {
+    background-color: var(--table-header-background);
+    font-weight: bold;
+    color: var(--primary-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.recent-results-table .result-row td {
+    background-color: var(--card-background);
+}
+
+.recent-results-table .result-row:hover td {
+    background-color: var(--background-color-over);
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pb-header {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 5px;
     }
 
-    .atleta-name {
-        font-size: 2.2rem;
-        margin-bottom: 10px;
-        color: var(--text-color);
+    .discipline-name {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .pb-result {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .pb-details {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-items: flex-end;
+    }
+
+    .toggle-icon {
+        grid-column: 3;
+        grid-row: 1 / span 2;
     }
 
     .atleta-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .info-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .label {
-        font-size: 0.9rem;
-        color: var(--text-color-secondary, #666);
-    }
-
-    [data-theme="dark"] .label {
-        color: #aaa;
-    }
-
-    .value {
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
-
-    .value a {
-        color: var(--primary-color);
-        text-decoration: none;
-    }
-
-    .value a:hover {
-        text-decoration: underline;
-    }
-
-    /* Section toggle buttons */
-    .section-toggle {
-        display: flex;
-        margin-bottom: 20px;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .toggle-btn {
-        flex: 1;
-        padding: 10px 15px;
-        background-color: var(--input-bg);
-        border: 1px solid var(--border-color);
-        cursor: pointer;
-        font-weight: 500;
-        transition: background-color 0.2s;
-        color: var(--text-color);
-    }
-
-    .toggle-btn:first-child {
-        border-right: none;
-        border-radius: 4px 0 0 4px;
-    }
-
-    .toggle-btn:last-child {
-        border-radius: 0 4px 4px 0;
-    }
-
-    .toggle-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-
-    /* Results sections */
-    .results-section {
-        display: none;
-    }
-
-    .results-section.active {
-        display: block;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        margin: 0 0 15px 0;
-        padding-bottom: 8px;
-        border-bottom: 2px solid var(--primary-color);
-        display: inline-block;
-        color: var(--text-color);
-    }
-
-    /* PB rows */
-    .pbs-list {
-        display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    .pb-row {
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        overflow: hidden;
-    }
-
-    .pb-header {
-        display: grid;
-        grid-template-columns: 2fr 1fr 2fr auto;
-        align-items: center;
-        padding: 12px 15px;
-        cursor: pointer;
-        background-color: var(--input-bg);
-        transition: background-color 0.2s;
-    }
-
-    .pb-header:hover {
-        background-color: var(--hover-bg);
-    }
-
-    .discipline-name {
-        font-weight: 600;
-    }
-
-    .pb-result {
-        font-weight: 700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .pb-details {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.9rem;
-        color: var(--text-color-secondary, #666);
-    }
-
-    [data-theme="dark"] .pb-details {
-        color: #aaa;
-    }
-
-    .toggle-icon {
-        display: flex;
-        align-items: center;
-        transition: transform 0.3s;
-    }
-
-    .toggle-icon.expanded {
-        transform: rotate(180deg);
-    }
-
-    .pb-details-container {
-        display: none;
-        padding: 0;
-        background-color: var(--card-background);
-        overflow: hidden;
-        overflow-y: auto;
-        transition: max-height 0.3s ease-out;
-    }
-
-    .pb-details-container.active {
-        display: block;
-        max-height: 400px;
-        transition: max-height 0.5s ease-in;
-    }
-
-    /* Tables */
     .results-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-        border: 1px solid var(--border-color);
-        border-radius: 6px; /* optional for rounded corners */
-        overflow: hidden;   /* keeps the border radius clean with table rows */
+        display: block;
+        overflow-x: auto;
     }
-
-    .results-table th {
-        text-align: left;
-        padding: 8px;
-        border-bottom: 1px solid var(--border-color);
-        background-color: var(--table-header-background);
-        position: sticky;
-        top: 0;
-        color: var(--text-color);
-    }
-
-    .results-table td {
-        padding: 8px;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-color);
-    }
-
-    .results-table tr:hover {
-        background-color: var(--hover-bg);
-    }
-
-    /* Additional styling for sortable tables */
-    .sortable .sortable-header {
-        cursor: pointer;
-        position: relative;
-    }
-    
-    .sortable .sortable-header:hover {
-        background-color: #f5f5f5;
-    }
-    
-    .sortable .sort-icon {
-        margin-left: 5px;
-        opacity: 0.5;
-    }
-    
-    .sortable .sort-default .sort-icon {
-        opacity: 1;
-    }
-    
-    .sortable-header.sort-asc .sort-icon {
-        content: "▲";
-        opacity: 1;
-    }
-    
-    .sortable-header.sort-desc .sort-icon {
-        content: "▼";
-        opacity: 1;
-    }
-
-    .result {
-        font-weight: 500;
-    }
-
-    .wind {
-        font-size: 0.9rem;
-        color: var(--text-color-secondary, #666);
-    }
-
-    [data-theme="dark"] .wind {
-        color: #aaa;
-    }
-
-    .no-results {
-        font-style: italic;
-        color: var(--text-color-secondary, #666);
-        margin: 20px 0;
-    }
-
-    [data-theme="dark"] .no-results {
-        color: #aaa;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .pb-header {
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap: 5px;
-        }
-
-        .discipline-name {
-            grid-column: 1;
-            grid-row: 1;
-        }
-
-        .pb-result {
-            grid-column: 1;
-            grid-row: 2;
-        }
-
-        .pb-details {
-            grid-column: 2;
-            grid-row: 1 / span 2;
-            align-items: flex-end;
-        }
-
-        .toggle-icon {
-            grid-column: 3;
-            grid-row: 1 / span 2;
-        }
-
-        .atleta-info {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .results-table, .recent-results-table {
-            display: block;
-            overflow-x: auto;
-        }
-    }
+}
 </style>
 
 {% endblock %}
