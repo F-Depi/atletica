@@ -81,7 +81,7 @@
                     <table class="results-table sortable">
                         <thead>
                             <tr>
-                                <th class="sortable-header sort-default" data-sort="result">Ris. <span class="sort-icon">▼</span></th>
+                                <th class="sortable-header sort-default" data-sort="result">Pres. <span class="sort-icon">▼</span></th>
                                 <th class="sortable-header" data-sort="date">Data <span class="sort-icon"></span></th>
                                 <th>Luogo</th>
                                 <th>Cat.</th>
@@ -510,12 +510,18 @@
 }
 
 .result {
+    white-space: nowrap;
     font-weight: 500;
+}
+
+.position {
+    white-space: nowrap;
 }
 
 .wind {
     font-size: 0.9rem;
     color: var(--text-color-secondary, #666);
+    white-space: nowrap;
 }
 
 [data-theme="dark"] .wind {
