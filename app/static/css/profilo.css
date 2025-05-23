@@ -162,12 +162,10 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 .results-table th {
-    padding: 12px;
-    background-color: var(--table-header-background);
     color: var(--text-color);
     font-weight: 600;
     text-align: left;
@@ -314,7 +312,7 @@
     
     .results-table,
     .recent-results-table {
-        font-size: 13px;
+        font-size: 1.1rem;
         border-radius: 0; /* Remove border radius for full width */
         box-shadow: none;
         width: 100vw; /* Full viewport width */
