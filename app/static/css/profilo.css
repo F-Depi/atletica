@@ -1,39 +1,37 @@
-/* Athlete Profile Styles */
+/* Simplified Athlete Profile Styles */
 .atleta-profile {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 20px;
     color: var(--text-color);
 }
 
+/* Header Section */
 .atleta-header {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .atleta-name {
     font-size: 2.2rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: var(--text-color);
 }
 
 .atleta-info {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
 .info-item {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .label {
     font-size: 0.9rem;
     color: var(--text-color-secondary, #666);
-}
-
-[data-theme="dark"] .label {
-    color: #aaa;
 }
 
 .value {
@@ -50,44 +48,37 @@
     text-decoration: underline;
 }
 
-
-/* Section toggle buttons */
+/* Toggle Buttons */
 .section-toggle {
     display: flex;
-    margin-bottom: 20px;
-    border-radius: 4px;
+    margin-bottom: 30px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .toggle-btn {
     flex: 1;
-    padding: 10px 15px;
-    background-color: var(--input-bg);
-    border: 1px solid var(--border-color);
+    padding: 12px 20px;
+    background-color: var(--card-background);
+    border: none;
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    transition: background-color 0.2s;
     color: var(--text-color);
+    transition: all 0.2s ease;
 }
 
-.toggle-btn:first-child {
-    border-right: none;
-    border-radius: 4px 0 0 4px;
-}
-
-.toggle-btn:last-child {
-    border-radius: 0 4px 4px 0;
+.toggle-btn:hover {
+    background-color: var(--hover-bg);
 }
 
 .toggle-btn.active {
     background-color: var(--primary-color);
     color: white;
-    border-color: var(--primary-color);
 }
 
-
-/* Results sections */
+/* Sections */
 .results-section {
     display: none;
 }
@@ -96,37 +87,28 @@
     display: block;
 }
 
-.section-title {
-    font-size: 1.5rem;
-    margin: 0 0 15px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--primary-color);
-    display: inline-block;
-    color: var(--text-color);
-}
-
-
-/* PB rows */
+/* Personal Bests - Simplified */
 .pbs-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .pb-row {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--card-background);
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .pb-header {
     display: grid;
     grid-template-columns: 2fr 1fr 2fr auto;
     align-items: center;
-    padding: 12px 15px;
+    padding: 15px 20px;
     cursor: pointer;
-    background-color: var(--input-bg);
     transition: background-color 0.2s;
+    gap: 15px;
 }
 
 .pb-header:hover {
@@ -135,29 +117,24 @@
 
 .discipline-name {
     font-weight: 600;
+    font-size: 1.1rem;
 }
 
 .pb-result {
-    font-weight: 700;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--primary-color);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: center;
 }
 
 .pb-details {
-    display: flex;
-    flex-direction: column;
     font-size: 0.9rem;
     color: var(--text-color-secondary, #666);
-}
-
-[data-theme="dark"] .pb-details {
-    color: #aaa;
+    text-align: right;
 }
 
 .toggle-icon {
-    display: flex;
-    align-items: center;
     transition: transform 0.3s;
 }
 
@@ -165,10 +142,11 @@
     transform: rotate(180deg);
 }
 
+/* Results Table - Unified Style */
 .pb-details-container {
     display: none;
-    padding: 0;
-    background-color: var(--card-background);
+    background-color: var(--background-color);
+    border-top: 1px solid var(--border-color);
     overflow: hidden;
     overflow-y: auto;
     transition: max-height 0.3s ease-out;
@@ -180,170 +158,149 @@
     transition: max-height 0.5s ease-in;
 }
 
-
-/* Tables */
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px; /* optional for rounded corners */
-    overflow: hidden;   /* keeps the border radius clean with table rows */
-}
-
-.results-table th {
-    text-align: left;
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--table-header-background);
-    position: sticky;
-    top: 0;
-    color: var(--text-color);
-}
-
-.results-table td {
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-
-.results-table tr:hover {
-    background-color: var(--hover-bg);
-}
-
-
-/* Additional styling for sortable tables */
-.sortable .sortable-header {
-    cursor: pointer;
-    position: relative;
-}
-
-.sortable .sort-icon {
-    margin-left: 5px;
-    opacity: 0.5;
-}
-
-.sortable .sort-default .sort-icon {
-    opacity: 1;
-}
-
-.sortable-header.sort-asc .sort-icon {
-    content: "▲";
-    opacity: 1;
-}
-
-.sortable-header.sort-desc .sort-icon {
-    content: "▼";
-    opacity: 1;
-}
-
-.result {
-    white-space: nowrap;
-    font-weight: 500;
-}
-
-.position {
-    white-space: nowrap;
-}
-
-.wind {
-    font-size: 0.9rem;
-    color: var(--text-color-secondary, #666);
-    white-space: nowrap;
-}
-
-[data-theme="dark"] .wind {
-    color: #aaa;
-}
-
-.no-results {
-    font-style: italic;
-    color: var(--text-color-secondary, #666);
-    margin: 20px 0;
-}
-
-[data-theme="dark"] .no-results {
-    color: #aaa;
-}
-
-
-/* Recent results table */
+.results-table,
 .recent-results-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    font-size: 14px;
+}
+
+.results-table th {
+    padding: 12px;
+    background-color: var(--table-header-background);
+    color: var(--text-color);
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.results-table td,
+.recent-results-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.results-table tr:hover,
+.recent-results-table .result-row:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Recent Results Specific */
+.recent-results-table {
     background: var(--card-background);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-top: 24px;
-    font-size: 14px;
-}
-
-.recent-results-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
 }
 
 .recent-results-table .group-header td {
     background-color: var(--table-header-background);
     font-weight: bold;
     color: var(--primary-color);
-    border-top: 1px solid var(--border-color);
 }
 
-.recent-results-table .result-row td {
-    background-color: var(--card-background);
+/* Sorting */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
 }
 
-.recent-results-table .result-row:hover td {
-    background-color: var(--background-color-over);
+.sort-icon {
+    margin-left: 8px;
+    opacity: 0.5;
 }
 
+.sort-default .sort-icon,
+.sort-asc .sort-icon,
+.sort-desc .sort-icon {
+    opacity: 1;
+}
 
-/* Responsive adjustments */
+/* Utility Classes */
+.result {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.wind {
+    font-size: 0.85rem;
+    color: var(--text-color-secondary, #666);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.position {
+    white-space: nowrap;
+}
+
+.no-results {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-color-secondary, #666);
+    padding: 40px 20px;
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .label,
+[data-theme="dark"] .pb-details,
+[data-theme="dark"] .wind,
+[data-theme="dark"] .no-results {
+    color: #aaa;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-    .pb-header {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 5px;
+    .atleta-profile {
+        padding: 15px;
     }
-
+    
+    .atleta-info {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .pb-header {
+        grid-template-columns: 2fr 1fr 2fr auto;
+        grid-template-rows: auto auto;
+        gap: 8px;
+    }
+    
     .discipline-name {
         grid-column: 1;
         grid-row: 1;
     }
-
+    
     .pb-result {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    .pb-details {
         grid-column: 2;
-        grid-row: 1 / span 2;
-        align-items: flex-end;
+        grid-row: 1;
     }
-
-        .pb-details-container {
-        margin: 0 -5px; /* Extend beyond container padding */
-        border-radius: 0; /* Remove border radius for edge-to-edge */
-    }
-
-    .toggle-icon {
+    
+    .pb-details {
         grid-column: 3;
-        grid-row: 1 / span 2;
-    }
-
-    .atleta-info {
+        grid-row: 1;
+        text-align: right;
+        display: flex;
         flex-direction: column;
-        gap: 10px;
+        align-items: flex-end;
+        line-height: 1.3;
     }
-
-    .results-table {
-        display: block;
-        overflow-x: auto;
+    
+    .toggle-icon {
+        grid-column: 4;
+        grid-row: 1;
+        margin-left: 10px;
+    }
+    
+    .results-table,
+    .recent-results-table {
+        font-size: 13px;
+    }
+    
+    .results-table th,
+    .results-table td,
+    .recent-results-table td {
+        padding: 8px;
     }
 }
-

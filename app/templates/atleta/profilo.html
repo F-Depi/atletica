@@ -62,7 +62,7 @@
                 <div class="pb-header" onclick="toggleResults(this)">
                     <div class="discipline-name">{{ discipline_name.replace('_',' ') }}</div>
                     <div class="pb-result">
-                        <span class="result">{{ discipline_data.best.prestazione_display }}</span>
+                        <span class="result"><b>{{ discipline_data.best.prestazione_display }}</b></span>
                         {% if 'vento' in discipline_data.best and discipline_data.best.vento %}
                         <span class="wind">({{ discipline_data.best.vento }})</span>
                         {% endif %}
