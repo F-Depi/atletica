@@ -166,7 +166,9 @@
 }
 
 .results-table th {
+    padding: 12px;
     color: var(--text-color);
+    background-color: var(--table-header-background);
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
