@@ -3,45 +3,63 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profilo.css') }}">
 
 <div class="atleta-profile">
-    <!-- Athlete header information -->
     <div class="atleta-header">
-        <h1 class="atleta-name">{{ atleta_name }}</h1>
-
-        <div class="atleta-info">
-            {% if atleta_data %}
-            <div class="info-item">
-                <span class="label">Anno di nascita:</span>
-                <span class="value">{{ atleta_data.anno_nascita or 'N/D' }}</span>
+        <div class="header-content">
+            <!-- Profile Picture Placeholder (optional) -->
+            <div class="profile-image">
+                <!-- If you have profile pictures, use this -->
+                <!-- <img src="{{ athlete_image_url }}" alt="{{ atleta_name }}"> -->
+                <div class="profile-initials">
+                    {{ atleta_name[:2].upper() }}
+                </div>
             </div>
-            <div class="info-item">
-                <span class="label">Categoria:</span>
-                <span class="value">{{ atleta_data.categoria or 'N/D' }}</span>
-            </div>
-            <div class="info-item">
-                <span class="label">Società:</span>
-                {% if atleta_data.link_societa %}
-                <span class="value">
-                    <a href="{{ atleta_data.link_societa }}" target="_blank"> {{ atleta_data.nome_societa}} </a>
-                </span>
-                {% else %}
-                <span class="value">N/D</span>
+            
+            <div class="header-text">
+                <h1 class="atleta-name">{{ atleta_name }}</h1>
+                {% if atleta_data %}
+                <div class="quick-stats">
+                    {% if atleta_data.categoria %}
+                    <span class="category-badge">{{ atleta_data.categoria }}</span>
+                    {% endif %}
+                    {% if atleta_data.anno_nascita %}
+                    <span class="birth-year">{{ atleta_data.anno_nascita }}</span>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
-            <div class="info-item">
-                <span class="label">Profilo Ufficale:</span>
-                {% if atleta_data.link_societa %}
-                <span class="value">
-                    <a href="{{ link_atleta_fidal }}" target="_blank"> FIDAL </a>
-                </span>
-                {% else %}
-                <span class="value">N/D</span>
-                {% endif %}
-            </div>
-
-            {% else %}
-            <div class="info-item">Informazioni atleta non disponibili</div>
-            {% endif %}
         </div>
+
+        {% if atleta_data %}
+        <div class="atleta-details">
+            <div class="detail-card">
+                <i class="fas fa-running"></i>
+                <div class="detail-content">
+                    <label>Società</label>
+                    {% if atleta_data.link_societa %}
+                    <a href="{{ atleta_data.link_societa }}" target="_blank" class="detail-value">
+                        {{ atleta_data.nome_societa}}
+                    </a>
+                    {% else %}
+                    <span class="detail-value">N/D</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <i class="fas fa-id-card"></i>
+                <div class="detail-content">
+                    <label>Profilo FIDAL</label>
+                    {% if atleta_data.link_societa %}
+                    <a href="{{ link_atleta_fidal }}" target="_blank" class="detail-value">
+                        Visualizza
+                    </a>
+                    {% else %}
+                    <span class="detail-value">N/D</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Toggle buttons for sections -->
