@@ -128,10 +128,9 @@ def handle_standard_rankings(tab):
 
     # Aggiungi filtro vento se necessario
     if legal_wind_only and should_show_wind(discipline, 'P'):
-        conditions.append("""(
-            ambiente = 'I' OR
-            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
-        )""")
+        conditions.append("""(ambiente = 'I' OR
+                         (vento IS NOT NULL AND ROUND(vento, 1) <= 2.0))""")
+
 
     # Costruisci la query
     where_clause = " AND ".join(conditions)
@@ -281,10 +280,8 @@ def handle_advanced_rankings():
             params['provincia_societa'] = provincia_societa
 
     if legal_wind_only and show_wind:
-        conditions.append("""(
-            ambiente = 'I' OR
-            CAST(NULLIF(REPLACE(vento, ',', '.'), '') AS FLOAT) <= 2.0
-        )""")
+        conditions.append("""(ambiente = 'I' OR
+                         (vento IS NOT NULL AND ROUND(vento, 1) <= 2.0))""")
 
     if gender:
         conditions.append("sesso = :gender")
