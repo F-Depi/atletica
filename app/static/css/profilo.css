@@ -215,6 +215,7 @@
     border-top: 1px solid var(--border-color);
     overflow: hidden;
     overflow-y: auto;
+    overflow-x: auto;
     transition: max-height 0.3s ease-out;
 }
 
