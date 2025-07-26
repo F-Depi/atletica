@@ -153,6 +153,7 @@ def atleta_profilo(atleta_path):
                 luogo, data, disciplina, ambiente
             FROM results
             WHERE link_atleta = :link_atleta
+                  AND disciplina NOT LIKE '%sconosciuto%'
             ORDER BY data DESC, disciplina ASC
         """)
         
