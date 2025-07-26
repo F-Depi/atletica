@@ -45,12 +45,6 @@ function initializeSortableTables() {
     sortableTables.forEach(table => {
         const headers = table.querySelectorAll('th.sortable-header');
 
-        // Initialize: Sort by result (default)
-        const defaultHeader = table.querySelector('th.sort-default');
-        if (defaultHeader) {
-            sortTable(table, defaultHeader, 'desc');
-        }
-
         headers.forEach(header => {
             header.addEventListener('click', function() {
                 const sortDirection = this.classList.contains('sort-asc') ? 'desc' : 'asc';
