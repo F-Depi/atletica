@@ -1196,10 +1196,8 @@ header .search-results .error {
         font-size: 1.1rem;
         border-radius: 0;
         box-shadow: none;
-        /*width: 100vw;
-        margin-left: calc(-50vw + 50%);*/
-         width: 100%;
-        min-width: max-content;  /* permette scroll se necessario */
+        width: 100%;
+        min-width: max-content;
     }
 
     .results-table th,
@@ -1497,6 +1495,29 @@ td.athlete-name a:hover {
     .athlete-card:hover {
         transform: none;
         box-shadow: none;
+    }
+    .section-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .toggle-btn {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        border-radius: 0;
+    }
+    
+    /* Bordi interni */
+    .toggle-btn:nth-child(1),
+    .toggle-btn:nth-child(2) {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .toggle-btn:nth-child(1),
+    .toggle-btn:nth-child(3) {
+        border-right: 1px solid var(--border-color);
     }
 }
 
