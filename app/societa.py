@@ -10,10 +10,45 @@ from app.app import DISCIPLINES
 # Create blueprint for società
 societa_bp = Blueprint('societa', __name__, url_prefix='/societa')
 
+
+def get_discipline_order(conn):
+    """
+    Recupera l'ordine delle discipline dalla tabella discipline.
+    Ritorna un dizionario {nome_disciplina: ordine}
+    """
+    order_sql = text("""
+        SELECT disciplina, COALESCE(ordine, 999) as ordine
+        FROM discipline
+        ORDER BY ordine, disciplina
+    """)
+    result = conn.execute(order_sql)
+    
+    return {row[0]: row[1] for row in result}
+
+
+def sort_disciplines_dict(results_dict, discipline_order):
+    """
+    Ordina un dizionario di discipline secondo l'ordine dal database.
+    
+    Args:
+        results_dict: Dizionario con discipline come chiavi
+        discipline_order: Dizionario {disciplina: ordine}
+    
+    Returns:
+        Dizionario ordinato
+    """
+    sorted_keys = sorted(
+        results_dict.keys(),
+        key=lambda x: (discipline_order.get(x, 999), x)
+    )
+    return {k: results_dict[k] for k in sorted_keys}
+
+
 @societa_bp.route('/', methods=['GET'])
 def index():
     """Redirect to home"""
     return redirect(url_for('index'))
+
 
 @societa_bp.route('/<cod_societa>', methods=['GET'])
 def societa_profilo(cod_societa):
@@ -24,6 +59,9 @@ def societa_profilo(cod_societa):
     selected_year = request.args.get('year', current_year, type=int)
     
     with engine.connect() as conn:
+        # Recupera l'ordine delle discipline dalla tabella discipline
+        discipline_order = get_discipline_order(conn)
+        
         # Get società info using cod_società
         societa_sql = text("""
             SELECT DISTINCT società, link_società, cod_società
@@ -140,6 +178,9 @@ def societa_profilo(cod_societa):
                     'results': discipline_df.to_dict('records'),
                     'best': discipline_df.iloc[best_idx].to_dict()
                 }
+        
+        # Ordina i risultati stagionali
+        seasonal_results = sort_disciplines_dict(seasonal_results, discipline_order)
         
         # Get recent results (last 100)
         recent_sql = text("""
@@ -271,6 +312,9 @@ def societa_profilo(cod_societa):
                     'top_10': top_10,
                     'tipo': discipline_type
                 }
+        
+        # Ordina i record
+        records = sort_disciplines_dict(records, discipline_order)
     
     return render_template(
         'societa/profilo.html',
@@ -298,6 +342,9 @@ def get_seasonal_results(cod_societa):
     engine = get_db_engine()
     
     with engine.connect() as conn:
+        # Recupera l'ordine delle discipline
+        discipline_order = get_discipline_order(conn)
+        
         # Verify società exists
         check_sql = text("""
             SELECT 1 FROM results 
@@ -334,7 +381,7 @@ def get_seasonal_results(cod_societa):
         ])
         
         if df.empty:
-            return jsonify({'results': {}})
+            return jsonify({'results': {}, 'discipline_order': []})
         
         df['prestazione_display'] = df.apply(
             lambda row: format_time(row['prestazione'], DISCIPLINES.get(row['disciplina'], {}), row['cronometraggio']),
@@ -365,4 +412,13 @@ def get_seasonal_results(cod_societa):
                 'best': discipline_df.iloc[0].to_dict() if not discipline_df.empty else None
             }
         
-        return jsonify({'results': seasonal_results})
+        # Ordina i risultati stagionali
+        seasonal_results = sort_disciplines_dict(seasonal_results, discipline_order)
+        
+        # Restituisci anche l'ordine delle discipline presenti
+        ordered_disciplines = list(seasonal_results.keys())
+        
+        return jsonify({
+            'results': seasonal_results,
+            'discipline_order': ordered_disciplines
+        })

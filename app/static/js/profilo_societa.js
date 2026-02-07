@@ -99,47 +99,108 @@ function initializeFilters() {
     }
 }
 
-// Load seasonal results via AJAX
-// Load seasonal results via AJAX
-function loadSeasonalResults(year) {
-    // Estrai cod_societa dall'URL (ora è semplicemente l'ultimo segmento)
-    const pathParts = window.location.pathname.split('/');
-    const codSocieta = pathParts[pathParts.length - 1];
-    const url = `/societa/${codSocieta}/seasonal?year=${year}`;
+// Gestione cambio stagione
+document.getElementById('season-select')?.addEventListener('change', async function() {
+    const year = this.value;
+    const codSocieta = window.location.pathname.split('/').pop();
     
+    try {
+        const response = await fetch(`/societa/${codSocieta}/seasonal?year=${year}`);
+        const data = await response.json();
+        
+        if (data.error) {
+            console.error(data.error);
+            return;
+        }
+        
+        updateSeasonalResults(data.results, data.discipline_order);
+        
+    } catch (error) {
+        console.error('Errore nel caricamento dei risultati:', error);
+    }
+});
+
+
+function updateSeasonalResults(results, disciplineOrder) {
     const container = document.querySelector('.seasonal-list');
+    
     if (!container) return;
     
-    // Show loading state
-    container.innerHTML = '<p class="loading">Caricamento risultati...</p>';
+    // Se non ci sono risultati
+    if (!results || Object.keys(results).length === 0) {
+        container.innerHTML = '<p class="no-results">Nessun risultato stagionale disponibile per questa stagione.</p>';
+        return;
+    }
     
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                container.innerHTML = `<p class="no-results">${data.error}</p>`;
-                return;
-            }
-            
-            if (Object.keys(data.results).length === 0) {
-                container.innerHTML = '<p class="no-results">Nessun risultato per questa stagione.</p>';
-                return;
-            }
-            
-            // Rebuild the seasonal results HTML
-            let html = '';
-            for (const [discipline, discData] of Object.entries(data.results)) {
-                html += buildSeasonalRowHTML(discipline, discData);
-            }
-            container.innerHTML = html;
-            
-            // Re-initialize sorting for new tables
-            initializeSortableTables();
-        })
-        .catch(error => {
-            console.error('Error loading seasonal results:', error);
-            container.innerHTML = '<p class="no-results">Errore nel caricamento dei risultati.</p>';
-        });
+    let html = '';
+    
+    // Usa l'ordine fornito dal server
+    const orderedDisciplines = disciplineOrder || Object.keys(results);
+    
+    for (const disciplineName of orderedDisciplines) {
+        const disciplineData = results[disciplineName];
+        
+        if (!disciplineData) continue;
+        
+        const displayName = disciplineName.replace(/_/g, ' ');
+        const best = disciplineData.best;
+        const resultsList = disciplineData.results;
+        
+        html += `
+        <div class="seasonal-row" data-discipline="${displayName}">
+            <div class="seasonal-header" onclick="toggleSeasonalResults(this)">
+                <div class="discipline-name">${displayName}</div>
+                <div class="result-count">
+                    <span class="count-badge">${resultsList.length}</span>
+                </div>
+                <div class="best-result">
+                    <span class="result"><b>${best.prestazione_display}</b></span>
+                    ${best.vento ? `<span class="wind">(${best.vento})</span>` : ''}
+                </div>
+                <span class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="details-container">
+                <table class="results-table sortable">
+                    <thead>
+                        <tr>
+                            <th class="sortable-header sort-default" data-sort="result">Pres. <span class="sort-icon">▼</span></th>
+                            <th>Atleta</th>
+                            <th class="sortable-header" data-sort="date">Data <span class="sort-icon"></span></th>
+                            <th>Luogo</th>
+                            <th>Cat.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${resultsList.map(result => `
+                        <tr data-raw-result="${result.prestazione || 0}"
+                            data-raw-date="${result.data ? result.data.split('/').reverse().join('') : '00000000'}">
+                            <td class="result">
+                                ${result.prestazione_display}
+                                ${result.vento ? `<span class="wind"> (${result.vento})</span>` : ''}
+                            </td>
+                            <td class="athlete-name">
+                                <a href="/atleti/${result.atleta_link}">
+                                    ${result.atleta}
+                                </a>
+                            </td>
+                            <td class="date">${result.data || '-'}</td>
+                            <td class="location">${result.luogo || '-'}</td>
+                            <td class="category">${result.categoria || '-'}</td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+    }
+    
+    container.innerHTML = html;
 }
 
 // Build HTML for a seasonal row
