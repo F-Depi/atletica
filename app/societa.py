@@ -221,29 +221,51 @@ def societa_profilo(cod_societa):
                 link_atleta,
                 MAX(anno) as anno,
                 MAX(categoria) as categoria,
-                COUNT(*) as num_risultati
+                COUNT(*) as num_risultati,
+                COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM data) = :current_year) as risultati_stagione
             FROM results
             WHERE cod_società = :cod_societa
             GROUP BY atleta, link_atleta
             ORDER BY atleta
         """)
-        
-        athletes_result = conn.execute(athletes_sql, {"cod_societa": cod_societa})
-        
+
+        athletes_result = conn.execute(athletes_sql, {
+            "cod_societa": cod_societa,
+            "current_year": current_year
+        })
+
         athletes = []
         athlete_categories = set()
         for row in athletes_result:
             link = '_'.join(row[1].split('/')[-2:])[:-3] + '=' if row[1] else ''
+            categoria = row[3] or ''
+            
+            # Determina il genere dalla categoria (M=maschile, F=femminile)
+            # Le categorie italiane tipicamente contengono M o F (es: SM35, SF40, JM, JF)
+            genere = ''
+            if categoria:
+                cat_upper = categoria.upper()
+                # Cerca F o M nella categoria
+                if 'F' in cat_upper:
+                    genere = 'F'
+                elif 'M' in cat_upper:
+                    genere = 'M'
+            
+            is_active = row[5] > 0  # Ha risultati nell'anno corrente
+            
             athletes.append({
                 'nome': row[0],
                 'link': link,
                 'anno': row[2],
-                'categoria': row[3],
-                'num_risultati': row[4]
+                'categoria': categoria,
+                'num_risultati': row[4],
+                'genere': genere,
+                'is_active': is_active,
+                'risultati_stagione': row[5]
             })
-            if row[3]:
-                athlete_categories.add(row[3])
-        
+            if categoria:
+                athlete_categories.add(categoria)
+
         athlete_categories = sorted(list(athlete_categories))
         
         # Get society records (all-time bests per discipline)

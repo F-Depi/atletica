@@ -673,3 +673,46 @@ a.detail-value:hover {
         width: calc(100% + 24px);
     }
 }
+
+/* Athletes count indicator */
+.athletes-count-indicator {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+}
+
+/* Active badge for athletes */
+.active-badge {
+    color: #22c55e;
+    font-size: 0.8rem;
+    margin-left: 4px;
+}
+
+/* Female avatar variation */
+.athlete-avatar.female {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+
+/* Filter bar improvements for mobile */
+@media (max-width: 768px) {
+    .filter-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .filter-bar .filter-input {
+        grid-column: 1 / -1;
+    }
+    
+    .filter-select {
+        min-width: unset;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-bar {
+        grid-template-columns: 1fr;
+    }
+}

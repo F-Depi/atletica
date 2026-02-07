@@ -63,41 +63,6 @@ function toggleRecordDetails(element) {
     }
 }
 
-// Initialize filters
-function initializeFilters() {
-    // Season filter
-    const seasonSelect = document.getElementById('season-select');
-    if (seasonSelect) {
-        seasonSelect.addEventListener('change', function() {
-            const year = this.value;
-            loadSeasonalResults(year);
-        });
-    }
-
-    // Athlete search filter
-    const athleteSearch = document.getElementById('athlete-search');
-    if (athleteSearch) {
-        athleteSearch.addEventListener('input', debounce(function() {
-            filterAthletes();
-        }, 300));
-    }
-
-    // Category filter
-    const categoryFilter = document.getElementById('category-filter');
-    if (categoryFilter) {
-        categoryFilter.addEventListener('change', function() {
-            filterAthletes();
-        });
-    }
-
-    // Discipline type filter for records
-    const disciplineTypeFilter = document.getElementById('discipline-type-filter');
-    if (disciplineTypeFilter) {
-        disciplineTypeFilter.addEventListener('change', function() {
-            filterRecords();
-        });
-    }
-}
 
 // Gestione cambio stagione
 document.getElementById('season-select')?.addEventListener('change', async function() {
@@ -257,26 +222,98 @@ function buildSeasonalRowHTML(discipline, data) {
     `;
 }
 
+// Initialize filters
+function initializeFilters() {
+    // Season filter
+    const seasonSelect = document.getElementById('season-select');
+    if (seasonSelect) {
+        seasonSelect.addEventListener('change', function() {
+            const year = this.value;
+            loadSeasonalResults(year);
+        });
+    }
+
+    // Athlete search filter
+    const athleteSearch = document.getElementById('athlete-search');
+    if (athleteSearch) {
+        athleteSearch.addEventListener('input', debounce(function() {
+            filterAthletes();
+        }, 300));
+    }
+
+    // Category filter
+    const categoryFilter = document.getElementById('category-filter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', function() {
+            filterAthletes();
+        });
+    }
+
+    // Gender filter
+    const genderFilter = document.getElementById('gender-filter');
+    if (genderFilter) {
+        genderFilter.addEventListener('change', function() {
+            filterAthletes();
+        });
+    }
+
+    // Status filter (active/historical)
+    const statusFilter = document.getElementById('status-filter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            filterAthletes();
+        });
+    }
+
+    // Discipline type filter for records
+    const disciplineTypeFilter = document.getElementById('discipline-type-filter');
+    if (disciplineTypeFilter) {
+        disciplineTypeFilter.addEventListener('change', function() {
+            filterRecords();
+        });
+    }
+}
+
 // Filter athletes
 function filterAthletes() {
     const searchTerm = document.getElementById('athlete-search')?.value.toLowerCase() || '';
     const categoryFilter = document.getElementById('category-filter')?.value || '';
+    const genderFilter = document.getElementById('gender-filter')?.value || '';
+    const statusFilter = document.getElementById('status-filter')?.value || '';
     
     const athleteCards = document.querySelectorAll('.athlete-card');
+    let visibleCount = 0;
     
     athleteCards.forEach(card => {
         const name = card.getAttribute('data-name') || '';
         const category = card.getAttribute('data-category') || '';
+        const gender = card.getAttribute('data-gender') || '';
+        const isActive = card.getAttribute('data-active') === 'true';
         
         const matchesSearch = name.includes(searchTerm);
         const matchesCategory = !categoryFilter || category === categoryFilter;
+        const matchesGender = !genderFilter || gender === genderFilter;
         
-        if (matchesSearch && matchesCategory) {
+        let matchesStatus = true;
+        if (statusFilter === 'active') {
+            matchesStatus = isActive;
+        } else if (statusFilter === 'historical') {
+            matchesStatus = !isActive;
+        }
+        
+        if (matchesSearch && matchesCategory && matchesGender && matchesStatus) {
             card.style.display = '';
+            visibleCount++;
         } else {
             card.style.display = 'none';
         }
     });
+
+    // Update visible count indicator
+    const countIndicator = document.getElementById('visible-athletes-count');
+    if (countIndicator) {
+        countIndicator.textContent = visibleCount;
+    }
 }
 
 // Filter records by discipline type

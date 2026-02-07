@@ -11,7 +11,7 @@
                     {{ societa_name[:2].upper() }}
                 </div>
             </div>
-            
+
             <div class="header-text">
                 <h1 class="societa-name">{{ societa_name }}</h1>
                 {% if societa_data %}
@@ -89,7 +89,7 @@
         {% if not seasonal_results %}
         <p class="no-results">Nessun risultato stagionale disponibile per questa società.</p>
         {% else %}
-        
+
         <!-- Season filter -->
         <div class="filter-bar">
             <label for="season-select">Stagione:</label>
@@ -203,10 +203,20 @@
         {% if not athletes %}
         <p class="no-results">Nessun atleta trovato per questa società.</p>
         {% else %}
-        
-        <!-- Search and filter -->
+
+        <!-- Search and filters -->
         <div class="filter-bar">
             <input type="text" id="athlete-search" class="filter-input" placeholder="Cerca atleta...">
+            <select id="gender-filter" class="filter-select">
+                <option value="">Tutti</option>
+                <option value="M">Uomini</option>
+                <option value="F">Donne</option>
+            </select>
+            <select id="status-filter" class="filter-select">
+                <option value="">Tutti gli atleti</option>
+                <option value="active">Attivi ({{ current_year }})</option>
+                <option value="historical">Solo storici</option>
+            </select>
             <select id="category-filter" class="filter-select">
                 <option value="">Tutte le categorie</option>
                 {% for cat in athlete_categories %}
@@ -215,11 +225,20 @@
             </select>
         </div>
 
+        <!-- Athletes count indicator -->
+        <div class="athletes-count-indicator">
+            <span id="visible-athletes-count">{{ athletes|length }}</span> / {{ athletes|length }} atleti
+        </div>
+
         <div class="athletes-grid">
             {% for athlete in athletes %}
-            <div class="athlete-card" data-name="{{ athlete.nome|lower }}" data-category="{{ athlete.categoria }}">
+            <div class="athlete-card" 
+                data-name="{{ athlete.nome|lower }}" 
+                data-category="{{ athlete.categoria }}"
+                data-gender="{{ athlete.genere }}"
+                data-active="{{ 'true' if athlete.is_active else 'false' }}">
                 <a href="{{ url_for('atleti.atleta_profilo', atleta_path=athlete.link) }}" class="athlete-link">
-                    <div class="athlete-avatar">
+                    <div class="athlete-avatar {% if athlete.genere == 'F' %}female{% endif %}">
                         {{ athlete.nome[:2].upper() }}
                     </div>
                     <div class="athlete-info">
@@ -233,6 +252,9 @@
                     </div>
                     <div class="athlete-stats">
                         <span class="stat">{{ athlete.num_risultati }} ris.</span>
+                        {% if athlete.is_active %}
+                        <span class="active-badge" title="Attivo {{ current_year }}">●</span>
+                        {% endif %}
                     </div>
                 </a>
             </div>
@@ -246,7 +268,7 @@
         {% if not records %}
         <p class="no-results">Nessun record disponibile per questa società.</p>
         {% else %}
-        
+
         <!-- Discipline type filter -->
         <div class="filter-bar">
             <select id="discipline-type-filter" class="filter-select">
