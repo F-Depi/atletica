@@ -1,80 +1,36 @@
 /* =============================================
-   PROFILO SOCIETÀ - STILI SPECIFICI
-   (Estende profilo.css)
+   PROFILO SOCIETÀ - SOLO DIFFERENZE
    ============================================= */
 
-/* Container leggermente più largo per la società */
+/* Container leggermente più largo */
 .societa-profile {
     max-width: 1100px;
 }
 
-/* Profile image quadrata invece che tonda */
+/* Profile image quadrata */
 .profile-image--square {
     border-radius: 16px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark, #1a5a8a));
 }
 
-/* Code badge con font monospace */
+/* Code badge monospace */
 .code-badge {
     font-family: monospace;
     font-weight: 600;
 }
 
-/* Toggle buttons - testo alternativo per mobile */
+/* Toggle buttons - testo alternativo */
 .toggle-btn .btn-text-short {
     display: none;
 }
 
 @media (max-width: 900px) {
-    .toggle-btn .btn-text {
-        display: none;
-    }
-    .toggle-btn .btn-text-short {
-        display: inline;
-    }
+    .toggle-btn .btn-text { display: none; }
+    .toggle-btn .btn-text-short { display: inline; }
 }
 
 /* =============================================
-   FILTER BAR
-   ============================================= */
-.filter-bar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.filter-bar label {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.filter-select,
-.filter-input {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--card-background);
-    color: var(--text-color);
-    font-size: 0.95rem;
-    min-width: 150px;
-}
-
-.filter-input {
-    flex: 1;
-    max-width: 300px;
-}
-
-.filter-select:focus,
-.filter-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
-}
-
-/* =============================================
-   HEADER SOCIETÀ (5 colonne con holder)
+   HEADER SOCIETÀ (5 colonne invece di 4)
    ============================================= */
 .pb-header--society {
     grid-template-columns: 2fr 1.2fr 1.5fr 1fr auto;
@@ -115,26 +71,49 @@
 .gender-badge.M {
     background-color: #e3f2fd;
     color: #1565c0;
-    border: 1px solid #bbdefb;
 }
 
 .gender-badge.F {
     background-color: #fce4ec;
     color: #c2185b;
-    border: 1px solid #f8bbd0;
 }
 
-/* Bordo colorato per genere */
-.pb-row.gender-M {
-    border-left: 4px solid #1565c0;
+.pb-row.gender-M { border-left: 4px solid #1565c0; }
+.pb-row.gender-F { border-left: 4px solid #c2185b; }
+
+/* =============================================
+   FILTER BAR (nuovo componente)
+   ============================================= */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.pb-row.gender-F {
-    border-left: 4px solid #c2185b;
+.filter-bar label {
+    font-weight: 500;
+}
+
+.filter-select,
+.filter-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-background);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    min-width: 150px;
+}
+
+.filter-input {
+    flex: 1;
+    max-width: 300px;
 }
 
 /* =============================================
-   ATHLETES GRID
+   ATHLETES GRID (nuovo componente)
    ============================================= */
 .athletes-count-indicator {
     margin-bottom: 15px;
@@ -151,7 +130,6 @@
 .athlete-card {
     background: var(--card-background);
     border-radius: 8px;
-    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -180,7 +158,6 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1rem;
     flex-shrink: 0;
 }
 
@@ -190,15 +167,12 @@
 
 .athlete-info {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
     min-width: 0;
 }
 
 .athlete-info .athlete-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -207,9 +181,6 @@
 .athlete-meta {
     font-size: 0.85rem;
     color: var(--text-color-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .category-tag {
@@ -217,13 +188,7 @@
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.8rem;
-}
-
-.athlete-stats {
-    text-align: right;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    margin-left: 8px;
 }
 
 .athlete-stats .stat {
@@ -233,12 +198,10 @@
 
 .active-badge {
     color: #22c55e;
-    font-size: 0.8rem;
+    margin-left: 4px;
 }
 
-/* =============================================
-   RANK COLUMN (per records)
-   ============================================= */
+/* Rank column per records */
 .rank {
     font-weight: 600;
     color: var(--primary-color);
@@ -246,69 +209,32 @@
     width: 40px;
 }
 
-/* =============================================
-   ATHLETE NAME LINKS IN TABLES
-   ============================================= */
-.athlete-name a {
+/* Links nelle tabelle */
+td.athlete-name a {
     color: var(--text-color);
     text-decoration: none;
 }
 
-.athlete-name a:hover {
+td.athlete-name a:hover {
     color: var(--primary-color);
-    text-decoration: underline;
 }
 
 /* =============================================
-   RESPONSIVE - SOCIETÀ SPECIFICO
+   RESPONSIVE - SOLO ELEMENTI NUOVI/DIVERSI
    ============================================= */
 @media (max-width: 768px) {
-    .filter-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
-    .filter-bar .filter-input {
-        grid-column: 1 / -1;
-    }
-    
-    .filter-select {
-        min-width: unset;
-        font-size: 0.9rem;
-        max-width: none;
-    }
-
-    /* Header società mobile */
+    /* Header 5 colonne → 2 colonne */
     .pb-header--society {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto;
-        gap: 6px;
+        position: relative;
+        padding-right: 40px;
     }
 
-    .pb-header--society .discipline-name {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .pb-header--society .pb-result {
-        grid-column: 2;
-        grid-row: 1;
-        text-align: right;
-    }
-
-    .pb-header--society .pb-holder {
-        grid-column: 1;
-        grid-row: 2;
-        font-size: 0.85rem;
-    }
-
-    .pb-header--society .pb-details {
-        grid-column: 2;
-        grid-row: 2;
-        text-align: right;
-    }
-
+    .pb-header--society .discipline-name { grid-column: 1; grid-row: 1; }
+    .pb-header--society .pb-result { grid-column: 2; grid-row: 1; text-align: right; }
+    .pb-header--society .pb-holder { grid-column: 1; grid-row: 2; font-size: 0.85rem; }
+    .pb-header--society .pb-details { grid-column: 2; grid-row: 2; text-align: right; }
     .pb-header--society .toggle-icon {
         position: absolute;
         right: 12px;
@@ -316,18 +242,27 @@
         transform: translateY(-50%);
     }
 
-    .pb-row {
-        position: relative;
+    .count-badge { display: none; }
+
+    /* Filter bar */
+    .filter-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .filter-input {
+        grid-column: 1 / -1;
+        max-width: none;
     }
 
-    .count-badge {
-        display: none;
+    .filter-select {
+        min-width: unset;
     }
 
-    /* Athletes grid mobile */
+    /* Athletes grid */
     .athletes-grid {
         grid-template-columns: 1fr;
-        gap: 8px;
         margin: 0 -12px;
     }
 

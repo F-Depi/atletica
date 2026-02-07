@@ -403,8 +403,8 @@
         font-size: 1.1rem;
         border-radius: 0;
         box-shadow: none;
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
+        width: 100%;
+        min-width: max-content;
     }
 
     .results-table th,
