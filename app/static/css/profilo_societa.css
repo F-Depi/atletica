@@ -299,6 +299,13 @@ td.athlete-name a:hover {
     .toggle-btn:nth-child(3) {
         border-right: 1px solid var(--border-color);
     }
+    .societa-profile .recent-results-table {
+        width: 100%;
+        margin-left: 0;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 @media (max-width: 480px) {

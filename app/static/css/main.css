@@ -1048,11 +1048,9 @@ header .search-results .error {
     background-color: var(--hover-bg);
 }
 
-/* Recent Results Table */
 .recent-results-table {
     background: var(--card-background);
     border-radius: 8px;
-    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
@@ -1210,9 +1208,15 @@ header .search-results .error {
         margin: 0;
         padding: 0;
     }
-
+    .results-section.active {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0;
+        padding: 0 12px;
+    }
     .recent-results-table {
-        margin-top: 15px;
+        min-width: 450px;
+        margin: 15px 0;
     }
 }
 
@@ -1518,6 +1522,13 @@ td.athlete-name a:hover {
     .toggle-btn:nth-child(1),
     .toggle-btn:nth-child(3) {
         border-right: 1px solid var(--border-color);
+    }
+    .societa-profile .recent-results-table {
+        width: 100%;
+        margin-left: 0;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }
 
