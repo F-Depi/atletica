@@ -6,15 +6,18 @@ cd app/static/css || { echo "Directory app/static/css not found!"; exit 1; }
 # List of files in order — you control the order here
 files=(
     "variables.css"
-    "base.css"
-    "header.css"
-    "components.css"
-    "tables.css"
-    "filters.css"
-    "theme-toggle.css"
     "utilities.css"
+    "base.css"
+    "components.css"
+    "filters.css"
     "footer.css"
+    "header.css"
+    "profilo.css"
+    "profilo_societa.css"
     "responsive.css"
+    "ricerca.css"
+    "tables.css"
+    "theme-toggle.css"
 )
 
 # Output file

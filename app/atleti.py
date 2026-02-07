@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for
 from sqlalchemy import text
 import pandas as pd
 from app.error_reporting import limiter
@@ -10,88 +10,11 @@ import re
 # Create blueprint for atletes
 atleti_bp = Blueprint('atleti', __name__, url_prefix='/atleta')
 
+
 @atleti_bp.route('/', methods=['GET'])
 def index():
-    """Render the atleta ricerca page"""
-    return render_template('atleta/ricerca.html')
-
-@atleti_bp.route('/ricerca', methods=['GET'])
-@limiter.limit("30 per minute")
-def trova_atleti():
-    """API endpoint for searching atleti with improved name matching"""
-    query = request.args.get('q', '').strip()
-    
-    if not query or len(query) < 3:
-        return jsonify([])
-    
-    engine = get_db_engine()
-    
-    try:
-        # Split the query into terms to search independently
-        terms = query.split()
-        
-        if len(terms) > 1:
-            # Multi-word search - create conditions where each term must be present
-            # but can be in any order
-            conditions = []
-            params = {}
-            
-            for i, term in enumerate(terms):
-                param_name = f"term_{i}"
-                conditions.append(f"atleta ILIKE :{param_name}")
-                params[param_name] = f"%{term}%"
-            
-            where_clause = " AND ".join(conditions)
-            
-            sql = text(f"""
-                SELECT DISTINCT atleta, link_atleta, anno
-                FROM atleti 
-                WHERE {where_clause}
-                ORDER BY atleta
-                LIMIT 10
-            """)
-            
-            with engine.connect() as conn:
-                result = conn.execute(sql, params)
-                atleti = []
-                
-                for row in result:
-                    # Extract name + unique code from link_atleta
-                    identifier = '_'.join(row[1].split('/')[-2:])
-                    identifier = identifier[:-3] + '='
-                    atleti.append({"name": f"{row[0]} ({row[2]})", "link": identifier})
-                
-            return jsonify(atleti)
-        
-        else:
-            # Single-word search - use simple pattern matching
-            sql = text("""
-                SELECT DISTINCT atleta, link_atleta, anno
-                FROM atleti 
-                WHERE atleta ILIKE :query
-                ORDER BY atleta
-                LIMIT 10
-            """)
-            
-            # Add wildcards for partial matches
-            search_query = f"%{query}%"
-            
-            with engine.connect() as conn:
-                result = conn.execute(sql, {"query": search_query})
-                atleti = []
-                
-                for row in result:
-                    # Extract name + unique code from link_atleta
-                    identifier = '_'.join(row[1].split('/')[-2:])
-                    identifier = identifier[:-3] + '='
-                    atleti.append({"name": f"{row[0]} ({row[2]})", "link": identifier})
-                
-            return jsonify(atleti)
-        
-    except Exception as e:
-        print(f"Error searching atleti: {e}")
-        return jsonify([])
-
+    """Redirect to home"""
+    return redirect(url_for('index'))
 
 @atleti_bp.route('/<path:atleta_path>', methods=['GET'])
 def atleta_profilo(atleta_path):
@@ -125,7 +48,7 @@ def atleta_profilo(atleta_path):
         # Try to get additional atleta info (birthdate, current club, category)
         atleta_info_sql = text("""
             SELECT 
-                anno, categoria, società, link_società
+                anno, categoria, società, cod_società
             FROM results
             WHERE link_atleta = :link_atleta
             ORDER BY data DESC
@@ -141,8 +64,8 @@ def atleta_profilo(atleta_path):
                 "anno_nascita": atleta_info[0],
                 "categoria": atleta_info[1],
                 "societa": atleta_info[2],
-                "link_societa": atleta_info[3],
-                "nome_societa": f"{atleta_info[3].split('/')[-2].replace('-',' ')} ({atleta_info[3].split('/')[-1]})"
+                "cod_societa": atleta_info[3],  # Ora usiamo direttamente il codice
+                "nome_societa": atleta_info[2]  # Nome semplice della società
             }
         
         # Get all results for the atleta using the full link_atleta_fidal

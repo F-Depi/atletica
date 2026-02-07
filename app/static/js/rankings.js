@@ -542,65 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-//function loadStats(discipline, queryParams) {
-//    // Create a copy of queryParams to avoid modifying the original
-//    const params = new URLSearchParams(queryParams);
-//
-//    // Ensure the category parameter is properly encoded
-//    const category = params.get('category');
-//    if (category) {
-//        params.set('category', encodeURIComponent(category));
-//    }
-//
-//    // Add legal_wind parameter if checkbox exists
-//    const legalWindCheckbox = document.querySelector('input[name="legal_wind"]');
-//    if (legalWindCheckbox) {
-//        params.set('legal_wind', legalWindCheckbox.checked);
-//    }
-//
-//    // Add year parameter if it exists
-//    const yearSelect = document.querySelector('select[name="year"]');
-//    if (yearSelect && yearSelect.value) {
-//        params.set('year', yearSelect.value);
-//    }
-//
-//    fetch(`/api/stats/${encodeURIComponent(discipline)}?${params.toString()}`)
-//        .then(response => {
-//            if (!response.ok) {
-//                throw new Error('Network response was not ok');
-//            }
-//            return response.json();
-//        })
-//        .then(data => {
-//            const classificaType = document.getElementById('disciplineInfo').dataset.classificaType;
-//            const isBestTime = classificaType === 'tempo';
-//            const statsHtml = `
-//                <div class="stat-box">
-//                <h3>Migliore</h3>
-//                <p>${formatTime(data.best, classificaType)}</p>
-//                </div>
-//                <div class="stat-box">
-//                <h3>Media</h3>
-//                <p>${formatTime(data.average, classificaType)}</p>
-//                </div>
-//                <div class="stat-box">
-//                <h3>Atleti totali</h3>
-//                <p>${data.athletes}</p>
-//                </div>
-//                <div class="stat-box">
-//                <h3>Risultati totali</h3>
-//                <p>${data.performances}</p>
-//                </div>
-//                `;
-//            document.getElementById('statsContainer').innerHTML = statsHtml;
-//        })
-//        .catch(error => {
-//            console.error('Error fetching stats:', error);
-//            document.getElementById('statsContainer').innerHTML = '<p>Error loading statistics</p>';
-//        });
-//}
-
-
 function formatTime(seconds, classificaType) {
     if (!seconds) return '-';
     seconds = parseFloat(seconds);
@@ -683,17 +624,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Errore nel recupero del CSRF token:', error);
             });
     }
-    
+
     if (!detailBox || !closeBtn) {
         console.error('Detail box o close button non trovati!');
         return;
     }
-    
+
     // Crea un overlay per facilitare la chiusura al tocco
     const overlay = document.createElement('div');
     overlay.className = 'detail-overlay';
     document.body.appendChild(overlay);
-    
+
     function showDetailBox() {
         detailBox.style.display = 'block';
         overlay.style.display = 'block';
@@ -703,45 +644,59 @@ document.addEventListener('DOMContentLoaded', function() {
         messaggioInvio.textContent = '';
         messaggioInvio.className = 'messaggio-invio';
     }
-    
+
     function hideDetailBox() {
         detailBox.style.display = 'none';
         overlay.style.display = 'none';
     }
-    
+
     rows.forEach(row => {
         row.addEventListener('click', function() {
             const atleta = this.getAttribute('data-atleta');
             const linkAtleta = this.getAttribute('data-link-atleta');
             const societa = this.getAttribute('data-societa');
-            const linkSocieta = this.getAttribute('data-link-societa');
+            const codSocieta = this.getAttribute('data-cod-societa');
             const prestazione = this.getAttribute('data-prestazione');
             const position = this.getAttribute('data-position');
-            
+
             // Memorizza tutti i dati della riga per la segnalazione
             currentRowData = {
                 atleta: atleta,
                 linkAtleta: linkAtleta,
                 societa: societa,
-                linkSocieta: linkSocieta,
+                codSocieta: codSocieta,
                 prestazione: prestazione,
                 position: position
             };
-            
-            // Memorizza i dati principali per riferimento immediato
+
             currentAtleta = atleta;
             currentPrestazione = prestazione;
-            
-            // Popola il box con i dati
+
+            // Popola il box
             document.getElementById('detailAtleta').textContent = `${atleta} - ${prestazione} (${position}°)`;
-            document.getElementById('linkAtleta').href = linkAtleta;
 
-            const clubCode = linkSocieta.slice(-5);
-            document.getElementById('linkSocieta').href = linkSocieta;
-            document.getElementById('linkSocieta').textContent = `Pagina società (${clubCode})`;
+            // Link atleta - converti da URL FIDAL a link interno
+            const atletaLink = document.getElementById('linkAtleta');
+            if (linkAtleta) {
+                const parts = linkAtleta.split('/');
+                const lastTwo = parts.slice(-2).join('_');
+                const identifier = lastTwo.slice(0, -3) + '=';
+                atletaLink.href = `/atleta/${encodeURIComponent(identifier)}`;
+                atletaLink.style.display = 'block';
+            } else {
+                atletaLink.style.display = 'none';
+            }
 
-            
-            // Mostra il box
+            // Link società - semplicemente /societa/codice
+            const societaLink = document.getElementById('linkSocieta');
+            if (codSocieta && societa) {
+                societaLink.href = `/societa/${codSocieta}`;
+                societaLink.textContent = `Pagina società (${codSocieta})`;
+                societaLink.style.display = 'block';
+            } else {
+                societaLink.style.display = 'none';
+            }
+
             showDetailBox();
         });
     });

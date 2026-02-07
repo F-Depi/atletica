@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-	<script src="https://app.rybbit.io/api/script.js" data-site-id="684" defer></script>
+        <script src="https://app.rybbit.io/api/script.js" data-site-id="684" defer></script>
         <title>AtleticaDB</title>
         <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png" />
         <script>
@@ -105,6 +105,7 @@
         <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
         <!-- Search bar behaviour -->
+        <!-- Search bar behaviour -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.getElementById('atletaSearch');
@@ -122,29 +123,45 @@
                         return;
                     }
 
-                    fetch(`/atleta/ricerca?q=${encodeURIComponent(query)}`)
+                    // Usa l'endpoint corretto
+                    fetch(`/ricerca/api?q=${encodeURIComponent(query)}`)
                         .then(response => response.json())
                         .then(data => {
                             searchResults.innerHTML = '';
 
-                            if (data.length === 0) {
+                            const hasAtleti = data.atleti && data.atleti.length > 0;
+                            const hasSocieta = data.societa && data.societa.length > 0;
+
+                            if (!hasAtleti && !hasSocieta) {
                                 searchResults.innerHTML = '<p class="no-results">Nessun risultato trovato</p>';
                                 return;
                             }
 
                             const resultsList = document.createElement('ul');
 
-                            data.forEach(atleta => {
-                                const listItem = document.createElement('li');
-                                const link = document.createElement('a');
+                            // Mostra atleti
+                            if (hasAtleti) {
+                                data.atleti.forEach(atleta => {
+                                    const listItem = document.createElement('li');
+                                    const link = document.createElement('a');
+                                    link.href = `/atleta/${encodeURIComponent(atleta.link)}`;
+                                    link.innerHTML = `<span class="result-type athlete">👤</span> ${atleta.name} <small>(${atleta.anno || ''})</small>`;
+                                    listItem.appendChild(link);
+                                    resultsList.appendChild(listItem);
+                                });
+                            }
 
-                                // Use the extracted path part from the URL
-                                link.href = `/atleta/${encodeURIComponent(atleta.link)}`;
-                                link.textContent = atleta.name;
-
-                                listItem.appendChild(link);
-                                resultsList.appendChild(listItem);
-                            });
+                            // Mostra società
+                            if (hasSocieta) {
+                                data.societa.forEach(soc => {
+                                    const listItem = document.createElement('li');
+                                    const link = document.createElement('a');
+                                    link.href = `/societa/${encodeURIComponent(soc.codice)}`;
+                                    link.innerHTML = `<span class="result-type society">🏢</span> ${soc.name} <small>(${soc.codice})</small>`;
+                                    listItem.appendChild(link);
+                                    resultsList.appendChild(listItem);
+                                });
+                            }
 
                             searchResults.appendChild(resultsList);
                         })

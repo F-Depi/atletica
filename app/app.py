@@ -65,9 +65,13 @@ def index():
 from app.rankings import rankings_bp
 from app.error_reporting import error_reporting_bp
 from app.atleti import atleti_bp
+from app.societa import societa_bp
+from app.ricerca import ricerca_bp
 app.register_blueprint(rankings_bp)
 app.register_blueprint(error_reporting_bp)
 app.register_blueprint(atleti_bp)
+app.register_blueprint(societa_bp)
+app.register_blueprint(ricerca_bp)
 
 
 if __name__ == '__main__':

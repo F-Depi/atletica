@@ -326,10 +326,11 @@
         </thead>
         <tbody>
             {% for result in results %}
-            <tr class="result-row" data-atleta="{{ result.atleta }}"
-                data-link-atleta="{{ result.link_atleta.replace('www.fidal.it', 'atletica.mooo.com') }}"
+            <tr class="result-row" 
+                data-atleta="{{ result.atleta }}"
+                data-link-atleta="{{ result.link_atleta }}"
                 data-societa="{{ result.società }}"
-                data-link-societa="{{ result.link_società }}"
+                data-cod-societa="{{ result.cod_società }}"
                 data-prestazione="{{ format_time(result.prestazione, discipline_info, result.cronometraggio) }}"
                 data-position="{{ result.position }}">
                 <td><b>{{ result.position }}</b></td>
