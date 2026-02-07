@@ -33,21 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFilters();
 });
 
-// Toggle seasonal results details
-function toggleSeasonalResults(element) {
-    const container = element.closest('.seasonal-row');
-    const detailsContainer = container.querySelector('.details-container');
-    const toggleIcon = container.querySelector('.toggle-icon');
-
-    if (detailsContainer.classList.contains('active')) {
-        detailsContainer.classList.remove('active');
-        toggleIcon.classList.remove('expanded');
-    } else {
-        detailsContainer.classList.add('active');
-        toggleIcon.classList.add('expanded');
-    }
-}
-
 // Toggle record details
 function toggleRecordDetails(element) {
     const container = element.closest('.record-row');

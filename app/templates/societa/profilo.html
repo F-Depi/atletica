@@ -1,26 +1,27 @@
 {% extends "base.html" %} {% block content %}
 
+<!-- Importa ENTRAMBI i CSS: prima quello base degli atleti, poi quello specifico -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profilo.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profilo_societa.css') }}">
 
-<div class="societa-profile">
-    <div class="societa-header">
+<div class="atleta-profile societa-profile">
+    <div class="atleta-header">
         <div class="header-content">
-            <!-- Society Logo/Initials -->
-            <div class="profile-image">
+            <div class="profile-image profile-image--square">
                 <div class="profile-initials">
                     {{ societa_name[:2].upper() }}
                 </div>
             </div>
 
             <div class="header-text">
-                <h1 class="societa-name">{{ societa_name }}</h1>
+                <h1 class="atleta-name">{{ societa_name }}</h1>
                 {% if societa_data %}
                 <div class="quick-stats">
                     {% if societa_data.codice %}
-                    <span class="code-badge">{{ societa_data.codice }}</span>
+                    <span class="category-badge code-badge">{{ societa_data.codice }}</span>
                     {% endif %}
                     {% if societa_data.num_atleti %}
-                    <span class="athletes-count">
+                    <span class="birth-year">
                         <i class="fas fa-users"></i> {{ societa_data.num_atleti }} atleti
                     </span>
                     {% endif %}
@@ -30,7 +31,7 @@
         </div>
 
         {% if societa_data %}
-        <div class="societa-details">
+        <div class="atleta-details">
             <div class="detail-card">
                 <i class="fas fa-trophy"></i>
                 <div class="detail-content">
@@ -64,7 +65,7 @@
         {% endif %}
     </div>
 
-    <!-- Toggle buttons for sections -->
+    <!-- Toggle buttons -->
     <div class="section-toggle">
         <button id="show-seasonal-btn" class="toggle-btn active" data-section="seasonal">
             <span class="btn-text">Risultati Stagionali</span>
@@ -90,7 +91,6 @@
         <p class="no-results">Nessun risultato stagionale disponibile per questa società.</p>
         {% else %}
 
-        <!-- Season filter -->
         <div class="filter-bar">
             <label for="season-select">Stagione:</label>
             <select id="season-select" class="filter-select">
@@ -100,33 +100,41 @@
             </select>
         </div>
 
-                <div class="seasonal-list">
+        <div class="pbs-list">
             {% for discipline_key, discipline_data in seasonal_results.items() %}
-            <div class="seasonal-row gender-{{ discipline_data.gender }}" data-discipline="{{ discipline_key }}">
-                <div class="seasonal-header" onclick="toggleSeasonalResults(this)">
+            <div class="pb-row gender-{{ discipline_data.gender }}" data-discipline="{{ discipline_key }}">
+                <div class="pb-header pb-header--society" onclick="toggleResults(this)">
                     <div class="discipline-name">
                         {{ discipline_data.base_discipline.replace('_',' ') }} 
                         <span class="gender-badge {{ discipline_data.gender }}">{{ discipline_data.gender }}</span>
                     </div>
-                    <div class="result-count">
-                        <span class="count-badge">{{ discipline_data.results|length }}</span>
-                    </div>
-                    <div class="best-result">
+                    
+                    <div class="pb-result">
                         <span class="result"><b>{{ discipline_data.best.prestazione_display }}</b></span>
                         {% if discipline_data.best.vento %}
                         <span class="wind">({{ discipline_data.best.vento }})</span>
                         {% endif %}
                     </div>
+                    
+                    <div class="pb-holder">
+                        <a href="{{ url_for('atleti.atleta_profilo', atleta_path=discipline_data.best.atleta_link) }}">
+                            {{ discipline_data.best.atleta }}
+                        </a>
+                    </div>
+                    
+                    <div class="pb-details">
+                        <span class="date">{{ discipline_data.best.data.strftime('%d/%m/%Y') if discipline_data.best.data else '-' }}</span>
+                        <span class="count-badge">{{ discipline_data.results|length }} ris.</span>
+                    </div>
+
                     <span class="toggle-icon">
-                        <!-- SVG icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 9l6 6 6-6"/>
                         </svg>
                     </span>
                 </div>
                 
-                <!-- Il resto della table rimane uguale, basta assicurarsi che i dati arrivino corretti -->
-                <div class="details-container">
+                <div class="pb-details-container">
                     <table class="results-table sortable">
                         <thead>
                             <tr>
@@ -209,7 +217,6 @@
         <p class="no-results">Nessun atleta trovato per questa società.</p>
         {% else %}
 
-        <!-- Search and filters -->
         <div class="filter-bar">
             <input type="text" id="athlete-search" class="filter-input" placeholder="Cerca atleta...">
             <select id="gender-filter" class="filter-select">
@@ -230,7 +237,6 @@
             </select>
         </div>
 
-        <!-- Athletes count indicator -->
         <div class="athletes-count-indicator">
             <span id="visible-athletes-count">{{ athletes|length }}</span> / {{ athletes|length }} atleti
         </div>
@@ -274,7 +280,6 @@
         <p class="no-results">Nessun record disponibile per questa società.</p>
         {% else %}
 
-        <!-- Discipline type filter -->
         <div class="filter-bar">
             <select id="discipline-type-filter" class="filter-select">
                 <option value="">Tutte le discipline</option>
@@ -288,26 +293,26 @@
             </select>
         </div>
 
-                <div class="records-list">
+        <div class="pbs-list">
             {% for discipline_key, record in records.items() %}
-            <div class="record-row gender-{{ record.gender }}" data-discipline="{{ discipline_key }}" data-type="{{ record.tipo }}">
-                <div class="record-header" onclick="toggleRecordDetails(this)">
+            <div class="pb-row gender-{{ record.gender }}" data-discipline="{{ discipline_key }}" data-type="{{ record.tipo }}">
+                <div class="pb-header pb-header--society" onclick="toggleResults(this)">
                     <div class="discipline-name">
                         {{ record.base_discipline.replace('_',' ') }}
                         <span class="gender-badge {{ record.gender }}">{{ record.gender }}</span>
                     </div>
-                    <div class="record-result">
+                    <div class="pb-result">
                         <span class="result"><b>{{ record.best.prestazione_display }}</b></span>
                         {% if record.best.vento %}
                         <span class="wind">({{ record.best.vento }})</span>
                         {% endif %}
                     </div>
-                    <div class="record-holder">
+                    <div class="pb-holder">
                         <a href="{{ url_for('atleti.atleta_profilo', atleta_path=record.best.atleta_link) }}">
                             {{ record.best.atleta }}
                         </a>
                     </div>
-                    <div class="record-details">
+                    <div class="pb-details">
                         <span class="date">{{ record.best.data.strftime('%d/%m/%Y') if record.best.data else '-' }}</span>
                     </div>
                     <span class="toggle-icon">
@@ -317,7 +322,7 @@
                     </span>
                 </div>
 
-                <div class="details-container">
+                <div class="pb-details-container">
                     <table class="results-table">
                         <thead>
                             <tr>
@@ -358,7 +363,7 @@
 
 </div>
 
-<!-- Include JavaScript -->
 <script src="{{ url_for('static', filename='js/profilo_societa.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profilo.js') }}"></script>
 
 {% endblock %}

@@ -1218,171 +1218,45 @@ header .search-results .error {
 
 
 /* ===== profilo_societa.css ===== */
-/* Base Container Styles */
+/* =============================================
+   PROFILO SOCIETÀ - STILI SPECIFICI
+   (Estende profilo.css)
+   ============================================= */
+
+/* Container leggermente più largo per la società */
 .societa-profile {
     max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
-    color: var(--text-color);
 }
 
-/* Header Section Styles */
-.societa-header {
-    background: var(--card-background);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 24px;
-}
-
-.profile-image {
-    width: 100px;
-    height: 100px;
+/* Profile image quadrata invece che tonda */
+.profile-image--square {
     border-radius: 16px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark, #1a5a8a));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2.2rem;
-    font-weight: bold;
-    flex-shrink: 0;
 }
 
-.header-text {
-    flex-grow: 1;
-}
-
-.societa-name {
-    font-size: 2.2rem;
-    margin: 0;
-    line-height: 1.2;
-    color: var(--text-color);
-}
-
-.quick-stats {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
+/* Code badge con font monospace */
 .code-badge {
-    background: var(--primary-color);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
     font-family: monospace;
+    font-weight: 600;
 }
 
-.athletes-count {
-    color: var(--text-color-secondary);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.societa-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-}
-
-.detail-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px;
-    background: var(--background-color);
-    border-radius: 8px;
-}
-
-.detail-card i {
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    width: 24px;
-    text-align: center;
-}
-
-.detail-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.detail-content label {
-    font-size: 0.85rem;
-    color: var(--text-color-secondary);
-}
-
-.detail-value {
-    font-size: 1rem;
-    color: var(--text-color);
-    text-decoration: none;
-}
-
-a.detail-value:hover {
-    color: var(--primary-color);
-}
-
-/* Toggle Buttons Section - 4 buttons */
-.section-toggle {
-    display: flex;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.toggle-btn {
-    flex: 1;
-    padding: 12px 16px;
-    background-color: var(--card-background);
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-color);
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
+/* Toggle buttons - testo alternativo per mobile */
 .toggle-btn .btn-text-short {
     display: none;
 }
 
-.toggle-btn:hover {
-    background-color: var(--hover-bg);
+@media (max-width: 900px) {
+    .toggle-btn .btn-text {
+        display: none;
+    }
+    .toggle-btn .btn-text-short {
+        display: inline;
+    }
 }
 
-.toggle-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* Results Sections */
-.results-section {
-    display: none;
-}
-
-.results-section.active {
-    display: block;
-}
-
-/* Filter Bar */
+/* =============================================
+   FILTER BAR
+   ============================================= */
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -1419,166 +1293,75 @@ a.detail-value:hover {
     box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
 }
 
-/* Seasonal/Records Lists */
-.seasonal-list,
-.records-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+/* =============================================
+   HEADER SOCIETÀ (5 colonne con holder)
+   ============================================= */
+.pb-header--society {
+    grid-template-columns: 2fr 1.2fr 1.5fr 1fr auto;
 }
 
-.seasonal-row,
-.record-row {
-    background: var(--card-background);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.seasonal-header,
-.record-header {
-    display: grid;
-    grid-template-columns: 2fr auto 1.5fr auto;
-    align-items: center;
-    padding: 15px 20px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    gap: 15px;
-}
-
-.record-header {
-    grid-template-columns: 2fr 1.5fr 1.5fr 1fr auto;
-}
-
-.seasonal-header:hover,
-.record-header:hover {
-    background-color: var(--hover-bg);
-}
-
-.discipline-name {
-    font-weight: 600;
-    font-size: 1.05rem;
-}
-
-.result-count .count-badge {
-    background: var(--primary-color);
-    color: white;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.best-result,
-.record-result {
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--primary-color);
-    white-space: nowrap;
-}
-
-.record-holder {
+.pb-holder {
     font-size: 0.95rem;
 }
 
-.record-holder a {
+.pb-holder a {
     color: var(--text-color);
     text-decoration: none;
 }
 
-.record-holder a:hover {
+.pb-holder a:hover {
     color: var(--primary-color);
 }
 
-.record-details {
+.count-badge {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-left: 8px;
+}
+
+/* =============================================
+   GENDER BADGES
+   ============================================= */
+.gender-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.gender-badge.M {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.gender-badge.F {
+    background-color: #fce4ec;
+    color: #c2185b;
+    border: 1px solid #f8bbd0;
+}
+
+/* Bordo colorato per genere */
+.pb-row.gender-M {
+    border-left: 4px solid #1565c0;
+}
+
+.pb-row.gender-F {
+    border-left: 4px solid #c2185b;
+}
+
+/* =============================================
+   ATHLETES GRID
+   ============================================= */
+.athletes-count-indicator {
+    margin-bottom: 15px;
     font-size: 0.9rem;
     color: var(--text-color-secondary);
 }
 
-/* Toggle Icon */
-.toggle-icon {
-    transition: transform 0.3s;
-    color: var(--text-color-secondary);
-}
-
-.toggle-icon.expanded {
-    transform: rotate(180deg);
-}
-
-/* Details Container */
-.details-container {
-    display: none;
-    background-color: var(--background-color);
-    border-top: 1px solid var(--border-color);
-    overflow: hidden;
-    overflow-y: auto;
-    overflow-x: auto;
-    transition: max-height 0.3s ease-out;
-}
-
-.details-container.active {
-    display: block;
-    max-height: 400px;
-}
-
-/* Results Tables */
-.results-table,
-.recent-results-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 0.95rem;
-}
-
-.results-table th {
-    padding: 12px;
-    color: var(--text-color);
-    background-color: var(--table-header-background);
-    font-weight: 600;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.results-table td,
-.recent-results-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-
-.results-table tr:hover,
-.recent-results-table .result-row:hover {
-    background-color: var(--hover-bg);
-}
-
-/* Rank column */
-.rank {
-    font-weight: 600;
-    color: var(--primary-color);
-    text-align: center;
-    width: 40px;
-}
-
-/* Recent Results Table */
-.recent-results-table {
-    background: var(--card-background);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.recent-results-table .group-header td {
-    background-color: var(--table-header-background);
-    font-weight: bold;
-    color: var(--primary-color);
-    padding: 12px 15px;
-}
-
-/* Athletes Grid */
 .athletes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1621,6 +1404,10 @@ a.detail-value:hover {
     flex-shrink: 0;
 }
 
+.athlete-avatar.female {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+
 .athlete-info {
     flex: 1;
     display: flex;
@@ -1654,6 +1441,9 @@ a.detail-value:hover {
 
 .athlete-stats {
     text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .athlete-stats .stat {
@@ -1661,53 +1451,24 @@ a.detail-value:hover {
     color: var(--text-color-secondary);
 }
 
-/* Sorting Styles */
-.sortable-header {
-    cursor: pointer;
-    user-select: none;
+.active-badge {
+    color: #22c55e;
+    font-size: 0.8rem;
 }
 
-.sort-icon {
-    margin-left: 4px;
-    opacity: 0.5;
-}
-
-.sort-default .sort-icon,
-.sort-asc .sort-icon,
-.sort-desc .sort-icon {
-    opacity: 1;
-}
-
-/* Utility Classes */
-.result {
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.wind {
-    font-size: 0.85rem;
-    color: var(--text-color-secondary);
-    opacity: 0.8;
-    white-space: nowrap;
-}
-
-.position {
-    white-space: nowrap;
-}
-
-.no-results,
-.loading {
+/* =============================================
+   RANK COLUMN (per records)
+   ============================================= */
+.rank {
+    font-weight: 600;
+    color: var(--primary-color);
     text-align: center;
-    font-style: italic;
-    color: var(--text-color-secondary);
-    padding: 40px 20px;
+    width: 40px;
 }
 
-.loading {
-    font-style: normal;
-}
-
-/* Athlete name links in tables */
+/* =============================================
+   ATHLETE NAME LINKS IN TABLES
+   ============================================= */
 .athlete-name a {
     color: var(--text-color);
     text-decoration: none;
@@ -1718,158 +1479,72 @@ a.detail-value:hover {
     text-decoration: underline;
 }
 
-/* Mobile Responsive Styles */
-@media (max-width: 900px) {
-    .toggle-btn .btn-text {
-        display: none;
+/* =============================================
+   RESPONSIVE - SOCIETÀ SPECIFICO
+   ============================================= */
+@media (max-width: 768px) {
+    .filter-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
     }
     
-    .toggle-btn .btn-text-short {
-        display: inline;
+    .filter-bar .filter-input {
+        grid-column: 1 / -1;
     }
-}
-
-@media (max-width: 768px) {
-    .societa-profile {
-        padding: 12px;
-    }
-
-    .societa-header {
-        border-radius: 12px;
-        padding: 16px;
-    }
-
-    .header-content {
-        gap: 16px;
-    }
-
-    .profile-image {
-        width: 70px;
-        height: 70px;
-        font-size: 1.8rem;
-    }
-
-    .societa-name {
-        font-size: 1.5rem;
-    }
-
-    .societa-details {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .detail-card {
-        padding: 10px;
-    }
-
-    .section-toggle {
-        margin: 0 -12px 20px -12px;
-        border-radius: 0;
-    }
-
-    .toggle-btn {
-        padding: 10px 8px;
-        font-size: 13px;
-    }
-
-    .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filter-input,
+    
     .filter-select {
-        width: 100%;
+        min-width: unset;
+        font-size: 0.9rem;
         max-width: none;
     }
 
-    .seasonal-list,
-    .records-list {
-        gap: 0;
-        margin: 0 -12px;
-    }
-
-    .seasonal-row,
-    .record-row {
-        border-radius: 0;
-        box-shadow: none;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .seasonal-header {
-        grid-template-columns: 1fr auto auto;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .record-header {
+    /* Header società mobile */
+    .pb-header--society {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto;
         gap: 6px;
-        padding: 12px;
     }
 
-    .record-header .discipline-name {
+    .pb-header--society .discipline-name {
         grid-column: 1;
         grid-row: 1;
     }
 
-    .record-header .record-result {
+    .pb-header--society .pb-result {
         grid-column: 2;
         grid-row: 1;
         text-align: right;
     }
 
-    .record-header .record-holder {
+    .pb-header--society .pb-holder {
         grid-column: 1;
         grid-row: 2;
         font-size: 0.85rem;
     }
 
-    .record-header .record-details {
+    .pb-header--society .pb-details {
         grid-column: 2;
         grid-row: 2;
         text-align: right;
     }
 
-    .record-header .toggle-icon {
+    .pb-header--society .toggle-icon {
         position: absolute;
         right: 12px;
         top: 50%;
         transform: translateY(-50%);
     }
 
-    .record-row {
+    .pb-row {
         position: relative;
     }
 
-    .result-count {
+    .count-badge {
         display: none;
     }
 
-    .best-result,
-    .record-result {
-        font-size: 0.95rem;
-    }
-
-    .details-container {
-        margin: 0;
-        border-radius: 0;
-    }
-
-    .results-table,
-    .recent-results-table {
-        font-size: 0.9rem;
-        border-radius: 0;
-        box-shadow: none;
-    }
-
-    .results-table th,
-    .results-table td,
-    .recent-results-table td {
-        padding: 8px 10px;
-    }
-
+    /* Athletes grid mobile */
     .athletes-grid {
         grid-template-columns: 1fr;
         gap: 8px;
@@ -1886,87 +1561,6 @@ a.detail-value:hover {
         transform: none;
         box-shadow: none;
     }
-
-    .recent-results-table {
-        margin: 0 -12px;
-        border-radius: 0;
-        width: calc(100% + 24px);
-    }
-}
-
-/* Athletes count indicator */
-.athletes-count-indicator {
-    margin-bottom: 15px;
-    font-size: 0.9rem;
-    color: var(--text-color-secondary);
-}
-
-/* Active badge for athletes */
-.active-badge {
-    color: #22c55e;
-    font-size: 0.8rem;
-    margin-left: 4px;
-}
-
-/* Female avatar variation */
-.athlete-avatar.female {
-    background: linear-gradient(135deg, #ec4899, #be185d);
-}
-
-/* Filter bar improvements for mobile */
-@media (max-width: 768px) {
-    .filter-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
-    .filter-bar .filter-input {
-        grid-column: 1 / -1;
-    }
-    
-    .filter-select {
-        min-width: unset;
-        font-size: 0.9rem;
-    }
-}
-
-/* Add to profilo_societa.css */
-
-.gender-badge {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
-.gender-badge.M {
-    background-color: #e3f2fd;
-    color: #1565c0;
-    border: 1px solid #bbdefb;
-}
-
-.gender-badge.F {
-    background-color: #fce4ec;
-    color: #c2185b;
-    border: 1px solid #f8bbd0;
-}
-
-/* Optional: Slight border color variation for rows */
-.seasonal-row.gender-M, .record-row.gender-M {
-    border-left: 4px solid #1565c0;
-}
-
-.seasonal-row.gender-F, .record-row.gender-F {
-    border-left: 4px solid #c2185b;
-}
-
-/* Ensure padding matches normal rows if no gender class */
-.seasonal-row, .record-row {
-    border-left: 4px solid transparent; 
 }
 
 @media (max-width: 480px) {
