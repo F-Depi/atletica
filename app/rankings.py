@@ -48,7 +48,7 @@ def rankings():
 
     # Se non ci sono parametri o manca la disciplina, reindirizza alla configurazione di default
     if not request.args or not request.args.get('discipline'):
-        return redirect(url_for('rankings.rankings', tab=tab, discipline='110Hs_h106-9.14', ambiente='P', category='ASS', year='2025'))
+        return redirect(url_for('rankings.rankings', tab=tab, discipline='60Hs_h106-9.14', ambiente='I', category='ASS', year='2026'))
 
     if tab in ['men', 'women']:
         return handle_standard_rankings(tab)

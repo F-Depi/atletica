@@ -34,7 +34,7 @@
 
             <select name="year" class="filter-select" id="menYearSelect">
                 <option value="">Tutti gli anni</option>
-                {% for y in range(2025, 2004, -1) %}
+                {% for y in range(2026, 2004, -1) %}
                 <option value="{{ y }}">{{ y }}</option>
                 {% endfor %}
             </select>
@@ -122,7 +122,7 @@
 
             <select name="year" class="filter-select" id="womenYearSelect">
                 <option value="">Tutti gli anni</option>
-                {% for y in range(2025, 2004, -1) %}
+                {% for y in range(2026, 2004, -1) %}
                 <option value="{{ y }}">{{ y }}</option>
                 {% endfor %}
             </select>
@@ -232,7 +232,7 @@
             <!-- Year filter -->
             <select name="year" class="filter-select">
                 <option value="">Tutti gli anni</option>
-                {% for y in range(2025, 2004, -1) %}
+                {% for y in range(2026, 2004, -1) %}
                 <option value="{{ y }}" {% if year == y|string %}selected{% endif %}>{{ y }}</option>
                 {% endfor %}
             </select>
