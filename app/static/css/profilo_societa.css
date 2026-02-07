@@ -711,6 +711,44 @@ a.detail-value:hover {
     }
 }
 
+/* Add to profilo_societa.css */
+
+.gender-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.gender-badge.M {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.gender-badge.F {
+    background-color: #fce4ec;
+    color: #c2185b;
+    border: 1px solid #f8bbd0;
+}
+
+/* Optional: Slight border color variation for rows */
+.seasonal-row.gender-M, .record-row.gender-M {
+    border-left: 4px solid #1565c0;
+}
+
+.seasonal-row.gender-F, .record-row.gender-F {
+    border-left: 4px solid #c2185b;
+}
+
+/* Ensure padding matches normal rows if no gender class */
+.seasonal-row, .record-row {
+    border-left: 4px solid transparent; 
+}
+
 @media (max-width: 480px) {
     .filter-bar {
         grid-template-columns: 1fr;

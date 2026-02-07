@@ -15,7 +15,6 @@ files=(
     "profilo.css"
     "profilo_societa.css"
     "responsive.css"
-    "ricerca.css"
     "tables.css"
     "theme-toggle.css"
 )

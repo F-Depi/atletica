@@ -100,11 +100,14 @@
             </select>
         </div>
 
-        <div class="seasonal-list">
-            {% for discipline_name, discipline_data in seasonal_results.items() %}
-            <div class="seasonal-row" data-discipline="{{ discipline_name.replace('_',' ') }}">
+                <div class="seasonal-list">
+            {% for discipline_key, discipline_data in seasonal_results.items() %}
+            <div class="seasonal-row gender-{{ discipline_data.gender }}" data-discipline="{{ discipline_key }}">
                 <div class="seasonal-header" onclick="toggleSeasonalResults(this)">
-                    <div class="discipline-name">{{ discipline_name.replace('_',' ') }}</div>
+                    <div class="discipline-name">
+                        {{ discipline_data.base_discipline.replace('_',' ') }} 
+                        <span class="gender-badge {{ discipline_data.gender }}">{{ discipline_data.gender }}</span>
+                    </div>
                     <div class="result-count">
                         <span class="count-badge">{{ discipline_data.results|length }}</span>
                     </div>
@@ -115,12 +118,14 @@
                         {% endif %}
                     </div>
                     <span class="toggle-icon">
+                        <!-- SVG icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 9l6 6 6-6"/>
                         </svg>
                     </span>
                 </div>
-
+                
+                <!-- Il resto della table rimane uguale, basta assicurarsi che i dati arrivino corretti -->
                 <div class="details-container">
                     <table class="results-table sortable">
                         <thead>
@@ -283,11 +288,14 @@
             </select>
         </div>
 
-        <div class="records-list">
-            {% for discipline_name, record in records.items() %}
-            <div class="record-row" data-discipline="{{ discipline_name.replace('_',' ') }}" data-type="{{ record.tipo }}">
+                <div class="records-list">
+            {% for discipline_key, record in records.items() %}
+            <div class="record-row gender-{{ record.gender }}" data-discipline="{{ discipline_key }}" data-type="{{ record.tipo }}">
                 <div class="record-header" onclick="toggleRecordDetails(this)">
-                    <div class="discipline-name">{{ discipline_name.replace('_',' ') }}</div>
+                    <div class="discipline-name">
+                        {{ record.base_discipline.replace('_',' ') }}
+                        <span class="gender-badge {{ record.gender }}">{{ record.gender }}</span>
+                    </div>
                     <div class="record-result">
                         <span class="result"><b>{{ record.best.prestazione_display }}</b></span>
                         {% if record.best.vento %}

@@ -86,6 +86,7 @@ document.getElementById('season-select')?.addEventListener('change', async funct
 });
 
 
+// Sostituisci la funzione updateSeasonalResults esistente
 function updateSeasonalResults(results, disciplineOrder) {
     const container = document.querySelector('.seasonal-list');
     
@@ -99,22 +100,28 @@ function updateSeasonalResults(results, disciplineOrder) {
     
     let html = '';
     
-    // Usa l'ordine fornito dal server
-    const orderedDisciplines = disciplineOrder || Object.keys(results);
+    // Usa l'ordine fornito dal server (che ora gestisce già M/F)
+    const orderedKeys = disciplineOrder || Object.keys(results);
     
-    for (const disciplineName of orderedDisciplines) {
-        const disciplineData = results[disciplineName];
+    for (const key of orderedKeys) {
+        const disciplineData = results[key];
         
         if (!disciplineData) continue;
         
-        const displayName = disciplineName.replace(/_/g, ' ');
+        // Estraggo nome base e genere dai dati forniti dall'API
+        const baseName = disciplineData.base_discipline ? disciplineData.base_discipline.replace(/_/g, ' ') : key;
+        const gender = disciplineData.gender || '';
+        
         const best = disciplineData.best;
         const resultsList = disciplineData.results;
         
         html += `
-        <div class="seasonal-row" data-discipline="${displayName}">
+        <div class="seasonal-row gender-${gender}" data-discipline="${key}">
             <div class="seasonal-header" onclick="toggleSeasonalResults(this)">
-                <div class="discipline-name">${displayName}</div>
+                <div class="discipline-name">
+                    ${baseName}
+                    ${gender ? `<span class="gender-badge ${gender}">${gender}</span>` : ''}
+                </div>
                 <div class="result-count">
                     <span class="count-badge">${resultsList.length}</span>
                 </div>
@@ -166,6 +173,9 @@ function updateSeasonalResults(results, disciplineOrder) {
     }
     
     container.innerHTML = html;
+    
+    // Re-initialize sortable tables for new content
+    initializeSortableTables();
 }
 
 // Build HTML for a seasonal row

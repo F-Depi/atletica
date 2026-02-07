@@ -26,21 +26,31 @@ def get_discipline_order(conn):
     return {row[0]: row[1] for row in result}
 
 
-def sort_disciplines_dict(results_dict, discipline_order):
+def sort_disciplines_with_gender(results_dict, discipline_order):
     """
-    Ordina un dizionario di discipline secondo l'ordine dal database.
-    
-    Args:
-        results_dict: Dizionario con discipline come chiavi
-        discipline_order: Dizionario {disciplina: ordine}
-    
-    Returns:
-        Dizionario ordinato
+    Ordina un dizionario di discipline separate per genere (es: "100m (M)", "100m (F)").
+    Estrae la disciplina base per cercare l'ordine, poi ordina per sesso.
     """
-    sorted_keys = sorted(
-        results_dict.keys(),
-        key=lambda x: (discipline_order.get(x, 999), x)
-    )
+    def get_sort_key(key):
+        # La chiave è attesa nel formato "Nome Disciplina (Sesso)"
+        # es: "100m (M)" -> split in "100m" e "M)"
+        try:
+            if ' (' in key:
+                base_disc, gender_part = key.rsplit(' (', 1)
+                gender = gender_part.replace(')', '')
+            else:
+                base_disc = key
+                gender = 'Z' # Se non c'è genere, va in fondo al gruppo disciplina
+            
+            # Ordine disciplina, poi Femminile prima di Maschile (o viceversa)
+            order = discipline_order.get(base_disc, 999)
+            gender_order = 0 if gender == 'F' else 1
+            
+            return (order, gender_order, key)
+        except:
+            return (999, 999, key)
+
+    sorted_keys = sorted(results_dict.keys(), key=get_sort_key)
     return {k: results_dict[k] for k in sorted_keys}
 
 
@@ -114,12 +124,12 @@ def societa_profilo(cod_societa):
         years_result = conn.execute(years_sql, {"cod_societa": cod_societa})
         available_years = [row[0] for row in years_result]
         
-        # Get seasonal results (selected year)
+        # --- SEASONAL RESULTS ---
         seasonal_sql = text("""
             SELECT 
                 prestazione, vento, tempo, cronometraggio,
                 atleta, link_atleta, anno, categoria,
-                posizione, luogo, data, disciplina, ambiente
+                posizione, luogo, data, disciplina, ambiente, sesso
             FROM results
             WHERE cod_società = :cod_societa
               AND EXTRACT(YEAR FROM data) = :selected_year
@@ -135,10 +145,9 @@ def societa_profilo(cod_societa):
         seasonal_df = pd.DataFrame(seasonal_result, columns=[
             'prestazione', 'vento', 'tempo', 'cronometraggio',
             'atleta', 'link_atleta', 'anno', 'categoria',
-            'posizione', 'luogo', 'data', 'disciplina', 'ambiente'
+            'posizione', 'luogo', 'data', 'disciplina', 'ambiente', 'sesso'
         ])
         
-        # Process seasonal results
         seasonal_results = {}
         if not seasonal_df.empty:
             seasonal_df['prestazione_display'] = seasonal_df.apply(
@@ -149,45 +158,58 @@ def societa_profilo(cod_societa):
                 lambda x: '_'.join(x.split('/')[-2:])[:-3] + '=' if x else ''
             )
             
+            # Riempi i valori nulli di sesso se necessario (opzionale) o filtrali
+            seasonal_df['sesso'] = seasonal_df['sesso'].fillna('M') # Fallback se nullo, o gestire diversamente
+            
             for discipline in seasonal_df['disciplina'].unique():
                 if discipline not in DISCIPLINES:
                     continue
+                
+                # Split per genere
+                for gender in ['M', 'F']:
+                    discipline_gender_df = seasonal_df[
+                        (seasonal_df['disciplina'] == discipline) & 
+                        (seasonal_df['sesso'] == gender)
+                    ].copy()
                     
-                discipline_df = seasonal_df[seasonal_df['disciplina'] == discipline].copy()
-                
-                if discipline_df.empty:
-                    continue
-                
-                if DISCIPLINES[discipline]['classifica'] == 'tempo':
-                    discipline_df = discipline_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
-                else:
-                    discipline_df = discipline_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
-                
-                # Get best result (considering wind for affected disciplines)
-                is_wind_affected = DISCIPLINES[discipline].get('vento', 'no') != 'no'
-                if is_wind_affected:
-                    valid_results = discipline_df[
-                        (discipline_df['vento'].astype(float) <= 2) | 
-                        (discipline_df['ambiente'] == 'I')
-                    ]
-                    best_idx = 0 if valid_results.empty else valid_results.index[0]
-                else:
-                    best_idx = 0
-                
-                seasonal_results[discipline] = {
-                    'results': discipline_df.to_dict('records'),
-                    'best': discipline_df.iloc[best_idx].to_dict()
-                }
+                    if discipline_gender_df.empty:
+                        continue
+                    
+                    if DISCIPLINES[discipline]['classifica'] == 'tempo':
+                        discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
+                    else:
+                        discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
+                    
+                    # Get best result
+                    is_wind_affected = DISCIPLINES[discipline].get('vento', 'no') != 'no'
+                    if is_wind_affected:
+                        valid_results = discipline_gender_df[
+                            (discipline_gender_df['vento'].astype(float) <= 2) | 
+                            (discipline_gender_df['ambiente'] == 'I')
+                        ]
+                        best_idx = 0 if valid_results.empty else valid_results.index[0]
+                    else:
+                        best_idx = 0
+                    
+                    # Create key like "100m (M)" or "100m (F)"
+                    key = f"{discipline} ({gender})"
+                    
+                    seasonal_results[key] = {
+                        'results': discipline_gender_df.to_dict('records'),
+                        'best': discipline_gender_df.iloc[best_idx].to_dict(),
+                        'base_discipline': discipline,
+                        'gender': gender
+                    }
         
-        # Ordina i risultati stagionali
-        seasonal_results = sort_disciplines_dict(seasonal_results, discipline_order)
+        # Ordina risultati stagionali (con la nuova logica per genere)
+        seasonal_results = sort_disciplines_with_gender(seasonal_results, discipline_order)
         
-        # Get recent results (last 100)
+        # --- RECENT RESULTS ---
         recent_sql = text("""
             SELECT 
                 prestazione, vento, tempo, cronometraggio,
                 atleta, link_atleta, anno, categoria,
-                posizione, luogo, data, disciplina, ambiente
+                posizione, luogo, data, disciplina, ambiente, sesso
             FROM results
             WHERE cod_società = :cod_societa
               AND disciplina NOT LIKE '%sconosciuto%'
@@ -200,7 +222,7 @@ def societa_profilo(cod_societa):
         recent_df = pd.DataFrame(recent_result, columns=[
             'prestazione', 'vento', 'tempo', 'cronometraggio',
             'atleta', 'link_atleta', 'anno', 'categoria',
-            'posizione', 'luogo', 'data', 'disciplina', 'ambiente'
+            'posizione', 'luogo', 'data', 'disciplina', 'ambiente', 'sesso'
         ])
         
         recent_results = []
@@ -214,7 +236,7 @@ def societa_profilo(cod_societa):
             )
             recent_results = recent_df.to_dict('records')
         
-        # Get athletes list
+        # --- ATHLETES LIST ---
         athletes_sql = text("""
             SELECT 
                 atleta,
@@ -222,7 +244,8 @@ def societa_profilo(cod_societa):
                 MAX(anno) as anno,
                 MAX(categoria) as categoria,
                 COUNT(*) as num_risultati,
-                COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM data) = :current_year) as risultati_stagione
+                COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM data) = :current_year) as risultati_stagione,
+                MAX(sesso) as sesso
             FROM results
             WHERE cod_società = :cod_societa
             GROUP BY atleta, link_atleta
@@ -240,18 +263,15 @@ def societa_profilo(cod_societa):
             link = '_'.join(row[1].split('/')[-2:])[:-3] + '=' if row[1] else ''
             categoria = row[3] or ''
             
-            # Determina il genere dalla categoria (M=maschile, F=femminile)
-            # Le categorie italiane tipicamente contengono M o F (es: SM35, SF40, JM, JF)
-            genere = ''
-            if categoria:
-                cat_upper = categoria.upper()
-                # Cerca F o M nella categoria
-                if 'F' in cat_upper:
+            # Genere dal DB o dalla categoria
+            genere = row[6] # sesso from DB
+            if not genere and categoria:
+                if 'F' in categoria.upper():
                     genere = 'F'
-                elif 'M' in cat_upper:
+                elif 'M' in categoria.upper():
                     genere = 'M'
             
-            is_active = row[5] > 0  # Ha risultati nell'anno corrente
+            is_active = row[5] > 0
             
             athletes.append({
                 'nome': row[0],
@@ -259,7 +279,7 @@ def societa_profilo(cod_societa):
                 'anno': row[2],
                 'categoria': categoria,
                 'num_risultati': row[4],
-                'genere': genere,
+                'genere': genere or '',
                 'is_active': is_active,
                 'risultati_stagione': row[5]
             })
@@ -268,12 +288,12 @@ def societa_profilo(cod_societa):
 
         athlete_categories = sorted(list(athlete_categories))
         
-        # Get society records (all-time bests per discipline)
+        # --- SOCIETY RECORDS ---
         records_sql = text("""
             SELECT 
                 prestazione, vento, tempo, cronometraggio,
                 atleta, link_atleta, anno, categoria,
-                posizione, luogo, data, disciplina, ambiente
+                posizione, luogo, data, disciplina, ambiente, sesso
             FROM results
             WHERE cod_società = :cod_societa
               AND disciplina NOT LIKE '%sconosciuto%'
@@ -285,7 +305,7 @@ def societa_profilo(cod_societa):
         records_df = pd.DataFrame(records_result, columns=[
             'prestazione', 'vento', 'tempo', 'cronometraggio',
             'atleta', 'link_atleta', 'anno', 'categoria',
-            'posizione', 'luogo', 'data', 'disciplina', 'ambiente'
+            'posizione', 'luogo', 'data', 'disciplina', 'ambiente', 'sesso'
         ])
         
         records = {}
@@ -298,45 +318,53 @@ def societa_profilo(cod_societa):
                 lambda x: '_'.join(x.split('/')[-2:])[:-3] + '=' if x else ''
             )
             
+            records_df['sesso'] = records_df['sesso'].fillna('M')
+
             for discipline in records_df['disciplina'].unique():
                 if discipline not in DISCIPLINES:
                     continue
+                
+                # Split per genere
+                for gender in ['M', 'F']:
+                    discipline_gender_df = records_df[
+                        (records_df['disciplina'] == discipline) & 
+                        (records_df['sesso'] == gender)
+                    ].copy()
                     
-                discipline_df = records_df[records_df['disciplina'] == discipline].copy()
+                    if discipline_gender_df.empty:
+                        continue
                 
-                if discipline_df.empty:
-                    continue
-                
-                if DISCIPLINES[discipline]['classifica'] == 'tempo':
-                    discipline_df = discipline_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
-                else:
-                    discipline_df = discipline_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
-                
-                # Get best result (considering wind)
-                is_wind_affected = DISCIPLINES[discipline].get('vento', 'no') != 'no'
-                if is_wind_affected:
-                    valid_results = discipline_df[
-                        (discipline_df['vento'].astype(float) <= 2) | 
-                        (discipline_df['ambiente'] == 'I')
-                    ]
-                    best_idx = 0 if valid_results.empty else valid_results.index[0]
-                else:
-                    best_idx = 0
-                
-                # Get top 10 for this discipline
-                top_10 = discipline_df.head(10).to_dict('records')
-                
-                # Get discipline type for filtering
-                discipline_type = DISCIPLINES[discipline].get('tipo', 'Altro')
-                
-                records[discipline] = {
-                    'best': discipline_df.iloc[best_idx].to_dict(),
-                    'top_10': top_10,
-                    'tipo': discipline_type
-                }
+                    if DISCIPLINES[discipline]['classifica'] == 'tempo':
+                        discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
+                    else:
+                        discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
+                    
+                    # Get best result
+                    is_wind_affected = DISCIPLINES[discipline].get('vento', 'no') != 'no'
+                    if is_wind_affected:
+                        valid_results = discipline_gender_df[
+                            (discipline_gender_df['vento'].astype(float) <= 2) | 
+                            (discipline_gender_df['ambiente'] == 'I')
+                        ]
+                        best_idx = 0 if valid_results.empty else valid_results.index[0]
+                    else:
+                        best_idx = 0
+                    
+                    top_10 = discipline_gender_df.head(10).to_dict('records')
+                    discipline_type = DISCIPLINES[discipline].get('tipo', 'Altro')
+                    
+                    key = f"{discipline} ({gender})"
+                    
+                    records[key] = {
+                        'best': discipline_gender_df.iloc[best_idx].to_dict(),
+                        'top_10': top_10,
+                        'tipo': discipline_type,
+                        'base_discipline': discipline,
+                        'gender': gender
+                    }
         
         # Ordina i record
-        records = sort_disciplines_dict(records, discipline_order)
+        records = sort_disciplines_with_gender(records, discipline_order)
     
     return render_template(
         'societa/profilo.html',
@@ -364,10 +392,8 @@ def get_seasonal_results(cod_societa):
     engine = get_db_engine()
     
     with engine.connect() as conn:
-        # Recupera l'ordine delle discipline
         discipline_order = get_discipline_order(conn)
         
-        # Verify società exists
         check_sql = text("""
             SELECT 1 FROM results 
             WHERE cod_società = :cod_societa
@@ -378,12 +404,11 @@ def get_seasonal_results(cod_societa):
         if not check_result.fetchone():
             return jsonify({'error': 'Società non trovata'}), 404
         
-        # Get seasonal results
         seasonal_sql = text("""
             SELECT 
                 prestazione, vento, tempo, cronometraggio,
                 atleta, link_atleta, anno, categoria,
-                posizione, luogo, data, disciplina, ambiente
+                posizione, luogo, data, disciplina, ambiente, sesso
             FROM results
             WHERE cod_società = :cod_societa
               AND EXTRACT(YEAR FROM data) = :year
@@ -399,7 +424,7 @@ def get_seasonal_results(cod_societa):
         df = pd.DataFrame(result, columns=[
             'prestazione', 'vento', 'tempo', 'cronometraggio',
             'atleta', 'link_atleta', 'anno', 'categoria',
-            'posizione', 'luogo', 'data', 'disciplina', 'ambiente'
+            'posizione', 'luogo', 'data', 'disciplina', 'ambiente', 'sesso'
         ])
         
         if df.empty:
@@ -413,31 +438,37 @@ def get_seasonal_results(cod_societa):
             lambda x: '_'.join(x.split('/')[-2:])[:-3] + '=' if x else ''
         )
         df['data'] = df['data'].apply(lambda x: x.strftime('%d/%m/%Y') if x else '-')
+        df['sesso'] = df['sesso'].fillna('M')
         
         seasonal_results = {}
         for discipline in df['disciplina'].unique():
             if discipline not in DISCIPLINES:
                 continue
+            
+            for gender in ['M', 'F']:
+                discipline_gender_df = df[
+                    (df['disciplina'] == discipline) & 
+                    (df['sesso'] == gender)
+                ].copy()
                 
-            discipline_df = df[df['disciplina'] == discipline].copy()
+                if discipline_gender_df.empty:
+                    continue
             
-            if discipline_df.empty:
-                continue
-            
-            if DISCIPLINES[discipline]['classifica'] == 'tempo':
-                discipline_df = discipline_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
-            else:
-                discipline_df = discipline_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
-            
-            seasonal_results[discipline] = {
-                'results': discipline_df.to_dict('records'),
-                'best': discipline_df.iloc[0].to_dict() if not discipline_df.empty else None
-            }
+                if DISCIPLINES[discipline]['classifica'] == 'tempo':
+                    discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=True).reset_index(drop=True)
+                else:
+                    discipline_gender_df = discipline_gender_df.sort_values('prestazione', ascending=False).reset_index(drop=True)
+                
+                key = f"{discipline} ({gender})"
+                
+                seasonal_results[key] = {
+                    'results': discipline_gender_df.to_dict('records'),
+                    'best': discipline_gender_df.iloc[0].to_dict() if not discipline_gender_df.empty else None,
+                    'gender': gender,
+                    'base_discipline': discipline
+                }
         
-        # Ordina i risultati stagionali
-        seasonal_results = sort_disciplines_dict(seasonal_results, discipline_order)
-        
-        # Restituisci anche l'ordine delle discipline presenti
+        seasonal_results = sort_disciplines_with_gender(seasonal_results, discipline_order)
         ordered_disciplines = list(seasonal_results.keys())
         
         return jsonify({
