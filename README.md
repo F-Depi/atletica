@@ -1,172 +1,221 @@
-# Introduzione 
-Questo sito utilizza un database di dati che ho creato e continuo ad aggiornare
-con quest'altro progetto:
-[database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana)
+# AtleticaDB
 
-Il database ha la seguente struttura.
+A web application for browsing Italian national athletics (track and field) rankings, athlete profiles, and society/team data. It covers results from 2005 to the present, sourced from the [FIDAL](https://www.fidal.it/graduatorie.php) (Federazione Italiana di Atletica Leggera) official rankings.
 
-## Struttura del database postgreSQL
-Table results
-"id"	"integer"	"NO"	"nextval('results_id_seq'::regclass)"
-"prestazione"	"double precision"	"YES"	
-"vento"	"numeric"	"YES"	
-"tempo"	"character varying"	"YES"	
-"cronometraggio"	"character varying"	"YES"	
-"atleta"	"character varying"	"YES"	
-"anno"	"integer"	"YES"	
-"categoria"	"character varying"	"YES"	
-"società"	"character varying"	"YES"	
-"posizione"	"character varying"	"YES"	
-"luogo"	"character varying"	"YES"	
-"data"	"date"	"YES"	
-"link_atleta"	"character varying"	"YES"	
-"link_società"	"character varying"	"YES"	
-"disciplina"	"character varying"	"YES"	
-"ambiente"	"character"	"YES"	
-"sesso"	"character"	"YES"	
-"cod_società"	"character"	"YES"	
-"guess_codice"	"ARRAY"	"YES"	
-"note"	"character varying"	"YES"
+The database powering this application is maintained in a companion project: [database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana).
 
-Table atleti
-"link_atleta"	"text"	"NO"
-"atleta"	"text"	"YES"
-"categoria"	"text"	"YES"
-"società"	"text"	"YES"
-"anno"	"integer"	"YES"
+---
 
-Table discipline
-"link_atleta"	"text"	"NO"	
-"atleta"	"text"	"YES"	
-"categoria"	"text"	"YES"	
-"società"	"text"	"YES"	
-"anno"	"integer"	"YES"
-"codice"	"character varying"	"NO"
-"disciplina"	"character varying"	"NO"
-"tipo"	"character varying"	"NO"
-"classifica"	"character varying"	"NO"
-"vento"	"boolean"	"NO"
-"categoria"	"ARRAY"	"YES"
-"note"	"character varying"	"YES"
-"ultimo_aggiornamento"	"timestamp without time zone"	"YES"
-"28"	"lungo"	"Salti"	"distanza"	true			"2026-02-06 06:02:27.675715"
-"M5"	"martello_5kg"	"Lanci"	"distanza"	false			"2026-02-06 06:02:38.586304"
-"M6"	"martello_6kg"	"Lanci"	"distanza"	false			"2026-02-06 06:02:48.179078"
-"M7"	"martello_7kg"	"Lanci"	"distanza"	false			"2026-02-06 06:02:57.766505"
-"G7"	"giavellotto_700g"	"Lanci"	"distanza"	false			"2026-02-06 06:03:07.578693"
-"G8"	"giavellotto_800g"	"Lanci"	"distanza"	false			"2026-02-06 06:03:17.335221"
-"21"	"Marcia_5km"	"Marcia"	"tempo"	false			"2026-02-06 06:03:27.28577"
-"46"	"Marcia_10000m"	"Marcia"	"tempo"	false			"2026-02-06 06:03:36.967061"
-"49"	"Marcia_10km"	"Marcia"	"tempo"	false			"2026-02-06 06:03:48.299022"
-"O2"	"Esathlon_CM_(asta)"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:03:57.452014"
-"IG"	"Pentathlon_I-O_AF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:04:11.401467"
-"IC"	"Pentathlon_I-O_AM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:04:20.741352"
-"I2"	"Pentathlon_JF_PF_SF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:04:30.650025"
-"I6"	"Pentathlon_AF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:04:40.01196"
-"43"	"Marcia_3000m"	"Marcia"	"tempo"	false			"2026-02-06 06:04:51.465486"
-"45"	"Marcia_5000m"	"Marcia"	"tempo"	false			"2026-02-06 06:05:01.532542"
-"L2"	"50Hs_h60-7.50"	"Ostacoli"	"tempo"	true	"{RM,RF}"		"2026-02-06 06:05:11.747781"
-"29"	"triplo"	"Salti"	"distanza"	true			"2026-02-06 06:05:22.768233"
-"P2"	"peso_2kg"	"Lanci"	"distanza"	false			"2026-02-06 06:05:36.751628"
-"KR"	"400Hs_h84"	"Ostacoli"	"tempo"	false			"2026-02-06 06:05:46.961763"
-"L3"	"50Hs_h76-8.00"	"Ostacoli"	"tempo"	true	"{CF}"		"2026-02-06 06:05:57.771015"
-"16"	"24h"	"Corse Piane"	"distanza"	false			"2026-02-06 06:06:07.596538"
-"L4"	"50Hs_h76-8.50"	"Ostacoli"	"tempo"	true	"{AF}"		"2026-02-06 06:06:36.93582"
-"L5"	"50Hs_h84-8.50"	"Ostacoli"	"tempo"	true	"{CM,JF,PF,SF}"		"2026-02-06 06:06:46.612731"
-"L6"	"50Hs_h91-9.14"	"Ostacoli"	"tempo"	true	"{AM}"		"2026-02-06 06:06:56.474974"
-"38"	"Pentathlon_Cadetti_pre2017"	"Prove Multiple"	"distanza"	false		"dismesso dal 2017"	"2026-02-06 06:07:06.420733"
-"41"	"Decathlon_PM_SM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:07:15.465768"
-"91"	"Decathlon_AM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:07:29.907509"
-"O1"	"Esathlon_CM_(disco)"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:07:39.71992"
-"O4"	"Eptathlon_JF_PF_SF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:07:49.326311"
-"81"	"Eptathlon_AF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:07:58.523566"
-"O3"	"Pentathlon_CF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:08:07.938506"
-"KX"	"200Hs"	"Ostacoli"	"tempo"	true			"2026-02-06 06:08:17.282261"
-"P6"	"peso_6kg"	"Lanci"	"distanza"	false			"2026-02-06 06:08:27.054525"
-"P7"	"peso_7kg"	"Lanci"	"distanza"	false			"2026-02-06 06:08:37.084563"
-"IE"	"Eptathlon_I-O_PM_SM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:08:46.029233"
-"19"	"Eptathlon_JM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:08:55.209517"
-"ID"	"Eptathlon_I-O_JM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:09:05.160021"
-"I3"	"Pentathlon_AM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:09:14.326296"
-"L7"	"50Hs_h100-9.14"	"Ostacoli"	"tempo"	true	"{CF}"		"2026-02-06 06:09:23.327343"
-"L8"	"50Hs_h106-9.14"	"Ostacoli"	"tempo"	true	"{CF}"		"2026-02-06 06:09:32.517481"
-"HB"	"60Hs_h106-9.14"	"Ostacoli"	"tempo"	true	"{PM,SM}"		"2026-02-06 06:09:42.359094"
-"HC"	"60Hs_h100-9.14"	"Ostacoli"	"tempo"	true	"{JM,SM35,SM40,SM45}"		"2026-02-06 06:09:56.016476"
-"KG"	"300Hs_h76"	"Ostacoli"	"tempo"	false			"2026-02-06 06:10:05.873033"
-"KQ"	"400Hs_h91"	"Ostacoli"	"tempo"	false			"2026-02-06 06:10:15.725299"
-"26"	"alto"	"Salti"	"distanza"	false			"2026-02-06 06:10:29.305642"
-"27"	"asta"	"Salti"	"distanza"	false			"2026-02-06 06:10:39.569545"
-"77"	"vortex"	"Lanci"	"distanza"	false			"2026-02-06 06:10:50.065598"
-"G4"	"giavellotto_400g"	"Lanci"	"distanza"	false			"2026-02-06 06:10:59.877635"
-"G5"	"giavellotto_500g"	"Lanci"	"distanza"	false			"2026-02-06 06:11:09.631726"
-"G6"	"giavellotto_600g"	"Lanci"	"distanza"	false			"2026-02-06 06:11:19.655209"
-"D1"	"disco_1kg"	"Lanci"	"distanza"	false			"2026-02-06 06:11:29.619323"
-"D2"	"disco_1.5kg"	"Lanci"	"distanza"	false			"2026-02-06 06:11:39.358724"
-"P3"	"peso_3kg"	"Lanci"	"distanza"	false			"2026-02-06 06:11:49.564049"
-"P4"	"peso_4kg"	"Lanci"	"distanza"	false			"2026-02-06 06:11:59.817552"
-"P5"	"peso_5kg"	"Lanci"	"distanza"	false			"2026-02-06 06:12:09.957988"
-"S2"	"2000st_h76"	"Siepi"	"tempo"	false	"{AF,SF35,SF40,SF45,SF50,SF55,SF60,SF65,SF70,SF75,SF80,SF86,SF90,SF95}"		"2026-02-06 06:12:20.334313"
-"S3"	"3000st_h91"	"Siepi"	"tempo"	false	"{JM,PM,SM,SM35,SM40,SM45,SM50,SM55}"		"2026-02-06 06:12:29.582055"
-"S4"	"3000st_h76"	"Siepi"	"tempo"	false	"{JF,PF,SF}"		"2026-02-06 06:12:41.255246"
-"S5"	"1200st_h76_SV"	"Siepi"	"tempo"	false	"{CM,CF}"		"2026-02-06 06:12:51.973736"
-"S6"	"2000st_h84"	"Siepi"	"tempo"	false	"{AM}"		"2026-02-06 06:13:05.863575"
-"20"	"Decathlon_JM"	"Prove Multiple"	"distanza"	false	"{JM}"		"2026-02-06 06:13:15.731808"
-"HM"	"60Hs_h60-7.50"	"Ostacoli"	"tempo"	true	"{RM,RF}"		"2026-02-06 06:13:27.649487"
-"K2"	"80Hs_h76-8.00"	"Ostacoli"	"tempo"	true	"{SF40,SF45}"	"funziona solo per XF"	"2026-02-06 06:13:36.550092"
-"K3"	"80Hs_h76-7.00"	"Ostacoli"	"tempo"	true	"{SM70,SM75}"		"2026-02-06 06:13:45.609244"
-"K4"	"80Hs_h68.6-7.00"	"Ostacoli"	"tempo"	true	"{SM80,SM86,SM90,SM95}"		"2026-02-06 06:13:54.574992"
-"KB"	"110Hs_h106-9.14"	"Ostacoli"	"tempo"	true	"{PM,SM}"		"2026-02-06 06:14:04.18707"
-"KC"	"110Hs_h100-9.14"	"Ostacoli"	"tempo"	true	"{JM,SM35,SM40,SM45}"		"2026-02-06 06:14:13.207471"
-"42"	"Marcia_2000m"	"Marcia"	"tempo"	false	"{RF,RM}"		"2026-02-06 06:14:23.748503"
-"KD"	"110Hs_h91-9.14"	"Ostacoli"	"tempo"	true	"{AM}"		"2026-02-06 06:14:33.464878"
-"H1"	"100Hs_h91-8.50"	"Ostacoli"	"tempo"	true	"{SM50,SM55}"		"2026-02-06 06:14:42.697062"
-"04"	"200m"	"Corse Piane"	"tempo"	true			"2026-02-06 06:14:57.152092"
-"01"	"60m"	"Corse Piane"	"tempo"	true			"2026-02-06 06:15:16.977875"
-"05"	"300m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:15:27.687444"
-"06"	"400m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:15:45.752419"
-"07"	"600m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:15:58.144226"
-"08"	"800m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:16:10.429042"
-"09"	"1000m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:16:21.417027"
-"11"	"1500m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:16:32.428903"
-"63"	"1miglio"	"Corse Piane"	"tempo"	false			"2026-02-06 06:16:42.229911"
-"13"	"3000m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:16:52.137543"
-"14"	"5000m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:17:05.944822"
-"03"	"100m"	"Corse Piane"	"tempo"	true			"2026-02-06 06:17:16.590642"
-"02"	"80m"	"Corse Piane"	"tempo"	true			"2026-02-06 06:17:27.897005"
-"12"	"2000m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:17:38.593934"
-"15"	"10000m"	"Corse Piane"	"tempo"	false			"2026-02-06 06:17:48.798771"
-"D3"	"disco_1.75kg"	"Lanci"	"distanza"	false			"2026-02-06 06:17:58.712505"
-"D4"	"disco_2kg"	"Lanci"	"distanza"	false			"2026-02-06 06:18:08.51317"
-"M3"	"martello_3kg"	"Lanci"	"distanza"	false			"2026-02-06 06:02:08.52976"
-"HK"	"60Hs_h76-7.00"	"Ostacoli"	"tempo"	true	"{SF50,SF55,SM70,SM75}"		"2026-02-06 06:19:34.495907"
-"HL"	"60Hs_h68.6-7.00"	"Ostacoli"	"tempo"	true	"{SF60,SF65,SF70,SF75,SF80,SF85,SF90,SF95,SM80,SM85,SM90,SM95}"		"2026-02-06 06:19:49.010238"
-"KS"	"400Hs_h76"	"Ostacoli"	"tempo"	false	"{AF}"		"2026-02-06 06:19:59.147722"
-"S1"	"2000st_h91"	"Siepi"	"tempo"	false	"{SM60,SM65,SM70,SM75,SM80,SM86,SM90,SM95}"		"2026-02-06 06:20:08.322305"
-"56"	"50m"	"Corse Piane"	"tempo"	true			"2026-02-06 06:20:21.973191"
-"M4"	"martello_4kg"	"Lanci"	"distanza"	false			"2026-02-06 06:20:32.817621"
-"IB"	"Pentathlon_I-O_JF_PF_SF"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:20:41.776794"
-"I5"	"Eptathlon_PM_SM"	"Prove Multiple"	"distanza"	false			"2026-02-06 06:20:50.909404"
-"HF"	"60Hs_h84-8.50"	"Ostacoli"	"tempo"	true	"{CM,JF,PF,SF,SF35}"		"2026-02-06 06:21:01.422296"
-"H2"	"100Hs_h84-8.50"	"Ostacoli"	"tempo"	true	"{CM,JF,PF,SF,SF35,studenteschi,maschili}"		"2026-02-06 06:21:11.093601"
-"H3"	"100Hs_h84-8.00"	"Ostacoli"	"tempo"	true	"{SM60,SM65}"		"2026-02-06 06:18:17.632929"
-"HD"	"60Hs_h91-9.14"	"Ostacoli"	"tempo"	true	"{AM}"		"2026-02-06 06:18:27.686853"
-"HE"	"60Hs_h91-8.50"	"Ostacoli"	"tempo"	true	"{SM50,SM55}"		"2026-02-06 06:18:37.123117"
-"HG"	"60Hs_h84-8.00"	"Ostacoli"	"tempo"	true	"{SM60,SM65}"		"2026-02-06 06:18:46.129502"
-"H4"	"100Hs_h76-8.50"	"Ostacoli"	"tempo"	true	"{AF}"		"2026-02-06 06:18:55.61329"
-"H5"	"100Hs_h76-8.00"	"Ostacoli"	"tempo"	true	"{studenteschi,femminili}"		"2026-02-06 06:19:04.710875"
-"HH"	"60Hs_h76-8.50"	"Ostacoli"	"tempo"	true	"{AF}"		"2026-02-06 06:19:15.20326"
-"HJ"	"60Hs_h76-8.00"	"Corse Piane"	"tempo"	true	"{SF40,SF45}"	"funziona solo per SF"	"2026-02-06 06:19:25.255688"
+## Features
 
+- **National Rankings** — Browse and filter Italian athletics rankings by discipline, category, year, gender, region, province, and society. Supports both indoor and outdoor results.
+- **Athlete Profiles** — View individual athlete performance histories, personal records, and seasonal bests, with links to official FIDAL profiles.
+- **Society/Team Profiles** — Explore team rosters, seasonal performance summaries, and member statistics.
+- **Unified Search** — Full-text search for athletes and societies.
+- **Wind Data** — Context-aware wind condition display for sprints, hurdles, and horizontal jumps.
+- **Error Reporting** — Users can submit data correction reports directly from the interface.
+- **Responsive UI** — Mobile-friendly layout with dark/light theme support.
 
-## TO DO
- - Calcolare il vento per i risultati delle prove multiple outdoor
- - Aggiungere i risultati delle liste all time fornite dalla FIDAL 
- [qui](https://www.fidal.it/content/Statistiche/25404)
- - Creare una pagina con le statistiche attualmente contenute 
- [qui](https://github.com/F-Depi/database-atletica-italiana/tree/main/statistiche)
- - Aggiungere una sezione per fare query direttamente sul database
- - Aggiungere i risultati all time riportati sul
- [sito fidal](https://www.fidal.it/content/Statistiche/25404)
- - Aggiungere i risultati delle gare in diretta. Ho già contruito il
- [programma](https://github.com/F-Depi/AtleticaDB-live),
- ma devo renderlo più accurato.
+---
+
+## Tech Stack
+
+| Layer      | Technology                                      |
+|------------|-------------------------------------------------|
+| Backend    | Python · [Flask](https://flask.palletsprojects.com/) |
+| Database   | PostgreSQL · SQLAlchemy · psycopg2              |
+| Data       | pandas                                          |
+| Frontend   | Jinja2 templates · Vanilla JS · Custom CSS      |
+| Security   | flask-wtf (CSRF) · flask-limiter (rate limiting)|
+| Production | Gunicorn                                        |
+
+---
+
+## Project Structure
+
+```
+atletica/
+├── app/
+│   ├── app.py               # Flask app initialization and main routes
+│   ├── models.py            # Database connection and SQLAlchemy models
+│   ├── rankings.py          # Rankings page and API
+│   ├── atleti.py            # Athlete profile pages
+│   ├── societa.py           # Society/team profile pages
+│   ├── ricerca.py           # Search functionality
+│   ├── error_reporting.py   # Error report submission
+│   ├── utils.py             # Shared helper functions
+│   ├── data/                # JSON configuration files (disciplines, categories, regions)
+│   ├── static/              # CSS, JavaScript, and images
+│   └── templates/           # Jinja2 HTML templates
+├── run.py                   # Development server entry point
+├── requirements.txt         # Python dependencies
+├── combine_css.sh           # Script to combine CSS files
+└── LICENSE                  # GNU GPLv3
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.9+
+- PostgreSQL (with a database populated by [database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana))
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/F-Depi/atletica.git
+cd atletica
+
+# 2. Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+### Configuration
+
+Create a `config.py` file in the project root (it is excluded from version control):
+
+```python
+DB_CONFIG = {
+    'user': 'your_postgres_user',
+    'password': 'your_postgres_password',
+    'host': 'localhost',
+    'database': 'atletica_db',
+}
+
+SECRET_KEY = 'your-secret-key-here'
+```
+
+### Running the Application
+
+```bash
+# Development (auto-reload enabled)
+python run.py
+
+# Production
+gunicorn -b 0.0.0.0:8000 app.app:app
+```
+
+The application is available at `http://localhost:5000` in development mode.
+
+### Building CSS
+
+The project ships individual CSS modules. To concatenate them into a single file:
+
+```bash
+chmod +x combine_css.sh
+./combine_css.sh
+```
+
+---
+
+## API Reference
+
+### Rankings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/rankings` | Rankings page (query params: `disciplina`, `categoria`, `sesso`, `anno`, `regione`, `provincia`, `societa`, `ambiente`) |
+| `GET` | `/api/disciplines/all` | All available disciplines |
+| `GET` | `/api/disciplines/<category>/<gender>` | Disciplines filtered by category and gender |
+| `GET` | `/api/discipline_info/<discipline>` | Discipline metadata (wind info, type, classification) |
+
+### Athlete & Society
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/atleta/<path:atleta_path>` | Athlete profile |
+| `GET` | `/societa/<cod_societa>` | Society profile |
+| `GET` | `/societa/<cod_societa>/seasonal` | Society seasonal performance summary |
+
+### Search & Utilities
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/ricerca/api?q=<query>` | Search athletes and societies (rate-limited: 30 req/min) |
+| `GET` | `/get-csrf-token` | Obtain a CSRF token |
+| `POST` | `/api/segnala-errore` | Submit a data error report (rate-limited: 5 req/min) |
+
+---
+
+## Database Schema
+
+The application connects to a PostgreSQL database with the following tables.
+
+### `results` — Performance records
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Auto-incremented identifier |
+| `atleta` | varchar | Athlete name |
+| `prestazione` | double precision | Numeric performance value |
+| `vento` | numeric | Wind reading (m/s) |
+| `tempo` | varchar | Formatted performance string |
+| `cronometraggio` | varchar | Timing method (manual / electronic) |
+| `anno` | integer | Season year |
+| `categoria` | varchar | Age category |
+| `società` | varchar | Society/team name |
+| `disciplina` | varchar | Event name |
+| `ambiente` | char | `I` = indoor, `P` = outdoor |
+| `sesso` | char | `M` = male, `F` = female |
+| `data` | date | Date of performance |
+| `luogo` | varchar | Location |
+| `posizione` | varchar | Finishing position |
+| `link_atleta` | varchar | FIDAL athlete profile link |
+| `link_società` | varchar | FIDAL society profile link |
+| `cod_società` | char | Society code |
+| `guess_codice` | ARRAY | Inferred discipline codes |
+| `note` | varchar | Additional notes |
+
+### `atleti` — Athlete master data
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `link_atleta` | text (PK) | Unique FIDAL athlete link |
+| `atleta` | text | Athlete name |
+| `categoria` | text | Current age category |
+| `società` | text | Current society |
+| `anno` | integer | Birth year |
+
+### `discipline` — Event definitions
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `codice` | varchar (PK) | Discipline code (e.g. `03` for 100 m) |
+| `disciplina` | varchar | Discipline name |
+| `tipo` | varchar | Category type (Corse Piane, Salti, Lanci, Ostacoli, Siepi, Marcia, Prove Multiple) |
+| `classifica` | varchar | `tempo` (time) or `distanza` (distance) |
+| `vento` | boolean | Whether wind readings apply |
+| `categoria` | ARRAY | Applicable age categories |
+| `ordine` | integer | Display order |
+| `note` | varchar | Additional notes |
+| `ultimo_aggiornamento` | timestamp | Last updated |
+
+---
+
+## Roadmap
+
+- [ ] Wind calculation for outdoor combined events (prove multiple)
+- [ ] Import all-time record lists provided by FIDAL ([link](https://www.fidal.it/content/Statistiche/25404))
+- [ ] Statistics dashboard based on [existing data](https://github.com/F-Depi/database-atletica-italiana/tree/main/statistiche)
+- [ ] Direct database query interface
+- [ ] Live race results integration ([AtleticaDB-live](https://github.com/F-Depi/AtleticaDB-live))
+
+---
+
+## Related Projects
+
+- [database-atletica-italiana](https://github.com/F-Depi/database-atletica-italiana) — Scripts that collect, clean, and maintain the athletics database.
+- [AtleticaDB-live](https://github.com/F-Depi/AtleticaDB-live) — Live race results integration (work in progress).
+
+---
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
