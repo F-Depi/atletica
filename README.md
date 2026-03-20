@@ -8,13 +8,12 @@ The database powering this application is maintained in a companion project: [da
 
 ## Features
 
-- **National Rankings** — Browse and filter Italian athletics rankings by discipline, category, year, gender, region, province, and society. Supports both indoor and outdoor results.
-- **Athlete Profiles** — View individual athlete performance histories, personal records, and seasonal bests, with links to official FIDAL profiles.
-- **Society/Team Profiles** — Explore team rosters, seasonal performance summaries, and member statistics.
-- **Unified Search** — Full-text search for athletes and societies.
-- **Wind Data** — Context-aware wind condition display for sprints, hurdles, and horizontal jumps.
-- **Error Reporting** — Users can submit data correction reports directly from the interface.
-- **Responsive UI** — Mobile-friendly layout with dark/light theme support.
+- **National Rankings**: Browse and filter Italian athletics results from any year, discipline, category, gender, region, province, and society, all in one page.
+- **Athlete Profiles**: View individual athlete performance histories, personal records, and seasonal bests, with links to official FIDAL profiles.
+- **Society/Team Profiles**: Explore team rosters, seasonal performance summaries, and member statistics.
+- **Unified Search**:Full-text search for athletes and societies.
+- **Error Reporting**: Users can submit data correction reports directly from the interface.
+- **Responsive UI**: Mobile-friendly layout with dark/light theme support.
 
 ---
 
