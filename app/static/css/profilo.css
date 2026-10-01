@@ -422,3 +422,101 @@
         margin-top: 15px;
     }
 }
+
+/* Da caricare DOPO profilo.css: riusa le sue classi e aggiunge solo ciò che manca */
+
+/* 4 bottoni di sezione: possono andare a capo su mobile */
+.societa-profile .section-toggle {
+    flex-wrap: wrap;
+}
+
+.societa-profile .toggle-btn {
+    flex: 1 1 auto;
+    padding: 12px 10px;
+    font-size: 15px;
+}
+
+/* Barra filtri dentro le sezioni */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+/* Tabelle "a scheda" (primati stagionali, lista atleti) */
+.table-card {
+    background: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.societa-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 1rem;
+}
+
+.societa-table th {
+    padding: 12px;
+    text-align: left;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--text-color);
+    background-color: var(--table-header-background);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.societa-table td {
+    padding: 10px 12px;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.societa-table tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Link atleta */
+.atleta-link {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.atleta-link:hover {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+/* Piccolo badge M/F accanto alla disciplina */
+.sesso-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    vertical-align: middle;
+    color: var(--text-color-secondary);
+    border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .societa-profile .toggle-btn {
+        flex: 1 1 45%;
+    }
+
+    .societa-profile .filters-bar .filter-select {
+        flex: 1 1 calc(50% - 5px);
+    }
+
+    /* Nei record il 3° blocco dell'header (atleta + luogo) ci sta già: lasciamo il layout di profilo.css */
+    .societa-table th,
+    .societa-table td {
+        padding: 8px;
+        font-size: 0.95rem;
+    }
+}

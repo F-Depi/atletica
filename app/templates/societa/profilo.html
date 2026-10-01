@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profilo.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/societa.css') }}">
+
+{% macro vento(v) %}{% if v %}<span class="wind"> ({{ v }})</span>{% endif %}{% endmacro %}
+{% macro nome_gara(r) %}{{ r.disciplina.replace('_', ' ') }}{% if r.ambiente == 'I' %} (indoor){% endif %}{% endmacro %}
+{% macro sesso_badge(s) %}<span class="sesso-badge sesso-{{ s }}">{{ s }}</span>{% endmacro %}
+
+<div class="atleta-profile societa-profile">
+
+    <!-- Header -->
+    <div class="atleta-header">
+        <div class="header-content">
+            <div class="profile-image">
+                <div class="profile-initials">{{ provincia }}</div>
+            </div>
+            <div class="header-text">
+                <h1 class="atleta-name">{{ nome_societa }}</h1>
+                <div class="quick-stats">
+                    <span class="category-badge">{{ cod_societa }}</span>
+                    <span class="birth-year">{{ provincia }}{% if regione %} · {{ regione }}{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="atleta-details">
+            <div class="detail-card">
+                <div class="detail-content">
+                    <label>Atleti</label>
+                    <span class="detail-value">{{ n_atleti }}</span>
+                </div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-content">
+                    <label>Risultati</label>
+                    <span class="detail-value">{{ n_risultati }}</span>
+                </div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-content">
+                    <label>Stagioni</label>
+                    <span class="detail-value">{{ prima_stagione }}{% if prima_stagione != ultima_stagione %} – {{ ultima_stagione }}{% endif %}</span>
+                </div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-content">
+                    <label>Pagina FIDAL</label>
+                    {% if link_fidal %}
+                    <a href="{{ link_fidal }}" target="_blank" class="detail-value">Visualizza</a>
+                    {% else %}
+                    <span class="detail-value">N/D</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle sezioni -->
+    <div class="section-toggle">
+        <button class="toggle-btn active" data-section="records">Record sociali</button>
+        <button class="toggle-btn" data-section="stagionali">Primati stagionali</button>
+        <button class="toggle-btn" data-section="recenti">Ultimi risultati</button>
+        <button class="toggle-btn" data-section="atleti">Lista atleti</button>
+    </div>
+
+    <!-- ===================== Record sociali ===================== -->
+    <section id="section-records" class="results-section active">
+        <div class="filters-bar" data-filter-bar>
+            <select class="filter-select" data-filter="sesso">
+                <option value="">Uomini e donne</option>
+                <option value="M">Uomini</option>
+                <option value="F">Donne</option>
+            </select>
+            <select class="filter-select" data-filter="ambiente">
+                <option value="">Indoor e outdoor</option>
+                <option value="P">Outdoor</option>
+                <option value="I">Indoor</option>
+            </select>
+        </div>
+
+        {% if not record_sociali %}
+        <p class="no-results">Nessun record disponibile per questa società.</p>
+        {% else %}
+        <div class="pbs-list">
+            {% for rec in record_sociali %}
+            <div class="pb-row" data-sesso="{{ rec.sesso }}" data-ambiente="{{ rec.ambiente }}">
+                <div class="pb-header" onclick="toggleResults(this)">
+                    <div class="discipline-name">{{ nome_gara(rec) }} {{ sesso_badge(rec.sesso) }}</div>
+                    <div class="pb-result">
+                        <span class="result"><b>{{ rec.best.prestazione_display }}</b></span>{{ vento(rec.best.vento) }}
+                    </div>
+                    <div class="pb-details">
+                        <span class="date">
+                            {% if rec.best.url_atleta %}
+                            <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
+                            {% else %}{{ rec.best.atleta }}{% endif %}
+                        </span>
+                        <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} · {{ rec.best.luogo or '-' }}</span>
+                    </div>
+                    <span class="toggle-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="pb-details-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Pres.</th>
+                                <th>Atleta</th>
+                                <th>Anno</th>
+                                <th>Data</th>
+                                <th>Luogo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rec.top %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
+                                <td>
+                                    {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+                                </td>
+                                <td>{{ r.anno or '-' }}</td>
+                                <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
+                                <td class="location">{{ r.luogo or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- ===================== Primati stagionali ===================== -->
+    <section id="section-stagionali" class="results-section">
+        {% if not anni %}
+        <p class="no-results">Nessun primato stagionale disponibile.</p>
+        {% else %}
+        <div class="filters-bar" data-filter-bar>
+            <select class="filter-select" data-filter="anno">
+                {% for a in anni %}
+                <option value="{{ a }}">{{ a }}</option>
+                {% endfor %}
+            </select>
+            <select class="filter-select" data-filter="sesso">
+                <option value="">Uomini e donne</option>
+                <option value="M">Uomini</option>
+                <option value="F">Donne</option>
+            </select>
+            <select class="filter-select" data-filter="ambiente">
+                <option value="">Indoor e outdoor</option>
+                <option value="P">Outdoor</option>
+                <option value="I">Indoor</option>
+            </select>
+        </div>
+
+        {% for a in anni %}
+        <div class="season-block table-card" data-anno="{{ a }}" {% if not loop.first %}style="display:none"{% endif %}>
+            <table class="societa-table">
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Pres.</th>
+                        <th>Atleta</th>
+                        <th>Data</th>
+                        <th>Luogo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in primati_stagionali[a] %}
+                    <tr data-sesso="{{ r.sesso }}" data-ambiente="{{ r.ambiente }}">
+                        <td>{{ nome_gara(r) }} {{ sesso_badge(r.sesso) }}</td>
+                        <td class="result"><b>{{ r.prestazione_display }}</b>{{ vento(r.vento) }}</td>
+                        <td>
+                            {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+                        </td>
+                        <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
+                        <td class="location">{{ r.luogo or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </section>
+
+    <!-- ===================== Ultimi risultati ===================== -->
+    <section id="section-recenti" class="results-section">
+        {% if not ultimi_risultati %}
+        <p class="no-results">Nessun risultato recente disponibile.</p>
+        {% else %}
+        <table class="recent-results-table">
+            <tbody>
+                {% set ns = namespace(last_group=None) %}
+                {% for r in ultimi_risultati %}
+                {% set current_group = r.data.strftime('%d/%m/%Y') ~ ' - ' ~ (r.luogo or '') %}
+                {% if current_group != ns.last_group %}
+                <tr class="group-header">
+                    <td colspan="4">{{ current_group }}</td>
+                </tr>
+                {% set ns.last_group = current_group %}
+                {% endif %}
+                <tr>
+                    <td class="discipline">{{ nome_gara(r) }} {{ sesso_badge(r.categoria) }}</td>
+                    <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
+                    <td>
+                        {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+                    </td>
+                    <td class="position">{{ r.posizione or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </section>
+
+    <!-- ===================== Lista atleti ===================== -->
+    <section id="section-atleti" class="results-section">
+        <div class="filters-bar" data-filter-bar>
+            <input type="text" class="filter-select" data-filter="q" placeholder="Cerca atleta..." autocomplete="off">
+            <select class="filter-select" data-filter="sesso">
+                <option value="">Uomini e donne</option>
+                <option value="M">Uomini</option>
+                <option value="F">Donne</option>
+            </select>
+            <label class="toggle-switch">
+                <input type="checkbox" data-filter="attivi">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Solo attivi ({{ ultima_stagione }})</span>
+            </label>
+        </div>
+
+        <div class="table-card">
+            <table class="societa-table sortable-generic">
+                <thead>
+                    <tr>
+                        <th class="sortable-header" data-type="text">Atleta <span class="sort-icon"></span></th>
+                        <th class="sortable-header" data-type="num">Anno <span class="sort-icon"></span></th>
+                        <th>Sesso</th>
+                        <th>Cat.</th>
+                        <th class="sortable-header" data-type="num">Stagioni <span class="sort-icon"></span></th>
+                        <th class="sortable-header" data-type="num">Risultati <span class="sort-icon"></span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in lista_atleti %}
+                    <tr data-sesso="{{ a.sesso }}" data-nome="{{ a.atleta|lower }}" data-attivo="{{ 1 if a.attivo else 0 }}">
+                        <td data-value="{{ a.atleta }}">
+                            {% if a.url_atleta %}<a href="{{ a.url_atleta }}" class="atleta-link">{{ a.atleta }}</a>{% else %}{{ a.atleta }}{% endif %}
+                        </td>
+                        <td>{{ a.anno or '-' }}</td>
+                        <td>{{ sesso_badge(a.sesso) }}</td>
+                        <td>{{ a.categoria or '-' }}</td>
+                        <td data-value="{{ a.ultima }}">{{ a.prima }}{% if a.prima != a.ultima %} – {{ a.ultima }}{% endif %}</td>
+                        <td data-value="{{ a.n_risultati }}">{{ a.n_risultati }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/societa.js') }}"></script>
+
+{% endblock %}

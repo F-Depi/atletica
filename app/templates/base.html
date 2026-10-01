@@ -39,7 +39,7 @@
                         <div class="search-container">
 
                             <div class="search-box">
-                                <input type="text" id="atletaSearch" placeholder="Cerca un atleta..." autocomplete="off">
+                                <input type="text" id="atletaSearch" placeholder="Cerca un atleta o una società..." autocomplete="off">
                                 <button id="searchButton">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="11" cy="11" r="8"></circle>
@@ -134,14 +134,25 @@
 
                             const resultsList = document.createElement('ul');
 
-                            data.forEach(atleta => {
+                            data.forEach(item => {
                                 const listItem = document.createElement('li');
                                 const link = document.createElement('a');
 
-                                // Use the extracted path part from the URL
-                                link.href = `/atleta/${encodeURIComponent(atleta.link)}`;
-                                link.textContent = atleta.name;
+                                // Il backend restituisce già l'URL corretto (atleta o società)
+                                link.href = item.type === 'societa'
+                                    ? `/societa/${encodeURIComponent(item.link)}`
+                                    : `/atleta/${encodeURIComponent(item.link)}`;
 
+                                // Etichetta per distinguere visivamente i due tipi
+                                const badge = document.createElement('span');
+                                badge.className = `search-badge search-badge-${item.type}`;
+                                badge.textContent = item.type === 'societa' ? 'Società ' : 'Atleta ';
+
+                                const label = document.createElement('span');
+                                label.textContent = item.name;
+
+                                link.appendChild(badge);
+                                link.appendChild(label);
                                 listItem.appendChild(link);
                                 resultsList.appendChild(listItem);
                             });

@@ -169,7 +169,8 @@ def handle_standard_rankings(tab):
                     vento,
                     ambiente,
                     link_atleta,
-                    link_società
+                    link_società,
+                    cod_società
                 FROM results 
                 WHERE {where_clause}
             )
@@ -194,7 +195,8 @@ def handle_standard_rankings(tab):
                     vento,
                     ambiente,
                     link_atleta,
-                    link_società
+                    link_società,
+                    cod_società
                 FROM results 
                 WHERE {where_clause}
                 ORDER BY atleta, prestazione {sort_direction}, data DESC
@@ -335,7 +337,8 @@ def handle_advanced_rankings():
                     vento,
                     ambiente,
                     link_atleta,
-                    link_società
+                    link_società,
+                    cod_società
                 FROM results 
                 WHERE {where_clause}
             )
@@ -360,7 +363,8 @@ def handle_advanced_rankings():
                     vento,
                     ambiente,
                     link_atleta,
-                    link_società
+                    link_società,
+                    cod_società
                 FROM results 
                 WHERE {where_clause}
                 ORDER BY atleta, prestazione {sort_direction}, data DESC
