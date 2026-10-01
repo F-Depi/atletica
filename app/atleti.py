@@ -45,28 +45,18 @@ def trova_atleti():
         """)
 
         # --- Società: ogni termine nel nome, oppure il codice società ---
-        soc_params = {"full_query": f"%{query}%"}
+        soc_params = {"full_query": f"%{query}%", "exact": query}
         soc_conditions = []
         for i, term in enumerate(terms):
-            soc_conditions.append(f"società ILIKE :term_{i}")
+            soc_conditions.append(f"nome ILIKE :term_{i}")
             soc_params[f"term_{i}"] = f"%{term}%"
 
-        # DISTINCT ON prende, per ogni codice, il nome più recente
-        # (una società può cambiare nome negli anni)
         societa_sql = text(f"""
             SELECT cod_società, nome
-            FROM (
-                SELECT DISTINCT ON (cod_società)
-                    cod_società, società AS nome
-                FROM results
-                WHERE cod_società IS NOT NULL
-                  AND (
-                        ({" AND ".join(soc_conditions)})
-                        OR cod_società ILIKE :full_query
-                      )
-                ORDER BY cod_società, data DESC
-            ) s
-            ORDER BY nome
+            FROM societa
+            WHERE ({" AND ".join(soc_conditions)})
+               OR cod_società ILIKE :full_query
+            ORDER BY (cod_società ILIKE :exact) DESC, nome
             LIMIT 5
         """)
 
