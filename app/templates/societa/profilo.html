@@ -7,6 +7,14 @@
 {% macro vento(v) %}{% if v %}<span class="wind"> ({{ v }})</span>{% endif %}{% endmacro %}
 {% macro nome_gara(r) %}{{ r.disciplina.replace('_', ' ') }}{% if r.ambiente == 'I' %} (indoor){% endif %}{% endmacro %}
 {% macro sesso_badge(s) %}<span class="sesso-badge sesso-{{ s }}">{{ s }}</span>{% endmacro %}
+{% macro filtro_categoria(categorie, categoria) %}
+<select class="filter-select" data-param="categoria">
+    <option value="">Tutte le categorie</option>
+    {% for c in categorie %}
+    <option value="{{ c }}"{% if c == categoria %} selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+</select>
+{% endmacro %}
 
 <div class="atleta-profile societa-profile">
 
@@ -78,6 +86,7 @@
                 <option value="P">Outdoor</option>
                 <option value="I">Indoor</option>
             </select>
+            {{ filtro_categoria(categorie, categoria) }}
         </div>
 
         {% if not record_sociali %}
@@ -142,15 +151,14 @@
 
     <!-- ===================== Primati stagionali ===================== -->
     <section id="section-stagionali" class="results-section">
-        {% if not anni %}
-        <p class="no-results">Nessun primato stagionale disponibile.</p>
-        {% else %}
         <div class="filters-bar" data-filter-bar>
+            {% if anni %}
             <select class="filter-select" data-filter="anno">
                 {% for a in anni %}
                 <option value="{{ a }}">{{ a }}</option>
                 {% endfor %}
             </select>
+            {% endif %}
             <select class="filter-select" data-filter="sesso">
                 <option value="">Uomini e donne</option>
                 <option value="M">Uomini</option>
@@ -161,8 +169,12 @@
                 <option value="P">Outdoor</option>
                 <option value="I">Indoor</option>
             </select>
+            {{ filtro_categoria(categorie, categoria) }}
         </div>
 
+        {% if not anni %}
+        <p class="no-results">Nessun primato stagionale disponibile.</p>
+        {% else %}
         {% for a in anni %}
         <div class="season-block table-card" data-anno="{{ a }}" {% if not loop.first %}style="display:none"{% endif %}>
             <table class="societa-table">
@@ -196,8 +208,20 @@
 
     <!-- ===================== Ultimi risultati ===================== -->
     <section id="section-recenti" class="results-section">
+        <div class="filters-bar" data-filter-bar>
+            {{ filtro_categoria(categorie, categoria) }}
+            <select class="filter-select" data-param="periodo">
+                <option value=""{% if not periodo %} selected{% endif %}>Ultimi {{ n_ultimi }} risultati</option>
+                <option value="3m"{% if periodo == '3m' %} selected{% endif %}>Ultimi 3 mesi</option>
+                <option value="6m"{% if periodo == '6m' %} selected{% endif %}>Ultimi 6 mesi</option>
+                <option value="ytd"{% if periodo == 'ytd' %} selected{% endif %}>Quest'anno ({{ anno_corrente }})</option>
+                {% for a in anni_periodo %}
+                <option value="{{ a }}"{% if periodo == a|string %} selected{% endif %}>Anno {{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
         {% if not ultimi_risultati %}
-        <p class="no-results">Nessun risultato recente disponibile.</p>
+        <p class="no-results">Nessun risultato per i filtri selezionati.</p>
         {% else %}
         <table class="recent-results-table">
             <tbody>
@@ -221,6 +245,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% if n_recenti_totali > ultimi_risultati|length %}
+        <p class="no-results">Mostrati i {{ ultimi_risultati|length }} più recenti su {{ n_recenti_totali }}.</p>
+        {% endif %}
         {% endif %}
     </section>
 
@@ -233,6 +260,7 @@
                 <option value="M">Uomini</option>
                 <option value="F">Donne</option>
             </select>
+            {{ filtro_categoria(categorie, categoria) }}
             <label class="toggle-switch">
                 <input type="checkbox" data-filter="attivi">
                 <span class="toggle-slider"></span>

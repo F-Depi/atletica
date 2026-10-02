@@ -27,6 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ---------- Filtri (sesso, ambiente, anno, ricerca, solo attivi) ----------
     root.querySelectorAll('[data-filter-bar]').forEach(bar => {
+        // ---------- Filtri lato server (categoria, periodo): ricarica mantenendo la sezione (#hash) ----------
+        root.querySelectorAll('[data-param]').forEach(el => {
+            el.addEventListener('change', () => {
+                const url = new URL(window.location.href);
+                if (el.value) url.searchParams.set(el.dataset.param, el.value);
+                else url.searchParams.delete(el.dataset.param);
+                window.location.href = url.toString();
+            });
+        });
         const section = bar.closest('.results-section');
         const get = name => bar.querySelector(`[data-filter="${name}"]`);
 
@@ -54,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        bar.querySelectorAll('select, input').forEach(i => {
+        bar.querySelectorAll('select:not([data-param]), input').forEach(i => {
             i.addEventListener('input', apply);
             i.addEventListener('change', apply);
         });
