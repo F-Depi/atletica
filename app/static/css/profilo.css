@@ -349,9 +349,12 @@
         margin: 0 15px 30px 15px;
     }
 
+    /* Lista PB a tutta larghezza: annulla il padding laterale di .atleta-profile (12px) */
     .pbs-list {
         gap: 0;
-        margin: 0 -15px;
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: 0;
     }
 
     .pb-row {
@@ -364,7 +367,7 @@
         grid-template-columns: 2fr 1fr 2fr auto;
         grid-template-rows: auto auto;
         gap: 8px;
-        padding: 10px;
+        padding: 10px 16px;
     }
 
     .discipline-name {
@@ -398,19 +401,29 @@
         border-radius: 0;
     }
 
-    .results-table,
-    .recent-results-table {
+    /* Tabella: 100% del contenitore, niente hack con 100vw */
+    .results-table {
+        width: 100%;
+        margin: 0;
         font-size: 1.1rem;
         border-radius: 0;
         box-shadow: none;
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
     }
 
     .results-table th,
-    .results-table td,
-    .recent-results-table td {
-        padding: 8px 12px;
+    .results-table td {
+        padding: 8px 6px;
+    }
+
+    /* Spazio dal bordo schermo solo sulla prima e sull'ultima colonna */
+    .results-table th:first-child,
+    .results-table td:first-child {
+        padding-left: 16px;
+    }
+
+    .results-table th:last-child,
+    .results-table td:last-child {
+        padding-right: 16px;
     }
 
     .results-section {
@@ -418,8 +431,25 @@
         padding: 0;
     }
 
+    /* Ultimi risultati: stessa logica (a tutta larghezza + padding interno) */
     .recent-results-table {
-        margin-top: 15px;
+        width: calc(100% + 24px);
+        margin: 15px -12px 0 -12px;
+        font-size: 1.1rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .recent-results-table td {
+        padding: 8px 6px;
+    }
+
+    .recent-results-table td:first-child {
+        padding-left: 16px;
+    }
+
+    .recent-results-table td:last-child {
+        padding-right: 16px;
     }
 }
 
