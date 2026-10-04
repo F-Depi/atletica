@@ -1,0 +1,33 @@
+{% from "societa/_macros.html" import sesso_badge %}
+{% if not lista_atleti %}
+<p class="no-results">Nessun atleta per i filtri selezionati.</p>
+{% else %}
+<div class="table-card">
+    <table class="societa-table sortable-generic">
+        <thead>
+            <tr>
+                <th class="sortable-header" data-type="text">Atleta <span class="sort-icon"></span></th>
+                <th class="sortable-header" data-type="num">Anno <span class="sort-icon"></span></th>
+                <th>Sesso</th>
+                <th>Cat.</th>
+                <th class="sortable-header" data-type="num">Stagioni <span class="sort-icon"></span></th>
+                <th class="sortable-header" data-type="num">Risultati <span class="sort-icon"></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in lista_atleti %}
+            <tr data-sesso="{{ a.sesso }}" data-nome="{{ a.atleta|lower }}" data-attivo="{{ 1 if a.attivo else 0 }}">
+                <td data-value="{{ a.atleta }}">
+                    {% if a.url_atleta %}<a href="{{ a.url_atleta }}" class="atleta-link">{{ a.atleta }}</a>{% else %}{{ a.atleta }}{% endif %}
+                </td>
+                <td>{{ a.anno or '-' }}</td>
+                <td>{{ sesso_badge(a.sesso) }}</td>
+                <td>{{ a.categoria or '-' }}</td>
+                <td data-value="{{ a.ultima }}">{{ a.prima }}{% if a.prima != a.ultima %} – {{ a.ultima }}{% endif %}</td>
+                <td data-value="{{ a.n_risultati }}">{{ a.n_risultati }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

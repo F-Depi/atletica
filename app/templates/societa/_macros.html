@@ -1,0 +1,79 @@
+{# Macro condivise tra la pagina e i frammenti caricati a richiesta #}
+{% macro vento(v) %}{% if v %}<span class="wind"> ({{ v }})</span>{% endif %}{% endmacro %}
+{% macro nome_gara(r) %}{{ r.disciplina.replace('_', ' ') }}{% if r.ambiente == 'I' %} (indoor){% endif %}{% endmacro %}
+{% macro sesso_badge(s) %}<span class="sesso-badge sesso-{{ s }}">{{ s }}</span>{% endmacro %}
+{% macro filtro_categoria(categorie, categoria) %}
+<select class="filter-select" data-param="categoria">
+    <option value="">Tutte le categorie</option>
+    {% for c in categorie %}
+    <option value="{{ c }}"{% if c == categoria %} selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+</select>
+{% endmacro %}
+{% macro filtro_sesso(sesso_default) %}
+<select class="filter-select" data-filter="sesso">
+    <option value="M"{% if sesso_default == 'M' %} selected{% endif %}>Uomini</option>
+    <option value="F"{% if sesso_default == 'F' %} selected{% endif %}>Donne</option>
+</select>
+{% endmacro %}
+{% macro filtro_ambiente() %}
+<select class="filter-select" data-filter="ambiente">
+    <option value="">Indoor e outdoor</option>
+    <option value="P">Outdoor</option>
+    <option value="I">Indoor</option>
+</select>
+{% endmacro %}
+{% macro record_row(rec) %}
+<div class="pb-row" data-sesso="{{ rec.sesso }}" data-ambiente="{{ rec.ambiente }}">
+    <div class="pb-header" onclick="toggleResults(this)">
+        <div class="discipline-name">{{ nome_gara(rec) }} {{ sesso_badge(rec.sesso) }}</div>
+        <div class="pb-result">
+            <span class="result"><b>{{ rec.best.prestazione_display }}</b></span>{{ vento(rec.best.vento) }}
+        </div>
+        <div class="pb-details">
+            <span class="date">
+                {% if rec.best.url_atleta %}
+                <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
+                {% else %}{{ rec.best.atleta }}{% endif %}
+            </span>
+            <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }}
+                <span class="mobile-break"></span>
+                {{ rec.best.luogo or '-' }}</span>
+        </div>
+        <span class="toggle-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+        </span>
+    </div>
+
+    <div class="pb-details-container">
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Pres.</th>
+                    <th>Atleta</th>
+                    <th>Anno</th>
+                    <th>Data</th>
+                    <th>Luogo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rec.top %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
+                    <td>
+                        {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+                    </td>
+                    <td>{{ r.anno or '-' }}</td>
+                    <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
+                    <td class="location">{{ r.luogo or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}

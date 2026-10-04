@@ -1,0 +1,30 @@
+{% from "societa/_macros.html" import vento, nome_gara, sesso_badge %}
+{% if not ultimi_risultati %}
+<p class="no-results">Nessun risultato per i filtri selezionati.</p>
+{% else %}
+<table class="recent-results-table">
+    <tbody>
+        {% set ns = namespace(last_group=None) %}
+        {% for r in ultimi_risultati %}
+        {% set current_group = r.data.strftime('%d/%m/%Y') ~ ' - ' ~ (r.luogo or '') %}
+        {% if current_group != ns.last_group %}
+        <tr class="group-header">
+            <td colspan="4">{{ current_group }}</td>
+        </tr>
+        {% set ns.last_group = current_group %}
+        {% endif %}
+        <tr>
+            <td class="discipline">{{ nome_gara(r) }} {{ sesso_badge(r.categoria) }}</td>
+            <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
+            <td>
+                {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+            </td>
+            <td class="position">{{ r.posizione or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if n_recenti_totali > ultimi_risultati|length %}
+<p class="no-results">Mostrati i {{ ultimi_risultati|length }} più recenti su {{ n_recenti_totali }}.</p>
+{% endif %}
+{% endif %}

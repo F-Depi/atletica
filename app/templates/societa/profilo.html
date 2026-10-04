@@ -1,82 +1,11 @@
 {% extends "base.html" %}
+{% from "societa/_macros.html" import record_row, filtro_categoria, filtro_sesso, filtro_ambiente %}
 {% block content %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profilo.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/societa.css') }}">
 
-{% macro vento(v) %}{% if v %}<span class="wind"> ({{ v }})</span>{% endif %}{% endmacro %}
-{% macro nome_gara(r) %}{{ r.disciplina.replace('_', ' ') }}{% if r.ambiente == 'I' %} (indoor){% endif %}{% endmacro %}
-{% macro sesso_badge(s) %}<span class="sesso-badge sesso-{{ s }}">{{ s }}</span>{% endmacro %}
-{% macro filtro_categoria(categorie, categoria) %}
-<select class="filter-select" data-param="categoria">
-    <option value="">Tutte le categorie</option>
-    {% for c in categorie %}
-    <option value="{{ c }}"{% if c == categoria %} selected{% endif %}>{{ c }}</option>
-    {% endfor %}
-</select>
-{% endmacro %}
-{% macro filtro_sesso(sesso_default) %}
-<select class="filter-select" data-filter="sesso">
-    <option value="M"{% if sesso_default == 'M' %} selected{% endif %}>Uomini</option>
-    <option value="F"{% if sesso_default == 'F' %} selected{% endif %}>Donne</option>
-</select>
-{% endmacro %}
-{% macro record_row(rec) %}
-<div class="pb-row" data-sesso="{{ rec.sesso }}" data-ambiente="{{ rec.ambiente }}">
-    <div class="pb-header" onclick="toggleResults(this)">
-        <div class="discipline-name">{{ nome_gara(rec) }} {{ sesso_badge(rec.sesso) }}</div>
-        <div class="pb-result">
-            <span class="result"><b>{{ rec.best.prestazione_display }}</b></span>{{ vento(rec.best.vento) }}
-        </div>
-        <div class="pb-details">
-            <span class="date">
-                {% if rec.best.url_atleta %}
-                <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
-                {% else %}{{ rec.best.atleta }}{% endif %}
-            </span>
-            <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} 
-                <span class="mobile-break"></span>
-                {{ rec.best.luogo or '-' }}</span>
-        </div>
-        <span class="toggle-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 9l6 6 6-6"/>
-            </svg>
-        </span>
-    </div>
-
-    <div class="pb-details-container">
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Pres.</th>
-                    <th>Atleta</th>
-                    <th>Anno</th>
-                    <th>Data</th>
-                    <th>Luogo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in rec.top %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
-                    <td>
-                        {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
-                    </td>
-                    <td>{{ r.anno or '-' }}</td>
-                    <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
-                    <td class="location">{{ r.luogo or '-' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% endmacro %}
-
-<div class="atleta-profile societa-profile">
+<div class="atleta-profile societa-profile" data-base-url="{{ url_for('societa.societa_profilo', cod_societa=cod_societa) }}">
 
     <!-- Header -->
     <div class="atleta-header">
@@ -133,15 +62,11 @@
         <button class="toggle-btn" data-section="atleti">Lista atleti</button>
     </div>
 
-    <!-- ===================== Record sociali ===================== -->
+    <!-- ===================== Record sociali (inclusi nella pagina) ===================== -->
     <section id="section-records" class="results-section active">
         <div class="filters-bar" data-filter-bar>
             {{ filtro_sesso(sesso_default) }}
-            <select class="filter-select" data-filter="ambiente">
-                <option value="">Indoor e outdoor</option>
-                <option value="P">Outdoor</option>
-                <option value="I">Indoor</option>
-            </select>
+            {{ filtro_ambiente() }}
             {{ filtro_categoria(categorie, categoria) }}
         </div>
 
@@ -154,7 +79,7 @@
         {% endif %}
     </section>
 
-    <!-- ===================== Primati stagionali ===================== -->
+    <!-- ===================== Primati stagionali (caricati a richiesta) ===================== -->
     <section id="section-stagionali" class="results-section">
         <div class="filters-bar" data-filter-bar>
             {% if anni %}
@@ -165,28 +90,18 @@
             </select>
             {% endif %}
             {{ filtro_sesso(sesso_default) }}
-            <select class="filter-select" data-filter="ambiente">
-                <option value="">Indoor e outdoor</option>
-                <option value="P">Outdoor</option>
-                <option value="I">Indoor</option>
-            </select>
+            {{ filtro_ambiente() }}
             {{ filtro_categoria(categorie, categoria) }}
         </div>
 
         {% if not anni %}
         <p class="no-results">Nessun primato stagionale disponibile.</p>
         {% else %}
-        {% for a in anni %}
-        <div class="season-block" data-anno="{{ a }}" {% if not loop.first %}style="display:none"{% endif %}>
-            <div class="pbs-list">
-                {% for rec in primati_stagionali[a] %}{{ record_row(rec) }}{% endfor %}
-            </div>
-        </div>
-        {% endfor %}
+        <div class="lazy-content" data-lazy><p class="no-results">Caricamento…</p></div>
         {% endif %}
     </section>
 
-    <!-- ===================== Ultimi risultati ===================== -->
+    <!-- ===================== Ultimi risultati (caricati a richiesta) ===================== -->
     <section id="section-recenti" class="results-section">
         <div class="filters-bar" data-filter-bar>
             {{ filtro_categoria(categorie, categoria) }}
@@ -200,38 +115,10 @@
                 {% endfor %}
             </select>
         </div>
-        {% if not ultimi_risultati %}
-        <p class="no-results">Nessun risultato per i filtri selezionati.</p>
-        {% else %}
-        <table class="recent-results-table">
-            <tbody>
-                {% set ns = namespace(last_group=None) %}
-                {% for r in ultimi_risultati %}
-                {% set current_group = r.data.strftime('%d/%m/%Y') ~ ' - ' ~ (r.luogo or '') %}
-                {% if current_group != ns.last_group %}
-                <tr class="group-header">
-                    <td colspan="4">{{ current_group }}</td>
-                </tr>
-                {% set ns.last_group = current_group %}
-                {% endif %}
-                <tr>
-                    <td class="discipline">{{ nome_gara(r) }} {{ sesso_badge(r.categoria) }}</td>
-                    <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
-                    <td>
-                        {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
-                    </td>
-                    <td class="position">{{ r.posizione or '-' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% if n_recenti_totali > ultimi_risultati|length %}
-        <p class="no-results">Mostrati i {{ ultimi_risultati|length }} più recenti su {{ n_recenti_totali }}.</p>
-        {% endif %}
-        {% endif %}
+        <div class="lazy-content" data-lazy><p class="no-results">Caricamento…</p></div>
     </section>
 
-    <!-- ===================== Lista atleti ===================== -->
+    <!-- ===================== Lista atleti (caricata a richiesta) ===================== -->
     <section id="section-atleti" class="results-section">
         <div class="filters-bar" data-filter-bar>
             <input type="text" class="filter-select" data-filter="q" placeholder="Cerca atleta..." autocomplete="off">
@@ -247,35 +134,7 @@
                 <span class="toggle-label">Solo attivi ({{ ultima_stagione }})</span>
             </label>
         </div>
-
-        <div class="table-card">
-            <table class="societa-table sortable-generic">
-                <thead>
-                    <tr>
-                        <th class="sortable-header" data-type="text">Atleta <span class="sort-icon"></span></th>
-                        <th class="sortable-header" data-type="num">Anno <span class="sort-icon"></span></th>
-                        <th>Sesso</th>
-                        <th>Cat.</th>
-                        <th class="sortable-header" data-type="num">Stagioni <span class="sort-icon"></span></th>
-                        <th class="sortable-header" data-type="num">Risultati <span class="sort-icon"></span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for a in lista_atleti %}
-                    <tr data-sesso="{{ a.sesso }}" data-nome="{{ a.atleta|lower }}" data-attivo="{{ 1 if a.attivo else 0 }}">
-                        <td data-value="{{ a.atleta }}">
-                            {% if a.url_atleta %}<a href="{{ a.url_atleta }}" class="atleta-link">{{ a.atleta }}</a>{% else %}{{ a.atleta }}{% endif %}
-                        </td>
-                        <td>{{ a.anno or '-' }}</td>
-                        <td>{{ sesso_badge(a.sesso) }}</td>
-                        <td>{{ a.categoria or '-' }}</td>
-                        <td data-value="{{ a.ultima }}">{{ a.prima }}{% if a.prima != a.ultima %} – {{ a.ultima }}{% endif %}</td>
-                        <td data-value="{{ a.n_risultati }}">{{ a.n_risultati }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <div class="lazy-content" data-lazy><p class="no-results">Caricamento…</p></div>
     </section>
 
 </div>

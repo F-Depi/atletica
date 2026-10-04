@@ -1,0 +1,8 @@
+{% from "societa/_macros.html" import record_row %}
+{% if not record %}
+<p class="no-results">Nessun primato per questa stagione.</p>
+{% else %}
+<div class="pbs-list">
+    {% for rec in record %}{{ record_row(rec) }}{% endfor %}
+</div>
+{% endif %}

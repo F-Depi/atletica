@@ -568,3 +568,6 @@
         font-size: 1.1rem;
     }
 }
+.lazy-content { min-height: 120px; transition: opacity .15s; }
+.lazy-content.loading { opacity: .5; }
+
