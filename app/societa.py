@@ -98,6 +98,35 @@ def applica_periodo(df, periodo, oggi):
     return df
 
 
+GRUPPO = ["disciplina", "ambiente", "sesso"]
+
+
+def top_per_gruppo(df, extra=()):
+    """Migliore prestazione per atleta, poi i primi TOP_PER_DISCIPLINA di ogni gruppo.
+    `df` deve essere già ordinato dal migliore al peggiore."""
+    chiavi = [*extra, *GRUPPO]
+    best = df.drop_duplicates([*chiavi, "link_atleta"])
+    return best[best.groupby(chiavi).cumcount() < TOP_PER_DISCIPLINA]
+
+
+def raggruppa_record(df):
+    """Da un DataFrame già limitato ai top a una lista di record (uno per disciplina/ambiente/sesso)"""
+    record = []
+    for (disc, amb, sesso), g in df.groupby(GRUPPO, sort=False):
+        righe = [to_row(r) for r in g.to_dict("records")]
+        record.append(
+            {
+                "disciplina": disc,
+                "ambiente": amb,
+                "sesso": sesso,
+                "best": righe[0],
+                "top": righe,
+            }
+        )
+    record.sort(key=chiave_ordine)
+    return record
+
+
 # --- route ---
 @societa_bp.route("/<cod_societa>", methods=["GET"])
 @limiter.limit("30/minute")
@@ -172,6 +201,10 @@ def societa_profilo(cod_societa):
     # "Attivo" = ha gareggiato nell'ultima stagione della società (a prescindere dalla categoria filtrata)
     link_attivi = set(df.loc[df["stagione"] == ultima_stagione_societa, "link_atleta"])
 
+    # Sesso predefinito nei filtri: quello con più risultati
+    conteggio_sesso = df.loc[df["sesso"].isin(["M", "F"]), "sesso"].value_counts()
+    sesso_default = conteggio_sesso.idxmax() if not conteggio_sesso.empty else "M"
+
     # Da qui in poi si lavora sul sottoinsieme della categoria scelta
     dfc = df[df["categoria"] == categoria] if categoria else df
 
@@ -179,32 +212,14 @@ def societa_profilo(cod_societa):
     valid_sorted = valid.sort_values(["sort_key", "data"])
 
     # ---------------------------------------------------- Record sociali ---
-    migliori = valid_sorted.drop_duplicates(
-        ["disciplina", "ambiente", "sesso", "link_atleta"]
-    )
-    gruppo = ["disciplina", "ambiente", "sesso"]
-    migliori = migliori[migliori.groupby(gruppo).cumcount() < TOP_PER_DISCIPLINA]
-
-    record_sociali = []
-    for (disc, amb, sesso), g in migliori.groupby(gruppo, sort=False):
-        righe = [to_row(r) for r in g.to_dict("records")]
-        record_sociali.append(
-            {
-                "disciplina": disc,
-                "ambiente": amb,
-                "sesso": sesso,
-                "best": righe[0],
-                "top": righe,
-            }
-        )
-    record_sociali.sort(key=chiave_ordine)
+    record_sociali = raggruppa_record(top_per_gruppo(valid_sorted))
 
     # -------------------------------------------------- Primati stagionali ---
-    stagionali_df = valid_sorted.drop_duplicates(["stagione"] + gruppo)
-    primati_stagionali = {}
-    for stagione, g in stagionali_df.groupby("stagione"):
-        righe = [to_row(r) for r in g.to_dict("records")]
-        primati_stagionali[int(stagione)] = sorted(righe, key=chiave_ordine)
+    stagionali_top = top_per_gruppo(valid_sorted, ["stagione"])
+    primati_stagionali = {
+        int(stagione): raggruppa_record(g)
+        for stagione, g in stagionali_top.groupby("stagione")
+    }
     anni = sorted(primati_stagionali, reverse=True)
 
     # ------------------------------------------------- Ultimi risultati ---
@@ -261,4 +276,5 @@ def societa_profilo(cod_societa):
         anno_corrente=oggi.year,
         anni_periodo=[a for a in anni_disponibili if a != oggi.year],
         n_ultimi=N_ULTIMI_RISULTATI,
+        sesso_default=sesso_default,
     )

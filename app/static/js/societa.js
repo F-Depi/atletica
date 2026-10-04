@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
         bar.querySelectorAll('select:not([data-param]), input').forEach(i => {
             i.addEventListener('input', apply);
             i.addEventListener('change', apply);
-        });
+        })
+        apply(); // applica subito i valori di default (es. sesso preselezionato)
     });
 
     // ---------- Ordinamento tabella atleti ----------

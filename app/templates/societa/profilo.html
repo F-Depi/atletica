@@ -15,6 +15,64 @@
     {% endfor %}
 </select>
 {% endmacro %}
+{% macro filtro_sesso(sesso_default) %}
+<select class="filter-select" data-filter="sesso">
+    <option value="M"{% if sesso_default == 'M' %} selected{% endif %}>Uomini</option>
+    <option value="F"{% if sesso_default == 'F' %} selected{% endif %}>Donne</option>
+</select>
+{% endmacro %}
+{% macro record_row(rec) %}
+<div class="pb-row" data-sesso="{{ rec.sesso }}" data-ambiente="{{ rec.ambiente }}">
+    <div class="pb-header" onclick="toggleResults(this)">
+        <div class="discipline-name">{{ nome_gara(rec) }} {{ sesso_badge(rec.sesso) }}</div>
+        <div class="pb-result">
+            <span class="result"><b>{{ rec.best.prestazione_display }}</b></span>{{ vento(rec.best.vento) }}
+        </div>
+        <div class="pb-details">
+            <span class="date">
+                {% if rec.best.url_atleta %}
+                <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
+                {% else %}{{ rec.best.atleta }}{% endif %}
+            </span>
+            <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} · {{ rec.best.luogo or '-' }}</span>
+        </div>
+        <span class="toggle-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+        </span>
+    </div>
+
+    <div class="pb-details-container">
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Pres.</th>
+                    <th>Atleta</th>
+                    <th>Anno</th>
+                    <th>Data</th>
+                    <th>Luogo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rec.top %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
+                    <td>
+                        {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
+                    </td>
+                    <td>{{ r.anno or '-' }}</td>
+                    <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
+                    <td class="location">{{ r.luogo or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}
 
 <div class="atleta-profile societa-profile">
 
@@ -76,11 +134,7 @@
     <!-- ===================== Record sociali ===================== -->
     <section id="section-records" class="results-section active">
         <div class="filters-bar" data-filter-bar>
-            <select class="filter-select" data-filter="sesso">
-                <option value="">Uomini e donne</option>
-                <option value="M">Uomini</option>
-                <option value="F">Donne</option>
-            </select>
+            {{ filtro_sesso(sesso_default) }}
             <select class="filter-select" data-filter="ambiente">
                 <option value="">Indoor e outdoor</option>
                 <option value="P">Outdoor</option>
@@ -93,58 +147,7 @@
         <p class="no-results">Nessun record disponibile per questa società.</p>
         {% else %}
         <div class="pbs-list">
-            {% for rec in record_sociali %}
-            <div class="pb-row" data-sesso="{{ rec.sesso }}" data-ambiente="{{ rec.ambiente }}">
-                <div class="pb-header" onclick="toggleResults(this)">
-                    <div class="discipline-name">{{ nome_gara(rec) }} {{ sesso_badge(rec.sesso) }}</div>
-                    <div class="pb-result">
-                        <span class="result"><b>{{ rec.best.prestazione_display }}</b></span>{{ vento(rec.best.vento) }}
-                    </div>
-                    <div class="pb-details">
-                        <span class="date">
-                            {% if rec.best.url_atleta %}
-                            <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
-                            {% else %}{{ rec.best.atleta }}{% endif %}
-                        </span>
-                        <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} · {{ rec.best.luogo or '-' }}</span>
-                    </div>
-                    <span class="toggle-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 9l6 6 6-6"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="pb-details-container">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Pres.</th>
-                                <th>Atleta</th>
-                                <th>Anno</th>
-                                <th>Data</th>
-                                <th>Luogo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for r in rec.top %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td class="result">{{ r.prestazione_display }}{{ vento(r.vento) }}</td>
-                                <td>
-                                    {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
-                                </td>
-                                <td>{{ r.anno or '-' }}</td>
-                                <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
-                                <td class="location">{{ r.luogo or '-' }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% endfor %}
+            {% for rec in record_sociali %}{{ record_row(rec) }}{% endfor %}
         </div>
         {% endif %}
     </section>
@@ -159,11 +162,7 @@
                 {% endfor %}
             </select>
             {% endif %}
-            <select class="filter-select" data-filter="sesso">
-                <option value="">Uomini e donne</option>
-                <option value="M">Uomini</option>
-                <option value="F">Donne</option>
-            </select>
+            {{ filtro_sesso(sesso_default) }}
             <select class="filter-select" data-filter="ambiente">
                 <option value="">Indoor e outdoor</option>
                 <option value="P">Outdoor</option>
@@ -176,31 +175,10 @@
         <p class="no-results">Nessun primato stagionale disponibile.</p>
         {% else %}
         {% for a in anni %}
-        <div class="season-block table-card" data-anno="{{ a }}" {% if not loop.first %}style="display:none"{% endif %}>
-            <table class="societa-table">
-                <thead>
-                    <tr>
-                        <th>Disciplina</th>
-                        <th>Pres.</th>
-                        <th>Atleta</th>
-                        <th>Data</th>
-                        <th>Luogo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in primati_stagionali[a] %}
-                    <tr data-sesso="{{ r.sesso }}" data-ambiente="{{ r.ambiente }}">
-                        <td>{{ nome_gara(r) }} {{ sesso_badge(r.sesso) }}</td>
-                        <td class="result"><b>{{ r.prestazione_display }}</b>{{ vento(r.vento) }}</td>
-                        <td>
-                            {% if r.url_atleta %}<a href="{{ r.url_atleta }}" class="atleta-link">{{ r.atleta }}</a>{% else %}{{ r.atleta }}{% endif %}
-                        </td>
-                        <td class="date">{{ r.data.strftime('%d/%m/%Y') }}</td>
-                        <td class="location">{{ r.luogo or '-' }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="season-block" data-anno="{{ a }}" {% if not loop.first %}style="display:none"{% endif %}>
+            <div class="pbs-list">
+                {% for rec in primati_stagionali[a] %}{{ record_row(rec) }}{% endfor %}
+            </div>
         </div>
         {% endfor %}
         {% endif %}
