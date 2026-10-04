@@ -433,8 +433,10 @@
 
     /* Ultimi risultati: stessa logica (a tutta larghezza + padding interno) */
     .recent-results-table {
-        width: calc(100% + 24px);
-        margin: 15px -12px 0 -12px;
+        gap: 0;
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: 0;
         font-size: 1.1rem;
         border-radius: 0;
         box-shadow: none;
@@ -534,7 +536,15 @@
     border: 1px solid var(--border-color);
 }
 
+.mobile-break {
+    display: none;
+}
+
 @media (max-width: 768px) {
+    .mobile-break {
+        display: block;
+    }
+
     .societa-profile .toggle-btn {
         flex: 1 1 45%;
     }
@@ -543,10 +553,18 @@
         flex: 1 1 calc(50% - 5px);
     }
 
+    .table-card {
+        gap: 0;
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: 0;
+        border-radius: 0px;
+    }
+
     /* Nei record il 3° blocco dell'header (atleta + luogo) ci sta già: lasciamo il layout di profilo.css */
     .societa-table th,
     .societa-table td {
         padding: 8px;
-        font-size: 0.95rem;
+        font-size: 1.1rem;
     }
 }

@@ -34,7 +34,9 @@
                 <a href="{{ rec.best.url_atleta }}" class="atleta-link" onclick="event.stopPropagation()">{{ rec.best.atleta }}</a>
                 {% else %}{{ rec.best.atleta }}{% endif %}
             </span>
-            <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} · {{ rec.best.luogo or '-' }}</span>
+            <span class="location">{{ rec.best.data.strftime('%d/%m/%Y') }} 
+                <span class="mobile-break"></span>
+                {{ rec.best.luogo or '-' }}</span>
         </div>
         <span class="toggle-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
