@@ -1,15 +1,26 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from sqlalchemy import text
 import pandas as pd
+from flask import (
+    Blueprint,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from sqlalchemy import text
 
-from app.app import DISCIPLINES, DISCIPLINE_STANDARD, REGIONI_PROVINCE, CATEGORY_MAPPING
-from app.models import get_db_engine
-from app.utils import should_show_wind, format_time
+from app.app import (
+    CATEGORY_MAPPING,
+    DISCIPLINE_STANDARD,
+    DISCIPLINES,
+    REGIONI_PROVINCE,
+)
 from app.error_reporting import limiter
+from app.models import get_db_engine
+from app.utils import format_time, should_show_wind
 
 # Create blueprint
 rankings_bp = Blueprint('rankings', __name__)
-
 
 ## Invia tutte le discipline alla tab con tutti i filtri
 ## Per la tab "Tutti i filtri e le gare"

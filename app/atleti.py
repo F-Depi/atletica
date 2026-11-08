@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, request, jsonify, abort
-from sqlalchemy import text
 import pandas as pd
+from flask import Blueprint, abort, jsonify, render_template, request
+from sqlalchemy import text
+
+from app.app import DISCIPLINES
 from app.error_reporting import limiter
 from app.models import get_db_engine
 from app.utils import format_time
-from app.app import DISCIPLINES
-import re
 
 # Create blueprint for atletes
 atleti_bp = Blueprint('atleti', __name__, url_prefix='/atleta')

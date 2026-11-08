@@ -1,8 +1,10 @@
 Flask
+flask_caching
+flask_compress
 flask_wtf
 flask_limiter
 SQLAlchemy
-psycopg2-binary
+psycopg[binary]
 pandas
 python-dotenv
 gunicorn

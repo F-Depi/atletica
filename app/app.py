@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, jsonify  # vedi nota sotto
+import json
+import logging
+import os
+
+from flask import Flask, jsonify, render_template, request  # vedi nota sotto
 from flask_compress import Compress
 from flask_wtf.csrf import CSRFProtect
-import logging, json, os
 
-from config import SECRET_KEY
 from app.cache import cache
+from config import SECRET_KEY
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
@@ -83,9 +86,9 @@ def index():
 
 
 """ Register blueprints """
-from app.rankings import rankings_bp
-from app.error_reporting import error_reporting_bp
 from app.atleti import atleti_bp
+from app.error_reporting import error_reporting_bp
+from app.rankings import rankings_bp
 from app.societa import societa_bp
 
 app.register_blueprint(rankings_bp)

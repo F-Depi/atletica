@@ -2,7 +2,6 @@ from flask import Blueprint
 
 from app.app import DISCIPLINES
 
-
 # Create blueprint
 error_reporting_bp = Blueprint('error_reporting', __name__)
 
@@ -16,10 +15,7 @@ def should_show_wind(discipline, ambiente):
     discipline_info = DISCIPLINES[discipline]
     
     # Don't show wind if discipline doesn't use it
-    if discipline_info.get('vento') != 'sì':
-        return False
-    
-    return True
+    return discipline_info.get('vento') == 'sì'
 
 
 def format_time(seconds, discipline_info, cronometraggio):
