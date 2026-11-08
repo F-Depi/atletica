@@ -5,8 +5,10 @@ import os
 from flask import Flask, jsonify, render_template, request  # vedi nota sotto
 from flask_compress import Compress
 from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import text
 
 from app.cache import cache
+from app.models import get_db_engine
 from config import SECRET_KEY
 
 app = Flask(__name__)
@@ -69,8 +71,20 @@ def ratelimit_handler(e):
 
 """ Load disciplines data """
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(f"{BASE_DIR}/data/dizionario_gare.json") as f:
-    DISCIPLINES = json.load(f)
+with get_db_engine().connect() as conn:
+    rows = conn.execute(text(
+        "SELECT disciplina, codice, tipo, classifica, vento FROM discipline"
+    )).mappings().all()
+
+DISCIPLINES = {
+    r["disciplina"]: {
+        "codice": r["codice"],
+        "tipo": r["tipo"],
+        "classifica": r["classifica"],
+        "vento": "sì" if r["vento"] else "no",
+    }
+    for r in rows
+}
 with open(f"{BASE_DIR}/data/discipline_standard.json") as f:
     DISCIPLINE_STANDARD = json.load(f)
 with open(f"{BASE_DIR}/data/regioni_province.json") as f:
